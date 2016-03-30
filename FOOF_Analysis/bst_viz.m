@@ -11,7 +11,7 @@ bst_path = '/Users/thomasdonoghue/Documents/brainstorm_db/Resting/data/Foof_vis/
 
 %% Load FOOF Data
 
-subj = 981954;
+subj = 220216;
 filename = [num2str(subj), '_Foof_Viz.mat'];
 
 % Load FOOF Data
