@@ -7,11 +7,11 @@ load('var_names.mat')
 
 % Set paths
 datapath = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/';
-bst_path = '/Users/thomasdonoghue/Documents/brainstorm_db/Resting/data/Foof_vis/VIS/';
+bst_path = '/Users/thomasdonoghue/Documents/brainstorm_db/om_viz/data/om_viz_subj/Visualizing-MEG-FOOF/';
 
 %% Load FOOF Data
 
-subj = 220216;
+subj = 390845;
 filename = [num2str(subj), '_Foof_Viz.mat'];
 
 % Load FOOF Data
@@ -19,9 +19,9 @@ load([datapath, filename]);
 %clear filename datapath
 
 %
-foof_dat = {slopes, thetas, alphas, betas};
+foof_dat = {slopes, thetas, alphas, betas, lowgammas};
 foof_labels = {['Slopes_', num2str(subj)], ['Thetas_', num2str(subj)], ...
-    ['Alphas_', num2str(subj)], ['Betas_', num2str(subj)]};
+    ['Alphas_', num2str(subj)], ['Betas_', num2str(subj)], ['LowGammas_', num2str(subj)]};
 
 disp('Data Loaded')
 
@@ -30,7 +30,7 @@ disp('Data Loaded')
 for i = 1:length(foof_dat)
     
     % Load BST dat file to use
-    file_name = ['results_wMNE_MEG_160224_141', num2str(4+i), '.mat'];
+    file_name = ['results_wMNE_MEG_KERNEL_160423_210', num2str(3+i), '.mat'];
     load([bst_path, file_name]);
     
     % Set data
