@@ -2,6 +2,7 @@ from __future__ import print_function, division
 from scipy.stats.stats import pearsonr
 import numpy as np
 import os
+import csv
 import scipy.io as sio
 import pickle
 import matplotlib.pyplot as plt
@@ -22,10 +23,10 @@ class Osc:
 		
 		# Alpha
 		self.alpha_low = 8
-		self.alpha_high = 13
+		self.alpha_high = 14
 		
 		# Beta
-		self.beta_low = 13
+		self.beta_low = 14
 		self.beta_high = 30
 
 		# Low Gamma
@@ -53,6 +54,7 @@ class MegData():
 		self.centers_all = np.array([])
 		self.powers_all = np.array([])
 		self.bws_all = np.array([])
+		self.nOscs = np.array([])
 
 		# Initialize matrices for osc-band data
 		self.gr_thetas = np.array([])
@@ -62,13 +64,24 @@ class MegData():
 
 		# Set plot title
 		self.title = ''
+		self.vis_opac = 0.1
 
 		# Set boolean for what has been run
 		self.has_data = False
 		self.all_osc = False
 		self.bands_vertex = False
 
-	def import_foof(self, subnum):
+		# Initialize demographic variables
+		self.sex = np.array([])
+		self.age = np.array([])
+
+		# Initialize peak frequency variables
+		self.peak_theta = np.array([])
+		self.peak_alpha = np.array([])
+		self.peak_beta = np.array([])
+		self.peak_lowgamma = np.array([])
+
+	def import_foof(self, subnum, get_demo=True):
 		""" Import FOOF results from pickle file. 
 		"""
 
@@ -112,6 +125,10 @@ class MegData():
 		for i in range(0, self.nPSDs):
 			self.osc_count[i, 0] = len(np.nonzero(self.centers[i, :])[0])
 
+		# Get demographic data
+		if(get_demo):
+			self.sex, self.age = _get_demo_csv(self.subnum)
+
 		# 
 		self.has_data = True
 
@@ -148,12 +165,15 @@ class MegData():
 		self.bands_vertex = True
 
 	def save_viz(self):
-		""" Saves a matfile in matfile format in Brainstorm for visualization. 
+		""" Saves a matfile of frequency information to be loaded with Brainstorm for visualization. 
 		"""
+
+		#
 		save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
 		save_name = str(self.subnum) + '_Foof_Viz'
 		save_file = os.path.join(save_path, save_name)
 
+		#
 		save_dict = {}
 		save_dict['slopes'] = self.chis
 		save_dict['thetas'] = self.thetas
@@ -161,6 +181,7 @@ class MegData():
 		save_dict['betas'] = self.betas
 		save_dict['lowgammas'] = self.lowgammas
 
+		#
 		sio.savemat(save_file, save_dict)
 
 	def all_oscs(self):
@@ -179,10 +200,18 @@ class MegData():
 		self.bws_all = self.bws_all[non_zeros]
 
 		# Get the number of oscillations
-		self.nOscs = len(self.centers)
+		self.nOscs = len(self.centers_all)
 
 		# Update format
 		self.all_osc = True
+
+	def peak_freq(self, osc):
+
+		#
+		self.peak_theta = _osc_peak(self.centers_all, osc.theta_low, osc.theta_high)
+		self.peak_alpha = _osc_peak(self.centers_all, osc.alpha_low, osc.alpha_high)
+		self.peak_beta = _osc_peak(self.centers_all, osc.beta_low, osc.beta_high)
+		self.peak_lowgamma = _osc_peak(self.centers_all, osc.lowgamma_low, osc.lowgamma_high)
 
 	def plot_all_oscs(self):
 		""" Plots histogram distributions of oscillation centers, powers and bws. 
@@ -234,6 +263,7 @@ class MegData():
 		t_fs = 18
 		ax_fs = 16
 
+		# 
 		plt.hist(self.osc_count, nBins, range=[0, 8])
 		plt.title('# Oscillations per Vertex', {'fontsize': t_fs, 'fontweight': 'bold'})
 		plt.xlabel('# Oscillations', {'fontsize': ax_fs, 'fontweight': 'bold'})
@@ -248,6 +278,7 @@ class MegData():
 		t_fs = 20
 		ax_fs = 16
 
+		# 
 		plt.hist(self.chis, nBins)
 		plt.title('Slopes - ' + self.title, {'fontsize': t_fs, 'fontweight': 'bold'})
 		plt.xlabel('Chi Parameter', {'fontsize': ax_fs, 'fontweight': 'bold'})
@@ -264,7 +295,6 @@ class MegData():
 		st_fs = 20 		# Super Title Font Size
 		sp_fs = 18		# Subplit Title Font Size
 		ax_fs = 16		# Axis Label Font Size
-		vis_alp = 0.1	# Opacity for plotting
 
 		# Set up subplots
 		f, ax = plt.subplots(3, 1, figsize=(15, 15))
@@ -276,7 +306,7 @@ class MegData():
 		corr_cen_bw, pcorr_cen_bw = pearsonr(self.centers_all, np.log10(self.bws_all))
 
 		# Plot
-		ax[0].plot(self.centers_all, np.log10(self.bws_all), '.', alpha=vis_alp)
+		ax[0].plot(self.centers_all, np.log10(self.bws_all), '.', alpha=self.vis_opac)
 		ax[0].set_title('Center vs. Bandwidth', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[0].set_xlabel('Centers', {'fontsize': ax_fs})
 		ax[0].set_ylabel('BW', {'fontsize': ax_fs})
@@ -287,7 +317,7 @@ class MegData():
 		corr_cen_pow, pcorr_cen_pow = pearsonr(self.centers_all, np.log10(self.powers_all))
 
 		# Plot
-		ax[1].plot(self.centers_all, np.log10(self.powers_all), '.', alpha=vis_alp)
+		ax[1].plot(self.centers_all, np.log10(self.powers_all), '.', alpha=self.vis_opac)
 		ax[1].set_title('Center vs. Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[1].set_xlabel('Centers', {'fontsize': ax_fs})
 		ax[1].set_ylabel('Log Power', {'fontsize': ax_fs})
@@ -298,7 +328,7 @@ class MegData():
 		corr_bw_pow, pcorr_bw_pow = pearsonr(np.log10(self.bws_all), np.log10(self.powers_all))
 
 		# Plot
-		ax[2].plot(np.log10(self.bws_all), np.log10(self.powers_all), '.', alpha=vis_alp)		
+		ax[2].plot(np.log10(self.bws_all), np.log10(self.powers_all), '.', alpha=self.vis_opac)		
 		ax[2].set_title('BW vs. Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[2].set_xlabel('Bandwidth (Hz)', {'fontsize': ax_fs})
 		ax[2].set_ylabel('Log Power', {'fontsize': ax_fs})
@@ -332,8 +362,12 @@ class GroupMegData(MegData):
 		self.nsubjs = int()
 		self.subjs = []
 
+		# 
+		self.nOscs_tot = int()
+
 		# Set title for plots
 		self.title = 'Group' 
+		self.vis_opac = 0.005
 
 	def add_subject(self, new_subj, add_all_oscs=True, add_vertex_bands=True):
 		"""
@@ -348,10 +382,16 @@ class GroupMegData(MegData):
 
 		# Add All-Osc Data
 		if(add_all_oscs):
+			
+			# Add oscillation parameters to current data 
 			self.centers_all = np.append(self.centers_all, new_subj.centers_all)
 			self.bws_all = np.append(self.bws_all, new_subj.bws_all)
 			self.powers_all = np.append(self.powers_all, new_subj.powers_all)
 			self.chis = np.append(self.chis, new_subj.chis)
+
+			# Update count of total number of oscillations
+			self.nOscs = np.append(self.nOscs, new_subj.nOscs)
+			self.nOscs_tot = len(self.centers_all)
 
 		if(add_vertex_bands):
 			if(self.nsubjs == 0):
@@ -369,16 +409,48 @@ class GroupMegData(MegData):
 		self.nsubjs += 1
 		self.subjs = np.append(self.subjs, new_subj.subnum)
 
+		# 
 		self.all_osc = add_all_oscs
 		self.bands_vertex = add_vertex_bands
 
+		# Add demographic data
+		self.sex = np.append(self.sex, new_subj.sex)
+		self.age = np.append(self.age, new_subj.age)
 
-class MegProb():
-	"""
-	"""
+		# Add osc-peak data
+		self.peak_theta = np.append(self.peak_theta, new_subj.peak_theta)
+		self.peak_alpha = np.append(self.peak_alpha, new_subj.peak_alpha)
+		self.peak_beta = np.append(self.peak_beta, new_subj.peak_beta)
+		self.peak_lowgamma = np.append(self.peak_lowgamma, new_subj.peak_lowgamma)
 
-	def __init__(self):
-		pass
+	def osc_vertex_prob(self):
+		"""
+		"""
+
+		#
+		self.theta_prob = _osc_prob(self.gr_thetas)
+		self.alpha_prob = _osc_prob(self.gr_alphas)
+		self.beta_prob = _osc_prob(self.gr_betas)
+		self.lowgamma_prob = _osc_prob(self.gr_lowgammas)
+
+	def set_prob_vis(self):
+		""" Saves a matfile (of osc-probs) to be loaded with Brainstorm for visualization. 
+		"""
+
+		#
+		save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
+		save_name = 'Group_Osc_Prob_Viz'
+		save_file = os.path.join(save_path, save_name)
+
+		#
+		save_dict = {}
+		save_dict['theta_prob'] = self.theta_prob
+		save_dict['alpha_prob'] = self.alpha_prob
+		save_dict['beta_prob'] = self.beta_prob
+		save_dict['lowgamma_prob'] = self.lowgamma_prob
+
+		#
+		sio.savemat(save_file, save_dict)
 
 
 ########################################################################
@@ -392,6 +464,7 @@ def clean_file_list(files_in, string):
     
     files_out = []
 
+    #
     for i in range(0, len(files_in)):
         if(string in files_in[i]):
             files_out.append(files_in[i])
@@ -404,6 +477,7 @@ def get_sub_nums(files_in):
 
 	sub_nums = []
 
+	#
 	for f in files_in:
 		str_split = f.split('_', 1)
 		sub_nums.append(int(str_split[0]))
@@ -414,8 +488,10 @@ def get_cur_subj(cur_subj, files):
     '''Takes an int, and a list of file names (strings), returns the file name with the number in it.
     '''
     
+    #
     cur_subj_str = str(cur_subj)
     
+    #
     for i in range(0, len(files)):
         if(cur_subj_str in files[i]):
             return files[i]
@@ -423,33 +499,94 @@ def get_cur_subj(cur_subj, files):
 def run_par_foof():
 	""" NOT YET IMPLEMENTED.
 	"""
+
 	pass
 
+
+##
+## The Following are 'Private' Functions. 
+##	They are called by the classes above, but not intended for direct use. 
+##
+
+
 def _get_osc(centers, powers, bws, osc_low, osc_high):
-		""" Searches for an oscillations of specified frequency band. 
-		Helper function for osc_per_vertex in MegData.
-		"""
+	""" Searches for an oscillations of specified frequency band. 
+	Helper function for osc_per_vertex in MegData.
+	"""
 
-		osc_inds = (centers > osc_low) & (centers < osc_high)
+	#
+	osc_inds = (centers > osc_low) & (centers < osc_high)
 
-		osc_cens = centers[osc_inds]
-		osc_pows = powers[osc_inds]
-		osc_bws = bws[osc_inds]
+	#
+	osc_cens = centers[osc_inds]
+	osc_pows = powers[osc_inds]
+	osc_bws = bws[osc_inds]
 
-		cen, n = _get_single_osc(osc_cens)
-		power, x = _get_single_osc(osc_pows)
-		bw, x = _get_single_osc(osc_bws)
+	#
+	cen, n = _get_single_osc(osc_cens)
+	power, x = _get_single_osc(osc_pows)
+	bw, x = _get_single_osc(osc_bws)
 
-		return np.array([cen, power, bw, n])
+	return np.array([cen, power, bw, n])
+
+def _get_demo_csv(sub_num):
+
+	#
+	csv_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/'
+	csv_file_name = '00-Collin_Subjects.csv'
+	csv_file = os.path.join(csv_data_path, csv_file_name)
+
+	#
+	with open(csv_file, 'rb') as f:
+		reader = csv.reader(f, delimiter=',')
+		for row in reader:
+			if(row[1] == str(sub_num)):
+				sex = row[4]
+				age = int(row[7])
+				break
+
+	return sex, age
 
 def _get_single_osc(osc_in):
-		'''Takes a vector, returns the first element, and the length.
-		Helper function for osc_per_vertex in MegData.
-		'''
+	'''Takes a vector, returns the first element, and the length.
+	Helper function for osc_per_vertex in MegData.
+	'''
 
-		if(len(osc_in) == 0):
-			return 0, 0
-		elif(len(osc_in) == 1):
-			return osc_in, 1
-		else:
-			return osc_in[0], len(osc_in)
+	#
+	if(len(osc_in) == 0):
+		return 0, 0
+	elif(len(osc_in) == 1):
+		return osc_in, 1
+	else:
+		return osc_in[0], len(osc_in)
+
+def _osc_prob(osc_mat):
+	""" Takes a 3D matrix of oscillations across subjects.
+	Returns a vector of probability of oscillation at each vertex. 
+	"""
+
+	#
+	[nVertex, nDim, nSubj] = np.shape(osc_mat)
+
+	#
+	prob = np.zeros([nVertex, 1])
+
+	#
+	for i in range(0, nVertex):
+		prob[i] = (np.count_nonzero(osc_mat[i, 0, :]) / nSubj)
+
+	return prob
+
+def _osc_peak(centers, osc_low, osc_high):
+	"""
+	"""
+
+	#
+	osc_inds = (centers > osc_low) & (centers < osc_high)
+	osc_cens = centers[osc_inds]
+	peak = np.mean(osc_cens)
+
+	return peak
+
+
+
