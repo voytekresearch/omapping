@@ -16,15 +16,19 @@ class Osc:
 	"""
 	def __init__(self):
 
+		# Theta
 		self.theta_low = 3
 		self.theta_high = 8
 		
+		# Alpha
 		self.alpha_low = 8
 		self.alpha_high = 13
 		
+		# Beta
 		self.beta_low = 13
 		self.beta_high = 30
 
+		# Low Gamma
 		self.lowgamma_low = 30
 		self.lowgamma_high = 40
 
@@ -45,16 +49,37 @@ class MegData():
 		self.powers = np.array([])
 		self.bws = np.array([])
 
-		# Set boolean for whether contains data
+		# Initialize vectors for all-osc data
+		self.centers_all = np.array([])
+		self.powers_all = np.array([])
+		self.bws_all = np.array([])
+
+		# Initialize matrices for osc-band data
+		self.gr_thetas = np.array([])
+		self.gr_alphas = np.array([])
+		self.gr_betas = np.array([])
+		self.gr_lowgammas = np.array([])
+
+		# Set plot title
+		self.title = ''
+
+		# Set boolean for what has been run
 		self.has_data = False
-		self.anat_format = True
+		self.all_osc = False
+		self.bands_vertex = False
 
 	def import_foof(self, subnum):
 		""" Import FOOF results from pickle file. 
 		"""
 
+		# Check if object already has data
+		if(self.has_data):
+			print("Subject object already contains add. Can't add")
+			return
+
 		# Set subject number for current data object
 		self.subnum = subnum
+		self.title = 'S-' + str(self.subnum)
 
 		#
 		foof_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/'
@@ -90,11 +115,11 @@ class MegData():
 		# 
 		self.has_data = True
 
-	def osc_per_vertex(self, osc):
+	def osc_bands_vertex(self, osc):
 		"""
 		"""
 
-		## Initialize vectors to save results
+		## Re-Initialize matrices to right size to save results
 		self.thetas = np.zeros([self.nPSDs, 4])
 		self.alphas = np.zeros([self.nPSDs, 4])
 		self.betas = np.zeros([self.nPSDs, 4])
@@ -120,6 +145,8 @@ class MegData():
 			self.lowgammas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp, 
 				osc.lowgamma_low, osc.lowgamma_high)
 
+		self.bands_vertex = True
+
 	def save_viz(self):
 		""" Saves a matfile in matfile format in Brainstorm for visualization. 
 		"""
@@ -140,38 +167,30 @@ class MegData():
 		""" Flatten osc data to vectors. 
 		"""
 
-		# Check if data in anatomy format
-		if(not self.anat_format):
-			print("Can't convert - subject not in anatomy format.")
-			return
-		
-		# Set chis as empty so not accidentally used when data in this format
-		self.chis = np.array([])
-
 		# Flatten osc data into vectors. Uses C-style row-major order
-		self.centers = self.centers.flatten('C')
-		self.powers = self.powers.flatten('C')
-		self.bws = self.bws.flatten('C')
+		self.centers_all = self.centers.flatten('C')
+		self.powers_all = self.powers.flatten('C')
+		self.bws_all = self.bws.flatten('C')
 
 		# Flattened vectors will have lots of zeros. Get only non-zero indices.
-		non_zeros = np.nonzero(self.centers)
-		self.centers = self.centers[non_zeros]
-		self.powers = self.powers[non_zeros]
-		self.bws = self.bws[non_zeros]
+		non_zeros = np.nonzero(self.centers_all)
+		self.centers_all = self.centers_all[non_zeros]
+		self.powers_all = self.powers_all[non_zeros]
+		self.bws_all = self.bws_all[non_zeros]
 
 		# Get the number of oscillations
 		self.nOscs = len(self.centers)
 
 		# Update format
-		self.anat_format = False
+		self.all_osc = True
 
 	def plot_all_oscs(self):
 		""" Plots histogram distributions of oscillation centers, powers and bws. 
 		"""
 
-		# Check if in the right format
-		if(self.anat_format):
-			print("Can't plot - subject data in wrong format.")
+		# Check if all_oscs computed
+		if(not self.all_osc):
+			print("All oscillations not computed. Can't plot.")
 			return
 
 		# Plot Settings
@@ -183,22 +202,22 @@ class MegData():
 		# Set up subplots
 		f, ax = plt.subplots(3, 1, figsize=(15, 15))
 		# Set plot super-title
-		plt.suptitle('Distributions of Oscillatory Parameters', fontsize=st_fs, fontweight='bold')
+		plt.suptitle('Distributions of Oscillatory Parameters - ' + self.title, fontsize=st_fs, fontweight='bold')
 
 		# Subplot 1 - Center Frequency
-		ax[0].hist(self.centers, nBins)
+		ax[0].hist(self.centers_all, nBins)
 		ax[0].set_title('Center Frequency', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[0].set_xlabel('Frequency', {'fontsize': ax_fs})
 		ax[0].set_ylabel('Count', {'fontsize': ax_fs})
 
 		# Subplot 2 - Power
-		ax[1].hist(np.log10(self.powers), nBins)
+		ax[1].hist(np.log10(self.powers_all), nBins)
 		ax[1].set_title('Oscillatory Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[1].set_xlabel('Log Power', {'fontsize': ax_fs})
 		ax[1].set_ylabel('Count', {'fontsize': ax_fs})
 
 		# Subplot 3 - Bandwidth
-		ax[2].hist(self.bws, nBins)
+		ax[2].hist(self.bws_all, nBins)
 		ax[2].set_title('Band Width', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[2].set_xlabel('Bandwidth (Hz)', {'fontsize': ax_fs})
 		ax[2].set_ylabel('Count', {'fontsize': ax_fs})
@@ -224,26 +243,21 @@ class MegData():
 		""" Plots a histogram of the chi values for all vertices. 
 		"""
 
-		# Check if in the right format
-		if(not self.anat_format):
-			print("Can't plot - subject data in wrong format.")
-			return
-
 		# Plot Settings
 		nBins = 100
 		t_fs = 20
 		ax_fs = 16
 
 		plt.hist(self.chis, nBins)
-		plt.title('Slopes', {'fontsize': t_fs, 'fontweight': 'bold'})
+		plt.title('Slopes - ' + self.title, {'fontsize': t_fs, 'fontweight': 'bold'})
 		plt.xlabel('Chi Parameter', {'fontsize': ax_fs, 'fontweight': 'bold'})
 		plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
 
 	def plot_comparison(self):
 
-		# Check if in the right format
-		if(self.anat_format):
-			print("Can't plot - subject data in wrong format.")
+		# Check if all-osc computed
+		if(not self.all_osc):
+			print("All oscillations not computed. Can't run comparisons.")
 			return
 
 		# Plot Settings
@@ -255,14 +269,14 @@ class MegData():
 		# Set up subplots
 		f, ax = plt.subplots(3, 1, figsize=(15, 15))
 		# Set plot super-title
-		plt.suptitle('Oscillation Parameter Comparisons (Single Subject)', fontsize=st_fs, fontweight='bold')
+		plt.suptitle('Oscillation Parameter Comparisons - ' + self.title, fontsize=st_fs, fontweight='bold')
 
 		## Centers vs. Bandwidth
 		# Check Correlation
-		corr_cen_bw, pcorr_cen_bw = pearsonr(self.centers, np.log10(self.bws))
+		corr_cen_bw, pcorr_cen_bw = pearsonr(self.centers_all, np.log10(self.bws_all))
 
 		# Plot
-		ax[0].plot(self.centers, np.log10(self.bws), '.', alpha=vis_alp)
+		ax[0].plot(self.centers_all, np.log10(self.bws_all), '.', alpha=vis_alp)
 		ax[0].set_title('Center vs. Bandwidth', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[0].set_xlabel('Centers', {'fontsize': ax_fs})
 		ax[0].set_ylabel('BW', {'fontsize': ax_fs})
@@ -270,10 +284,10 @@ class MegData():
 
 		## Centers vs. Power
 		# Check Correlation
-		corr_cen_pow, pcorr_cen_pow = pearsonr(self.centers, np.log10(self.powers))
+		corr_cen_pow, pcorr_cen_pow = pearsonr(self.centers_all, np.log10(self.powers_all))
 
 		# Plot
-		ax[1].plot(self.centers, np.log10(self.powers), '.', alpha=vis_alp)
+		ax[1].plot(self.centers_all, np.log10(self.powers_all), '.', alpha=vis_alp)
 		ax[1].set_title('Center vs. Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[1].set_xlabel('Centers', {'fontsize': ax_fs})
 		ax[1].set_ylabel('Log Power', {'fontsize': ax_fs})
@@ -281,10 +295,10 @@ class MegData():
 
 		## Bandwidth vs. Power
 		# Check Correlation
-		corr_bw_pow, pcorr_bw_pow = pearsonr(np.log10(self.bws), np.log10(self.powers))
+		corr_bw_pow, pcorr_bw_pow = pearsonr(np.log10(self.bws_all), np.log10(self.powers_all))
 
 		# Plot
-		ax[2].plot(np.log10(self.bws), np.log10(self.powers), '.', alpha=vis_alp)		
+		ax[2].plot(np.log10(self.bws_all), np.log10(self.powers_all), '.', alpha=vis_alp)		
 		ax[2].set_title('BW vs. Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[2].set_xlabel('Bandwidth (Hz)', {'fontsize': ax_fs})
 		ax[2].set_ylabel('Log Power', {'fontsize': ax_fs})
@@ -312,35 +326,51 @@ class GroupMegData(MegData):
 
 	def __init__(self):
 
+		MegData.__init__(self)
+
+		# Initialize groups subject variables
 		self.nsubjs = int()
 		self.subjs = []
 
-		self.chis = np.array([])
-		self.centers = np.array([])
-		self.powers = np.array([])
-		self.bws = np.array([])
+		# Set title for plots
+		self.title = 'Group' 
 
-	def add_subject(self, new_subj):
+	def add_subject(self, new_subj, add_all_oscs=True, add_vertex_bands=True):
 		"""
 		Input:
 			new_subj	- MEG subject (instance of MegData)
 
-		NOTE: THIS WON'T WORK RIGHT NOW, SHAPE OF RESULTS
 		"""
 
 		# Check if subject has data
 		if(not new_subj.has_data):
-			print("Empty meg data object. Cannot add.")
+			print("Empty meg data object. Cannot add data.")
 
-		# Add Data
-		self.centers = np.append(self.centers, new_subj.centers)
-		self.bws = np.append(self.bws, new_subj.bws)
-		self.powers = np.append(self.powers, new_subj.powers)
-		self.chis = np.append(self.chis, new_subj.chis)
+		# Add All-Osc Data
+		if(add_all_oscs):
+			self.centers_all = np.append(self.centers_all, new_subj.centers_all)
+			self.bws_all = np.append(self.bws_all, new_subj.bws_all)
+			self.powers_all = np.append(self.powers_all, new_subj.powers_all)
+			self.chis = np.append(self.chis, new_subj.chis)
+
+		if(add_vertex_bands):
+			if(self.nsubjs == 0):
+				self.gr_thetas = new_subj.thetas
+				self.gr_alphas = new_subj.alphas
+				self.gr_betas = new_subj.betas
+				self.gr_lowgammas = new_subj.lowgammas
+			else:
+				self.gr_thetas = np.dstack([self.gr_thetas, new_subj.thetas])
+				self.gr_alphas = np.dstack([self.gr_alphas, new_subj.alphas])
+				self.gr_betas = np.dstack([self.gr_betas, new_subj.betas])
+				self.gr_lowgammas = np.dstack([self.gr_lowgammas, new_subj.lowgammas])
 
 		# Update subj count and subject number list
 		self.nsubjs += 1
 		self.subjs = np.append(self.subjs, new_subj.subnum)
+
+		self.all_osc = add_all_oscs
+		self.bands_vertex = add_vertex_bands
 
 
 class MegProb():
@@ -367,6 +397,18 @@ def clean_file_list(files_in, string):
             files_out.append(files_in[i])
             
     return files_out
+
+def get_sub_nums(files_in):
+	""" Takes a list of files. Returns a list of subject numbers. 
+	"""
+
+	sub_nums = []
+
+	for f in files_in:
+		str_split = f.split('_', 1)
+		sub_nums.append(int(str_split[0]))
+
+	return sub_nums
 
 def get_cur_subj(cur_subj, files):
     '''Takes an int, and a list of file names (strings), returns the file name with the number in it.
