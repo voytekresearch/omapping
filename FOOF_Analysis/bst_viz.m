@@ -37,6 +37,18 @@ foof_labels = {'xx', 'Theta_Prob', 'Alpha_Prob', 'Beta_Prob', 'LowGamma_Prob'};
 
 disp('Data Loaded')
 
+%% Load FOOF Data - Osc Score
+
+% Set filename
+filename = 'Group_Osc_Score_viz.mat';
+
+% Load Grop osc-score data
+load([datapath, filename])
+foof_dat = {[], theta_score, alpha_score, beta_score, lowgamma_score};
+foof_labels = {'xx', 'Theta_Score', 'Alpha_Score', 'Beta_Score', 'LowGamma_Score'};
+
+disp('Data Loaded')
+
 %% Set FOOF Data
 
 for i = 1:length(foof_dat)
@@ -47,7 +59,7 @@ for i = 1:length(foof_dat)
     
     % Set data
     Time = 0;
-    ImageGridAmp = foof_dat{i};
+    ImageGridAmp = foof_dat{i}';
     Comment = foof_labels{i};
 
     % Save bst 
@@ -57,6 +69,11 @@ for i = 1:length(foof_dat)
 end
 
 disp('Viz Set')
+
+%%
+
+% NOTE: SECTION BELOW ONLY HAD TO BE RUN ONCE TO CREATE A FILE TO USE
+% DON'T RE-RUN UNLESS NEED THE BST VARS FILE AGAIN
 
 %% Save a list of variable names to save a proper bst file
 clear all; close all;

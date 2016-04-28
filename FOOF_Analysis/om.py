@@ -8,9 +8,9 @@ import pickle
 import matplotlib.pyplot as plt
 
 
-########################################################################
-#######################  OMEGAMAPPING - CLASSES  #######################
-########################################################################
+########################################################################################
+###############################  OMEGAMAPPING - CLASSES  ###############################
+########################################################################################
 
 class Osc:
 	""" Class to store oscillations parameters. 
@@ -23,10 +23,10 @@ class Osc:
 		
 		# Alpha
 		self.alpha_low = 8
-		self.alpha_high = 14
+		self.alpha_high = 13
 		
 		# Beta
-		self.beta_low = 14
+		self.beta_low = 13
 		self.beta_high = 30
 
 		# Low Gamma
@@ -72,7 +72,7 @@ class MegData():
 		self.bands_vertex = False
 
 		# Initialize demographic variables
-		self.sex = np.array([])
+		self.sex = []
 		self.age = np.array([])
 
 		# Initialize peak frequency variables
@@ -80,6 +80,7 @@ class MegData():
 		self.peak_alpha = np.array([])
 		self.peak_beta = np.array([])
 		self.peak_lowgamma = np.array([])
+
 
 	def import_foof(self, subnum, get_demo=True):
 		""" Import FOOF results from pickle file. 
@@ -129,8 +130,9 @@ class MegData():
 		if(get_demo):
 			self.sex, self.age = _get_demo_csv(self.subnum)
 
-		# 
+		# Update boolean to say current subject has data attached
 		self.has_data = True
+
 
 	def osc_bands_vertex(self, osc):
 		"""
@@ -164,6 +166,7 @@ class MegData():
 
 		self.bands_vertex = True
 
+
 	def save_viz(self):
 		""" Saves a matfile of frequency information to be loaded with Brainstorm for visualization. 
 		"""
@@ -183,6 +186,7 @@ class MegData():
 
 		#
 		sio.savemat(save_file, save_dict)
+
 
 	def all_oscs(self):
 		""" Flatten osc data to vectors. 
@@ -205,6 +209,7 @@ class MegData():
 		# Update format
 		self.all_osc = True
 
+
 	def peak_freq(self, osc):
 
 		#
@@ -212,6 +217,7 @@ class MegData():
 		self.peak_alpha = _osc_peak(self.centers_all, osc.alpha_low, osc.alpha_high)
 		self.peak_beta = _osc_peak(self.centers_all, osc.beta_low, osc.beta_high)
 		self.peak_lowgamma = _osc_peak(self.centers_all, osc.lowgamma_low, osc.lowgamma_high)
+
 
 	def plot_all_oscs(self):
 		""" Plots histogram distributions of oscillation centers, powers and bws. 
@@ -223,7 +229,7 @@ class MegData():
 			return
 
 		# Plot Settings
-		nBins = 100 	# Number of bins for histograms
+		nBins = 160 	# Number of bins for histograms
 		st_fs = 20 		# Super Title Font Size
 		sp_fs = 18		# Subplit Title Font Size
 		ax_fs = 16		# Axis Label Font Size
@@ -254,6 +260,7 @@ class MegData():
 		# Adjust subplot spacing
 		plt.subplots_adjust(hspace=0.4)
 
+
 	def plot_hist_count(self):
 		""" Plots a histogram of the osc_count vector. 
 		"""
@@ -263,11 +270,12 @@ class MegData():
 		t_fs = 18
 		ax_fs = 16
 
-		# 
+		# Create histogram
 		plt.hist(self.osc_count, nBins, range=[0, 8])
 		plt.title('# Oscillations per Vertex', {'fontsize': t_fs, 'fontweight': 'bold'})
 		plt.xlabel('# Oscillations', {'fontsize': ax_fs, 'fontweight': 'bold'})
 		plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
+
 
 	def plot_slopes(self):
 		""" Plots a histogram of the chi values for all vertices. 
@@ -278,11 +286,12 @@ class MegData():
 		t_fs = 20
 		ax_fs = 16
 
-		# 
+		# Create histogram
 		plt.hist(self.chis, nBins)
 		plt.title('Slopes - ' + self.title, {'fontsize': t_fs, 'fontweight': 'bold'})
 		plt.xlabel('Chi Parameter', {'fontsize': ax_fs, 'fontweight': 'bold'})
 		plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
+
 
 	def plot_comparison(self):
 
@@ -336,9 +345,12 @@ class MegData():
 		# Adjust subplot spacing
 		plt.subplots_adjust(hspace=0.4)
 
-		print('Center-BW Corr: ' + str(corr_cen_bw) + ' with p of : ' + str(pcorr_cen_bw))
-		print('Center-Power Corr: ' + str(corr_cen_pow) + ' with p of : ' + str(pcorr_cen_pow))
-		print('BW-Power Corr: ' + str(corr_bw_pow) + ' with p of : ' + str(pcorr_bw_pow))
+		corrs = [['Center - B.W.'   , corr_cen_bw , pcorr_cen_bw ],
+				 ['Center - Power'  , corr_cen_pow, pcorr_cen_pow],
+				 ['B.W. - Power '   , corr_bw_pow , pcorr_bw_pow ],
+				 ]
+
+		return corrs
 
 
 	def save_pickle(self):
@@ -353,6 +365,7 @@ class GroupMegData(MegData):
 
 	Note: Class derived from MegData
 	"""
+
 
 	def __init__(self):
 
@@ -369,9 +382,14 @@ class GroupMegData(MegData):
 		self.title = 'Group' 
 		self.vis_opac = 0.005
 
-	def add_subject(self, new_subj, add_all_oscs=True, add_vertex_bands=True):
+		# Set booleans for what has been run
+		self.osc_prob_done = False
+		self.osc_score_done = False
+
+
+	def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, add_vertex_oscs=False):
 		"""
-		Input:
+		Inputs:
 			new_subj	- MEG subject (instance of MegData)
 
 		"""
@@ -393,6 +411,7 @@ class GroupMegData(MegData):
 			self.nOscs = np.append(self.nOscs, new_subj.nOscs)
 			self.nOscs_tot = len(self.centers_all)
 
+		# 
 		if(add_vertex_bands):
 			if(self.nsubjs == 0):
 				self.gr_thetas = new_subj.thetas
@@ -405,6 +424,17 @@ class GroupMegData(MegData):
 				self.gr_betas = np.dstack([self.gr_betas, new_subj.betas])
 				self.gr_lowgammas = np.dstack([self.gr_lowgammas, new_subj.lowgammas])
 
+		# 
+		if(add_vertex_oscs):
+			if(self.nsubjs == 0):
+				self.centers = new_subj.centers
+				self.powers = new_subj.powers
+				self.bws = new_subj.bws
+			else:
+				self.centers = np.dstack([self.centers, new_subj.centers])
+				self.powers = np.dstack([self.powers, new_subj.powers])
+				self.bws = np.dstack([self.bws, new_subj.bws])
+
 		# Update subj count and subject number list
 		self.nsubjs += 1
 		self.subjs = np.append(self.subjs, new_subj.subnum)
@@ -414,7 +444,7 @@ class GroupMegData(MegData):
 		self.bands_vertex = add_vertex_bands
 
 		# Add demographic data
-		self.sex = np.append(self.sex, new_subj.sex)
+		self.sex.append(new_subj.sex)
 		self.age = np.append(self.age, new_subj.age)
 
 		# Add osc-peak data
@@ -423,7 +453,8 @@ class GroupMegData(MegData):
 		self.peak_beta = np.append(self.peak_beta, new_subj.peak_beta)
 		self.peak_lowgamma = np.append(self.peak_lowgamma, new_subj.peak_lowgamma)
 
-	def osc_vertex_prob(self):
+
+	def osc_prob(self):
 		"""
 		"""
 
@@ -432,6 +463,10 @@ class GroupMegData(MegData):
 		self.alpha_prob = _osc_prob(self.gr_alphas)
 		self.beta_prob = _osc_prob(self.gr_betas)
 		self.lowgamma_prob = _osc_prob(self.gr_lowgammas)
+
+		#
+		self.osc_prob_done = True
+
 
 	def set_prob_vis(self):
 		""" Saves a matfile (of osc-probs) to be loaded with Brainstorm for visualization. 
@@ -453,9 +488,224 @@ class GroupMegData(MegData):
 		sio.savemat(save_file, save_dict)
 
 
-########################################################################
-####################### OMEGAMAPPING - FUNCTIONS #######################
-########################################################################
+	def osc_prob_corrs(self):
+		"""
+		"""
+
+		# Check if oscillation probabilities have been calculated. 
+		if(not self.osc_prob_done):
+			print("Osc Probability not calculated - can't proceed.")
+			return
+
+		# Theta-Alpha Corr
+		[r_th_al, p_th_al] = pearsonr(self.theta_prob, self.alpha_prob)
+
+		# Theta-Beta Corr
+		[r_th_be, p_th_be] = pearsonr(self.theta_prob, self.beta_prob)
+
+		# Theta-LG Corr
+		[r_th_lg, p_th_lg] = pearsonr(self.theta_prob, self.lowgamma_prob)
+
+		# Alpha-Beta Corr
+		[r_al_be, p_al_be] = pearsonr(self.alpha_prob, self.beta_prob)
+
+		# Alpha-LG Corr
+		[r_al_lg, p_al_lg] = pearsonr(self.alpha_prob, self.lowgamma_prob)
+
+		# Beta-LG Corr
+		[r_be_lg, p_be_lg] = pearsonr(self.beta_prob, self.lowgamma_prob)
+
+		corrs = [['Theta-Alpha', r_th_al, p_th_al],
+				 ['Theta-Beta' , r_th_be, p_th_be],
+				 ['Theta-LG'   , r_th_lg, p_th_lg],
+				 ['Alpha-Beta' , r_al_be, p_al_be],
+				 ['Alpha-LG'   , r_al_lg, p_al_lg],
+				 ['Beta-LG'    , r_be_lg, p_be_lg],
+				 ]
+
+		return corrs
+
+
+	def osc_score_corrs(self):
+		"""
+		"""
+
+		# Check if oscillation probabilities have been calculated. 
+		if(not self.osc_score_done):
+			print("Osc Score not calculated - can't proceed.")
+			return
+
+		# Theta-Alpha Corr
+		[r_th_al, p_th_al] = pearsonr(self.theta_score, self.alpha_score)
+
+		# Theta-Beta Corr
+		[r_th_be, p_th_be] = pearsonr(self.theta_score, self.beta_score)
+
+		# Theta-LG Corr
+		[r_th_lg, p_th_lg] = pearsonr(self.theta_score, self.lowgamma_score)
+
+		# Alpha-Beta Corr
+		[r_al_be, p_al_be] = pearsonr(self.alpha_score, self.beta_score)
+
+		# Alpha-LG Corr
+		[r_al_lg, p_al_lg] = pearsonr(self.alpha_score, self.lowgamma_score)
+
+		# Beta-LG Corr
+		[r_be_lg, p_be_lg] = pearsonr(self.beta_score, self.lowgamma_score)
+
+		corrs = [['Theta-Alpha', r_th_al, p_th_al],
+				 ['Theta-Beta' , r_th_be, p_th_be],
+				 ['Theta-LG'   , r_th_lg, p_th_lg],
+				 ['Alpha-Beta' , r_al_be, p_al_be],
+				 ['Alpha-LG'   , r_al_lg, p_al_lg],
+				 ['Beta-LG'    , r_be_lg, p_be_lg],
+				 ]
+
+		return corrs
+
+
+	def osc_score(self):
+
+		#
+		if(not self.osc_prob_done):
+			print("Oscillation probability not computed. Can't continue.")
+
+		#	
+		self.theta_pow_ratio = _osc_pow_ratio(self.gr_thetas)
+		self.alpha_pow_ratio = _osc_pow_ratio(self.gr_alphas)
+		self.beta_pow_ratio = _osc_pow_ratio(self.gr_betas)
+		self.lowgamma_pow_ratio = _osc_pow_ratio(self.gr_lowgammas)
+
+		#
+		self.theta_score = self.theta_pow_ratio * self.theta_prob
+		self.alpha_score = self.alpha_pow_ratio * self.alpha_prob
+		self.beta_score = self.beta_pow_ratio * self.beta_prob
+		self.lowgamma_score = self.lowgamma_pow_ratio * self.lowgamma_prob
+
+		#
+		self.osc_score_done = True
+
+
+	def set_score_vis(self):
+		""" Saves a matfile (of osc-score) to be loaded with Brainstorm for visualization. 
+		"""
+
+		#
+		save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
+		save_name = 'Group_Osc_Score_Viz'
+		save_file = os.path.join(save_path, save_name)
+
+		#
+		save_dict = {}
+		save_dict['theta_score'] = self.theta_score
+		save_dict['alpha_score'] = self.alpha_score
+		save_dict['beta_score'] = self.beta_score
+		save_dict['lowgamma_score'] = self.lowgamma_score
+
+		#
+		sio.savemat(save_file, save_dict)
+
+
+	def osc_age_comparison_plot(self):
+
+		# Plot settings
+		st_fs = 20
+		sp_fs = 18
+
+		# Set up subplots
+		f, ax = plt.subplots(2, 2, figsize=(10, 10))
+		# Set plot super-title
+		plt.suptitle('Peak Frequency / Age Comparisons', fontsize=st_fs, fontweight='bold')
+
+		# Theta
+		ax[0,0].plot(self.age, self.peak_theta, '.')
+		ax[0,0].set_title('Theta', {'fontsize': sp_fs, 'fontweight': 'bold'})
+
+		# Alpha
+		ax[0,1].plot(self.age, self.peak_alpha, '.')
+		ax[0,1].set_title('Alpha', {'fontsize': sp_fs, 'fontweight': 'bold'})
+
+		# Beta
+		ax[1,0].plot(self.age, self.peak_beta, '.')
+		ax[1,0].set_title('Beta', {'fontsize': sp_fs, 'fontweight': 'bold'})
+
+		# Gamma
+		ax[1,1].plot(self.age, self.peak_lowgamma, '.')
+		ax[1,1].set_title('Low Gamma', {'fontsize': sp_fs, 'fontweight': 'bold'})
+
+		# Check correlations
+		[r_age_th_peak, p_age_th_peak] = pearsonr(self.age, self.peak_theta)
+		[r_age_al_peak, p_age_al_peak] = pearsonr(self.age, self.peak_alpha)
+		[r_age_be_peak, p_age_be_peak] = pearsonr(self.age, self.peak_beta)
+		[r_age_lg_peak, p_age_lg_peak] = pearsonr(self.age, self.peak_lowgamma)
+
+		# Store correlation results in list to return
+		corrs = [['Theta Peak - Age' , r_age_th_peak, p_age_th_peak],
+				 ['Alpha Peak - Age' , r_age_al_peak, p_age_al_peak],
+				 ['Beta Peak - Age'  , r_age_be_peak, p_age_be_peak],
+				 ['LG Peak - Age'    , r_age_lg_peak, p_age_lg_peak],
+				 ]
+
+		return corrs
+
+
+	def freq_corr(self, f_win):
+		"""
+
+		To test more explicitly, you can take all neighboring pairs of frequencies using, say, 3 Hz segments, and look at correlation coefficient.
+
+		So 2-5 Hz v 5-8 Hz, then 3-6 v 6-9, then 4-7 v 8-11, and so on, all the way up to 33-36 v 37-40.
+		"""
+
+		#
+		[nVertex, nSlots, nSubj] = np.shape(self.centers)
+
+		nFs = len(range(3, 40-f_win))
+
+		prob_mat = np.zeros([nVertex, nFs])
+
+		#
+		for v in range(0, nVertex):
+
+			#
+			for s in range(0, nSubj):
+
+				cens_temp = self.centers[v, :, s]
+
+				# 
+				i  = 0
+				for f in range(3, 40-f_win):
+
+					#
+					cens_fwin = _get_all_osc(cens_temp, f, f + f_win)
+
+					#
+					if(len(cens_fwin) != 0):
+						prob_mat[v, i] += 1
+
+					i += 1
+
+		#
+		prob_mat = prob_mat/nSubj
+
+		# 
+		corr_vec = np.zeros([nFs-1])
+		p_vec = np.zeros([nFs-1])
+
+		# Compute corr between f and f+1 start windows
+		#for f in range(0, nFs-1):
+			#corr_vec[f], p_vec[f] = pearsonr(prob_mat[:, f], prob_mat[:, f+1])
+
+		# Compute corr between f and f+f_win start windows
+		for f_ind in range(0, nFs-f_win):
+			corr_vec[f_ind], p_vec[f_ind] = pearsonr(prob_mat[:, f_ind], prob_mat[:, f_ind+f_win])
+
+		return corr_vec, p_vec
+
+
+########################################################################################
+############################### OMEGAMAPPING - FUNCTIONS ###############################
+########################################################################################
 
 
 def clean_file_list(files_in, string):
@@ -471,6 +721,7 @@ def clean_file_list(files_in, string):
             
     return files_out
 
+
 def get_sub_nums(files_in):
 	""" Takes a list of files. Returns a list of subject numbers. 
 	"""
@@ -484,6 +735,7 @@ def get_sub_nums(files_in):
 
 	return sub_nums
 
+
 def get_cur_subj(cur_subj, files):
     '''Takes an int, and a list of file names (strings), returns the file name with the number in it.
     '''
@@ -496,6 +748,7 @@ def get_cur_subj(cur_subj, files):
         if(cur_subj_str in files[i]):
             return files[i]
 
+
 def run_par_foof():
 	""" NOT YET IMPLEMENTED.
 	"""
@@ -503,14 +756,14 @@ def run_par_foof():
 	pass
 
 
-##
-## The Following are 'Private' Functions. 
-##	They are called by the classes above, but not intended for direct use. 
-##
+########################################################################################
+###############################  OM - PRIVATE FUNCTIONS  ###############################
+########################################################################################
 
 
 def _get_osc(centers, powers, bws, osc_low, osc_high):
 	""" Searches for an oscillations of specified frequency band. 
+	Returns a single oscillation in that band. 
 	Helper function for osc_per_vertex in MegData.
 	"""
 
@@ -522,14 +775,33 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
 	osc_pows = powers[osc_inds]
 	osc_bws = bws[osc_inds]
 
-	#
-	cen, n = _get_single_osc(osc_cens)
-	power, x = _get_single_osc(osc_pows)
-	bw, x = _get_single_osc(osc_bws)
+	# Get number of oscillations in the frequency band. 
+	n = len(osc_cens)
+
+	# OLD: Get single oscillation. This just returned the first (lowest freq) osc.
+	#cen, n = _get_single_osc(osc_cens)
+	#power, x = _get_single_osc(osc_pows)
+	#bw, x = _get_single_osc(osc_bws)
+
+	# Get highest power oscillation in band
+	cen, power, bw = _get_single_osc_power(osc_cens, osc_pows, osc_bws)
 
 	return np.array([cen, power, bw, n])
 
+
+def _get_all_osc(centers, osc_low, osc_high):
+	"""
+	"""
+
+	osc_inds = (centers > osc_low) & (centers < osc_high)
+	osc_cens = centers[osc_inds]
+
+	return osc_cens
+
+
 def _get_demo_csv(sub_num):
+	"""
+	"""
 
 	#
 	csv_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/'
@@ -547,8 +819,11 @@ def _get_demo_csv(sub_num):
 
 	return sex, age
 
+
 def _get_single_osc(osc_in):
-	'''Takes a vector, returns the first element, and the length.
+	''' OLD - UNUSED
+	Takes a vector, returns the first element, and the length.
+	This selects the lowest frequency oscillation. 
 	Helper function for osc_per_vertex in MegData.
 	'''
 
@@ -560,22 +835,65 @@ def _get_single_osc(osc_in):
 	else:
 		return osc_in[0], len(osc_in)
 
-def _osc_prob(osc_mat):
-	""" Takes a 3D matrix of oscillations across subjects.
-	Returns a vector of probability of oscillation at each vertex. 
+
+def _get_single_osc_power(osc_cens, osc_pows, osc_bws):
+	"""
 	"""
 
-	#
+	# 
+	if(len(osc_cens) == 0):
+		return 0., 0., 0.
+	elif(len(osc_cens) == 1):
+		return osc_cens, osc_pows, osc_bws
+	else:
+		high_ind = np.argmax(osc_pows)
+		return osc_cens[high_ind], osc_pows[high_ind], osc_bws[high_ind]
+
+
+def _osc_prob(osc_mat):
+	""" Takes a 3D matrix of oscillations across subjects.
+	osc_mat: [nVertex, nDim, nSubj]
+	Returns a vector of probability of oscillation at each vertex.
+	"""
+
+	# 
 	[nVertex, nDim, nSubj] = np.shape(osc_mat)
 
 	#
-	prob = np.zeros([nVertex, 1])
+	prob = np.zeros([nVertex])
 
 	#
 	for i in range(0, nVertex):
 		prob[i] = (np.count_nonzero(osc_mat[i, 0, :]) / nSubj)
 
 	return prob
+
+
+def _osc_pow_ratio(osc_mat):
+	"""
+	"""
+
+	#
+	[nVertex, nDim, nSubj] = np.shape(osc_mat)
+
+	#
+	avg_powers = np.zeros(nVertex)
+	for v in range(0, nVertex):
+		temp_pows = osc_mat[v, 1, :]
+		temp_pows = temp_pows[np.nonzero(temp_pows)]
+		if(len(temp_pows) == 0):
+			avg_powers[v] = 0
+		else:
+			avg_powers[v] = np.mean(temp_pows)
+	max_all = max(avg_powers)
+
+	#
+	pow_ratio = np.zeros(nVertex)
+	for v in range(0, nVertex):
+		pow_ratio[v] = np.mean(osc_mat[v, 1, :]) / max_all
+
+	return pow_ratio
+
 
 def _osc_peak(centers, osc_low, osc_high):
 	"""
@@ -587,6 +905,3 @@ def _osc_peak(centers, osc_low, osc_high):
 	peak = np.mean(osc_cens)
 
 	return peak
-
-
-
