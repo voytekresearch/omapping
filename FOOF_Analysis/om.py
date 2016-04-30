@@ -1,20 +1,18 @@
 from __future__ import print_function, division
-from scipy.stats.stats import pearsonr
-import numpy as np
 import os
 import csv
-import scipy.io as sio
 import pickle
+import numpy as np
+import scipy.io as sio
 import matplotlib.pyplot as plt
-
+from scipy.stats.stats import pearsonr
 
 ########################################################################################
 ###############################  OMEGAMAPPING - CLASSES  ###############################
 ########################################################################################
 
 class Osc:
-	""" Class to store oscillations parameters. 
-	"""
+	"""Class to store oscillations parameters."""
 	def __init__(self):
 
 		# Theta
@@ -35,8 +33,7 @@ class Osc:
 
 
 class MegData():
-	""" Class for a single subject of FOOF results for MEG Source PSDs. 
-	"""
+	"""Class for a single subject of FOOF results for MEG Source PSDs."""
 
 	def __init__(self):
 
@@ -83,11 +80,10 @@ class MegData():
 
 
 	def import_foof(self, subnum, get_demo=True):
-		""" Import FOOF results from pickle file. 
-		"""
+		"""Import FOOF results from pickle file."""
 
 		# Check if object already has data
-		if(self.has_data):
+		if self.has_data:
 			print("Subject object already contains add. Can't add")
 			return
 
@@ -95,12 +91,12 @@ class MegData():
 		self.subnum = subnum
 		self.title = 'S-' + str(self.subnum)
 
-		#
+		# Set up paths, get list of files for available subjects
 		foof_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/'
 		files = os.listdir(foof_data_path)
 		files = clean_file_list(files, 'Foof_Vertex')
 
-		#
+		# Get specific file path for specific subject
 		cur_subj_file = get_cur_subj(subnum, files)
 		cur_subj_path = os.path.join(foof_data_path, cur_subj_file)
 
@@ -127,7 +123,7 @@ class MegData():
 			self.osc_count[i, 0] = len(np.nonzero(self.centers[i, :])[0])
 
 		# Get demographic data
-		if(get_demo):
+		if get_demo:
 			self.sex, self.age = _get_demo_csv(self.subnum)
 
 		# Update boolean to say current subject has data attached
@@ -135,7 +131,12 @@ class MegData():
 
 
 	def osc_bands_vertex(self, osc):
-		"""
+		"""Groups oscillations at each vertex in distinct frequency bands. 
+		Stores band specific oscillations in (self.){thetas, alphas, betas, lowgammas}.
+
+		Inputs:
+			self		- MegData object
+			osc 		- An object containing frequency bands to use
 		"""
 
 		## Re-Initialize matrices to right size to save results
@@ -144,39 +145,37 @@ class MegData():
 		self.betas = np.zeros([self.nPSDs, 4])
 		self.lowgammas = np.zeros([self.nPSDs, 4])
 
-		#
+		# Loop through each vertex
 		for i in range(0, self.nPSDs):
 
-			#
+			# Get centers, powers and bws from individual vertex
 			centers_temp = self.centers[i, :]
 			powers_temp = self.powers[i, :]
 			bws_temp = self.bws[i, :]
 
-			self.thetas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp, 
+			# Get oscillations in specific band for each band
+			self.thetas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
 				osc.theta_low, osc.theta_high)
-
-			self.alphas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp, 
+			self.alphas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
 				osc.alpha_low, osc.alpha_high)
-
-			self.betas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp, 
+			self.betas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
 				osc.beta_low, osc.beta_high)
-
-			self.lowgammas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp, 
+			self.lowgammas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
 				osc.lowgamma_low, osc.lowgamma_high)
 
+		# Update boolean to note that current subject has band specific oscs calculated. 
 		self.bands_vertex = True
 
 
 	def save_viz(self):
-		""" Saves a matfile of frequency information to be loaded with Brainstorm for visualization. 
-		"""
+		"""Saves a matfile of frequency information to be loaded with Brainstorm for visualization."""
 
-		#
+		# Set up paths to save to
 		save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
 		save_name = str(self.subnum) + '_Foof_Viz'
 		save_file = os.path.join(save_path, save_name)
 
-		#
+		# Save desired outputs into a dictionary
 		save_dict = {}
 		save_dict['slopes'] = self.chis
 		save_dict['thetas'] = self.thetas
@@ -184,12 +183,17 @@ class MegData():
 		save_dict['betas'] = self.betas
 		save_dict['lowgammas'] = self.lowgammas
 
-		#
+		# Save the dicionary out to a .mat file
 		sio.savemat(save_file, save_dict)
 
 
 	def all_oscs(self):
-		""" Flatten osc data to vectors. 
+		"""Flatten osc data to vectors. 
+
+		When imported, oscillation data is in matrix form [nVertex, osc_slots].
+		This functions converts these matrices into 1-D vectors.
+
+		Note: This function loses information about which vertex oscillations occur at. 
 		"""
 
 		# Flatten osc data into vectors. Uses C-style row-major order
@@ -206,13 +210,18 @@ class MegData():
 		# Get the number of oscillations
 		self.nOscs = len(self.centers_all)
 
-		# Update format
+		# Update boolean that all-oscillations has been computed
 		self.all_osc = True
 
 
 	def peak_freq(self, osc):
+		"""Calculates the peak frequency for each oscillatory band.
 
-		#
+		Inputs:
+			osc 		- object with oscillation frequency details
+		"""
+
+		# Get peak frequency within each frequency band
 		self.peak_theta = _osc_peak(self.centers_all, osc.theta_low, osc.theta_high)
 		self.peak_alpha = _osc_peak(self.centers_all, osc.alpha_low, osc.alpha_high)
 		self.peak_beta = _osc_peak(self.centers_all, osc.beta_low, osc.beta_high)
@@ -220,8 +229,7 @@ class MegData():
 
 
 	def plot_all_oscs(self):
-		""" Plots histogram distributions of oscillation centers, powers and bws. 
-		"""
+		"""Plots histogram distributions of oscillation centers, powers and bws."""
 
 		# Check if all_oscs computed
 		if(not self.all_osc):
@@ -229,10 +237,10 @@ class MegData():
 			return
 
 		# Plot Settings
-		nBins = 160 	# Number of bins for histograms
-		st_fs = 20 		# Super Title Font Size
-		sp_fs = 18		# Subplit Title Font Size
-		ax_fs = 16		# Axis Label Font Size
+		nBins = 160 		# Number of bins for histograms
+		st_fs = 20 			# Super Title Font Size
+		sp_fs = 18			# Subplot Title Font Size
+		ax_fs = 16			# Axis Label Font Size
 
 		# Set up subplots
 		f, ax = plt.subplots(3, 1, figsize=(15, 15))
@@ -262,13 +270,12 @@ class MegData():
 
 
 	def plot_hist_count(self):
-		""" Plots a histogram of the osc_count vector. 
-		"""
+		"""Plots a histogram of the osc_count vector."""
 
 		# Plot Settings
-		nBins = 25
-		t_fs = 18
-		ax_fs = 16
+		nBins = 25 			# Number of bins for histograms
+		t_fs = 18 			# Title font size
+		ax_fs = 16 			# Axis label font size
 
 		# Create histogram
 		plt.hist(self.osc_count, nBins, range=[0, 8])
@@ -278,13 +285,12 @@ class MegData():
 
 
 	def plot_slopes(self):
-		""" Plots a histogram of the chi values for all vertices. 
-		"""
+		"""Plots a histogram of the chi values for all vertices."""
 
 		# Plot Settings
-		nBins = 100
-		t_fs = 20
-		ax_fs = 16
+		nBins = 100 		# Number of bins for histograms
+		t_fs = 20 			# Title font size
+		ax_fs = 16 			# Axis label font size
 
 		# Create histogram
 		plt.hist(self.chis, nBins)
@@ -294,6 +300,10 @@ class MegData():
 
 
 	def plot_comparison(self):
+		"""Computes correlations and plots comparisons between oscillatory parameters.
+
+		Checks Centers vs. Bandwidth, Centers vs. Power and Bandwidth vs. Power. 
+		"""
 
 		# Check if all-osc computed
 		if(not self.all_osc):
@@ -301,12 +311,13 @@ class MegData():
 			return
 
 		# Plot Settings
-		st_fs = 20 		# Super Title Font Size
-		sp_fs = 18		# Subplit Title Font Size
-		ax_fs = 16		# Axis Label Font Size
+		st_fs = 20 			# Super Title Font Size
+		sp_fs = 18			# Subplit Title Font Size
+		ax_fs = 16			# Axis Label Font Size
 
 		# Set up subplots
 		f, ax = plt.subplots(3, 1, figsize=(15, 15))
+
 		# Set plot super-title
 		plt.suptitle('Oscillation Parameter Comparisons - ' + self.title, fontsize=st_fs, fontweight='bold')
 
@@ -320,7 +331,6 @@ class MegData():
 		ax[0].set_xlabel('Centers', {'fontsize': ax_fs})
 		ax[0].set_ylabel('BW', {'fontsize': ax_fs})
 
-
 		## Centers vs. Power
 		# Check Correlation
 		corr_cen_pow, pcorr_cen_pow = pearsonr(self.centers_all, np.log10(self.powers_all))
@@ -330,7 +340,6 @@ class MegData():
 		ax[1].set_title('Center vs. Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
 		ax[1].set_xlabel('Centers', {'fontsize': ax_fs})
 		ax[1].set_ylabel('Log Power', {'fontsize': ax_fs})
-
 
 		## Bandwidth vs. Power
 		# Check Correlation
@@ -345,6 +354,7 @@ class MegData():
 		# Adjust subplot spacing
 		plt.subplots_adjust(hspace=0.4)
 
+		# Save correlation results to list to return
 		corrs = [['Center - B.W.'   , corr_cen_bw , pcorr_cen_bw ],
 				 ['Center - Power'  , corr_cen_pow, pcorr_cen_pow],
 				 ['B.W. - Power '   , corr_bw_pow , pcorr_bw_pow ],
@@ -354,18 +364,17 @@ class MegData():
 
 
 	def save_pickle(self):
-		""" Save current meg data object as a pickled object. 
-		"""
+		"""Save current meg data object as a pickled object."""
+
 		pass
 
 
 class GroupMegData(MegData):
-	""" A class to store OMEGA data from multiple subjects.
-	Holds all oscillations, regardless of spatial location. 
+	"""A class to store OMEGA data from multiple subjects.
 
+	Holds all oscillations, regardless of spatial location. 
 	Note: Class derived from MegData
 	"""
-
 
 	def __init__(self):
 
@@ -388,9 +397,13 @@ class GroupMegData(MegData):
 
 
 	def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, add_vertex_oscs=False):
-		"""
+		"""Adds a new subject to the GroupMegData object. 
+
 		Inputs:
-			new_subj	- MEG subject (instance of MegData)
+			new_subj			- MEG subject (instance of MegData)
+			add_all_oscs		- 
+			add_vertex_bands	- 
+			add_vertex_oscs		- 
 
 		"""
 
@@ -399,7 +412,7 @@ class GroupMegData(MegData):
 			print("Empty meg data object. Cannot add data.")
 
 		# Add All-Osc Data
-		if(add_all_oscs):
+		if add_all_oscs:
 			
 			# Add oscillation parameters to current data 
 			self.centers_all = np.append(self.centers_all, new_subj.centers_all)
@@ -411,9 +424,10 @@ class GroupMegData(MegData):
 			self.nOscs = np.append(self.nOscs, new_subj.nOscs)
 			self.nOscs_tot = len(self.centers_all)
 
-		# 
-		if(add_vertex_bands):
-			if(self.nsubjs == 0):
+		# Add band-specific data
+		if add_vertex_bands:
+
+			if self.nsubjs == 0:
 				self.gr_thetas = new_subj.thetas
 				self.gr_alphas = new_subj.alphas
 				self.gr_betas = new_subj.betas
@@ -425,8 +439,9 @@ class GroupMegData(MegData):
 				self.gr_lowgammas = np.dstack([self.gr_lowgammas, new_subj.lowgammas])
 
 		# 
-		if(add_vertex_oscs):
-			if(self.nsubjs == 0):
+		if add_vertex_oscs:
+
+			if self.nsubjs == 0:
 				self.centers = new_subj.centers
 				self.powers = new_subj.powers
 				self.bws = new_subj.bws
@@ -455,42 +470,39 @@ class GroupMegData(MegData):
 
 
 	def osc_prob(self):
-		"""
-		"""
+		"""Calculates the probability (per vertex / across subjects) of an oscillation in a specific band."""
 
-		#
+		# For each frequency band, compute the probability of oscillation in that band. 
 		self.theta_prob = _osc_prob(self.gr_thetas)
 		self.alpha_prob = _osc_prob(self.gr_alphas)
 		self.beta_prob = _osc_prob(self.gr_betas)
 		self.lowgamma_prob = _osc_prob(self.gr_lowgammas)
 
-		#
+		# Update boolean that oscillation probability has been computed
 		self.osc_prob_done = True
 
 
 	def set_prob_vis(self):
-		""" Saves a matfile (of osc-probs) to be loaded with Brainstorm for visualization. 
-		"""
+		"""Saves a matfile (of osc-probs) to be loaded with Brainstorm for visualization."""
 
-		#
+		# Set up paths to save to
 		save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
 		save_name = 'Group_Osc_Prob_Viz'
 		save_file = os.path.join(save_path, save_name)
 
-		#
+		# Save desired outputs into a dictionary
 		save_dict = {}
 		save_dict['theta_prob'] = self.theta_prob
 		save_dict['alpha_prob'] = self.alpha_prob
 		save_dict['beta_prob'] = self.beta_prob
 		save_dict['lowgamma_prob'] = self.lowgamma_prob
 
-		#
+		# Save the dicionary out to a .mat file
 		sio.savemat(save_file, save_dict)
 
 
 	def osc_prob_corrs(self):
-		"""
-		"""
+		"""Calculates the correlations between oscillation probabilities."""
 
 		# Check if oscillation probabilities have been calculated. 
 		if(not self.osc_prob_done):
@@ -515,6 +527,7 @@ class GroupMegData(MegData):
 		# Beta-LG Corr
 		[r_be_lg, p_be_lg] = pearsonr(self.beta_prob, self.lowgamma_prob)
 
+		# Save correlation results in a list to return
 		corrs = [['Theta-Alpha', r_th_al, p_th_al],
 				 ['Theta-Beta' , r_th_be, p_th_be],
 				 ['Theta-LG'   , r_th_lg, p_th_lg],
@@ -527,8 +540,7 @@ class GroupMegData(MegData):
 
 
 	def osc_score_corrs(self):
-		"""
-		"""
+		"""Calculates the correlations between oscillations scores."""
 
 		# Check if oscillation probabilities have been calculated. 
 		if(not self.osc_score_done):
@@ -553,6 +565,7 @@ class GroupMegData(MegData):
 		# Beta-LG Corr
 		[r_be_lg, p_be_lg] = pearsonr(self.beta_score, self.lowgamma_score)
 
+		# Save correlation results in a list to return
 		corrs = [['Theta-Alpha', r_th_al, p_th_al],
 				 ['Theta-Beta' , r_th_be, p_th_be],
 				 ['Theta-LG'   , r_th_lg, p_th_lg],
@@ -565,52 +578,53 @@ class GroupMegData(MegData):
 
 
 	def osc_score(self):
+		"""Calculate the oscillation score for each frequency band."""
 
-		#
-		if(not self.osc_prob_done):
+		# Check if osc-prob is calculated. Can't proceed if it isnt. 
+		if not self.osc_prob_done:
 			print("Oscillation probability not computed. Can't continue.")
 
-		#	
+		# Compute power ratio for each oscillatory band
 		self.theta_pow_ratio = _osc_pow_ratio(self.gr_thetas)
 		self.alpha_pow_ratio = _osc_pow_ratio(self.gr_alphas)
 		self.beta_pow_ratio = _osc_pow_ratio(self.gr_betas)
 		self.lowgamma_pow_ratio = _osc_pow_ratio(self.gr_lowgammas)
 
-		#
+		# Compute oscillation score for each oscillatory band
 		self.theta_score = self.theta_pow_ratio * self.theta_prob
 		self.alpha_score = self.alpha_pow_ratio * self.alpha_prob
 		self.beta_score = self.beta_pow_ratio * self.beta_prob
 		self.lowgamma_score = self.lowgamma_pow_ratio * self.lowgamma_prob
 
-		#
+		# Set boolean that osc-score has been computed
 		self.osc_score_done = True
 
 
 	def set_score_vis(self):
-		""" Saves a matfile (of osc-score) to be loaded with Brainstorm for visualization. 
-		"""
+		"""Saves a matfile (of osc-scores) to be loaded with Brainstorm for visualization."""
 
-		#
+		# Set up paths to save to
 		save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
 		save_name = 'Group_Osc_Score_Viz'
 		save_file = os.path.join(save_path, save_name)
 
-		#
+		# Save desired outputs into a dictionary
 		save_dict = {}
 		save_dict['theta_score'] = self.theta_score
 		save_dict['alpha_score'] = self.alpha_score
 		save_dict['beta_score'] = self.beta_score
 		save_dict['lowgamma_score'] = self.lowgamma_score
 
-		#
+		# Save the dicionary out to a .mat file
 		sio.savemat(save_file, save_dict)
 
 
 	def osc_age_comparison_plot(self):
+		"""Creates a plot comparing peak frequency to age for each frequency band."""
 
 		# Plot settings
-		st_fs = 20
-		sp_fs = 18
+		st_fs = 20 			# Font size for the super title
+		sp_fs = 18			# Font size for the subplot titles
 
 		# Set up subplots
 		f, ax = plt.subplots(2, 2, figsize=(10, 10))
@@ -650,45 +664,45 @@ class GroupMegData(MegData):
 
 
 	def freq_corr(self, f_win):
+		"""Calculates the correlation between adjacent frequency bands. 
+
+		Inputs:
+			f_win 		- Size of frequency window to use
 		"""
 
-		To test more explicitly, you can take all neighboring pairs of frequencies using, say, 3 Hz segments, and look at correlation coefficient.
-
-		So 2-5 Hz v 5-8 Hz, then 3-6 v 6-9, then 4-7 v 8-11, and so on, all the way up to 33-36 v 37-40.
-		"""
-
-		#
+		# Get # vertices, # of subjects to loop through
 		[nVertex, nSlots, nSubj] = np.shape(self.centers)
 
+		# Initialize variables for # of freqs, and matrix to store probability
 		nFs = len(range(3, 40-f_win))
-
 		prob_mat = np.zeros([nVertex, nFs])
 
-		#
+		# Loop through all vertices
 		for v in range(0, nVertex):
 
-			#
+			# Loop through all subjects
 			for s in range(0, nSubj):
 
+				# Store centers for current vertex, current subj in temp vector
 				cens_temp = self.centers[v, :, s]
 
-				# 
+				# Loop through freq-ranges, counting when oscillations occur
 				i  = 0
 				for f in range(3, 40-f_win):
 
-					#
+					# Get the oscillation centers
 					cens_fwin = _get_all_osc(cens_temp, f, f + f_win)
 
-					#
+					# If there is an osc in range, add to prob_mat count
 					if(len(cens_fwin) != 0):
 						prob_mat[v, i] += 1
 
 					i += 1
 
-		#
+		# Divide by # of subjects to get probability per freq-range
 		prob_mat = prob_mat/nSubj
 
-		# 
+		# Initialize vectors to store correlations and p-values
 		corr_vec = np.zeros([nFs-1])
 		p_vec = np.zeros([nFs-1])
 
@@ -709,8 +723,15 @@ class GroupMegData(MegData):
 
 
 def clean_file_list(files_in, string):
-    '''Takes a list of file names (strings), returns only those with 'string' in them.
-    '''
+    """Takes a list of file names (strings), returns only those with 'string' in them.
+
+    Inputs:
+    	files_in 		-
+    	string 			-
+
+    Outputs:
+    	files_out		-
+    """
     
     files_out = []
 
@@ -723,22 +744,36 @@ def clean_file_list(files_in, string):
 
 
 def get_sub_nums(files_in):
-	""" Takes a list of files. Returns a list of subject numbers. 
+	"""Takes a list of files. Returns a list of subject numbers. 
+
+	Inputs:
+		files_in 		- list of files
+
+	Outputs:
+		subnums 		- list of subject numbers
 	"""
 
-	sub_nums = []
+	# Intialize variable to store subject numbers
+	subnums = []
 
 	#
 	for f in files_in:
 		str_split = f.split('_', 1)
-		sub_nums.append(int(str_split[0]))
+		subnums.append(int(str_split[0]))
 
-	return sub_nums
+	return subnums
 
 
 def get_cur_subj(cur_subj, files):
-    '''Takes an int, and a list of file names (strings), returns the file name with the number in it.
-    '''
+    """Takes an int, and a list of file names (strings), returns the file name with the number in it.
+
+    Inputs:
+    	cur_subj 		- subject number to search for in given file list (int)
+    	files 			- list of files
+
+    Outputs:
+    	subj_file 		- file name of subject file
+    """
     
     #
     cur_subj_str = str(cur_subj)
@@ -765,12 +800,24 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
 	""" Searches for an oscillations of specified frequency band. 
 	Returns a single oscillation in that band. 
 	Helper function for osc_per_vertex in MegData.
+
+	Inputs:
+		centers 		- vector of oscillation centers
+		powers  		- vector of oscillation powers
+		bws 			- vector of oscillation bandwidths
+		osc_low 		- 
+		osc_high 		-
+
+	Outputs:
+		osc_out 		- Tuple 
+							[centers, powers, bws, number of oscillations]
+
 	"""
 
-	#
+	# Find indices of oscillations in the specified range
 	osc_inds = (centers > osc_low) & (centers < osc_high)
 
-	#
+	# Get cen, pow & bw for oscillations in specfied range
 	osc_cens = centers[osc_inds]
 	osc_pows = powers[osc_inds]
 	osc_bws = bws[osc_inds]
@@ -790,29 +837,44 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
 
 
 def _get_all_osc(centers, osc_low, osc_high):
-	"""
+	"""Returns all the oscillations in a specified frequency band. 
+
+	Inputs:
+		centers 		- Vector of oscillation centers
+		osc_low 		- Lower bound for frequency range
+		osc_high 		- Upper bound for frequency range
+	Outputs:
+		osc_cens 		- Osc centers in specified frequency band
 	"""
 
+	#
 	osc_inds = (centers > osc_low) & (centers < osc_high)
 	osc_cens = centers[osc_inds]
 
 	return osc_cens
 
 
-def _get_demo_csv(sub_num):
-	"""
+def _get_demo_csv(subnum):
+	"""Get demographic information from csv file for specified subject.
+
+	Inputs:
+		subnum 		- Subject number to get demographic info for
+
+	Outputs:
+		sex 		- Sex ['M'/'F'] of specified subject
+		age 		- Age (in whole years) of specified subject
 	"""
 
-	#
+	# Set up paths for demographic info csv file
 	csv_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/'
 	csv_file_name = '00-Collin_Subjects.csv'
 	csv_file = os.path.join(csv_data_path, csv_file_name)
 
-	#
+	# Open csv file, loop through looking for right row, grab age & sex information
 	with open(csv_file, 'rb') as f:
 		reader = csv.reader(f, delimiter=',')
 		for row in reader:
-			if(row[1] == str(sub_num)):
+			if(row[1] == str(subnum)):
 				sex = row[4]
 				age = int(row[7])
 				break
@@ -821,11 +883,11 @@ def _get_demo_csv(sub_num):
 
 
 def _get_single_osc(osc_in):
-	''' OLD - UNUSED
+	""" OLD - UNUSED
 	Takes a vector, returns the first element, and the length.
 	This selects the lowest frequency oscillation. 
 	Helper function for osc_per_vertex in MegData.
-	'''
+	"""
 
 	#
 	if(len(osc_in) == 0):
@@ -837,32 +899,48 @@ def _get_single_osc(osc_in):
 
 
 def _get_single_osc_power(osc_cens, osc_pows, osc_bws):
-	"""
+	"""Return the highest power oscillation in a given range.
+
+	Inputs:
+		osc_cens		- Vector of oscillation centers
+		osc_pows 		- Vector of oscillation powers
+		osc_bws 		- Vector of oscillation bandwidths
+
+	Outputs:
+		center 			- Center frequency value of highest power oscillation
+		power 			- Power value of highest power oscillation
+		bw 				- Bandwidth of highest power oscillation
 	"""
 
-	# 
+	# Return zeros if there are no oscillations in given vectors
 	if(len(osc_cens) == 0):
 		return 0., 0., 0.
+	# If singular oscillation, return that oscillation
 	elif(len(osc_cens) == 1):
 		return osc_cens, osc_pows, osc_bws
+	# If multiple oscillations, return the one with the highest power
 	else:
 		high_ind = np.argmax(osc_pows)
 		return osc_cens[high_ind], osc_pows[high_ind], osc_bws[high_ind]
 
 
 def _osc_prob(osc_mat):
-	""" Takes a 3D matrix of oscillations across subjects.
-	osc_mat: [nVertex, nDim, nSubj]
-	Returns a vector of probability of oscillation at each vertex.
+	"""Takes a 3D matrix of oscillations across subjects, calculates probability of oscillation.
+
+	Inputs:
+		osc_mat 		- Matrix of 
+							[nVertex, nDim, nSubj]
+	Outputs:
+		prob 			- Vector with probability of given oscillation at each vertex
 	"""
 
-	# 
+	# Check how many vertices and subjects in group
 	[nVertex, nDim, nSubj] = np.shape(osc_mat)
 
-	#
+	# Initialize vector to store probabilities
 	prob = np.zeros([nVertex])
 
-	#
+	# Loop through all vertices, calculating osc prob for each
 	for i in range(0, nVertex):
 		prob[i] = (np.count_nonzero(osc_mat[i, 0, :]) / nSubj)
 
@@ -870,25 +948,43 @@ def _osc_prob(osc_mat):
 
 
 def _osc_pow_ratio(osc_mat):
-	"""
+	"""Calculate the power ratio of an oscillation. 
+	Power ratio is a score between [0, 1] power relative to 
+		max power in that frequency band. 
+
+	Inputs:
+		osc_mat 		-
+
+	Outputs:
+		pow_ratio 		- 
 	"""
 
-	#
+	# Check how many vertices and subjects in group
 	[nVertex, nDim, nSubj] = np.shape(osc_mat)
 
-	#
+	# Initialize vector to store average powers
 	avg_powers = np.zeros(nVertex)
+
+	# Loop through all vertices
 	for v in range(0, nVertex):
+
+		# Pull out temp vector of all oscillation powers
 		temp_pows = osc_mat[v, 1, :]
 		temp_pows = temp_pows[np.nonzero(temp_pows)]
+
+		# If there are oscillations get average power
 		if(len(temp_pows) == 0):
 			avg_powers[v] = 0
 		else:
 			avg_powers[v] = np.mean(temp_pows)
+
+	# Get the maximum power across all vertices
 	max_all = max(avg_powers)
 
-	#
+	# Initialize vector to store power ratios
 	pow_ratio = np.zeros(nVertex)
+
+	# Loop through all vertices, calculating power ratio
 	for v in range(0, nVertex):
 		pow_ratio[v] = np.mean(osc_mat[v, 1, :]) / max_all
 
@@ -896,12 +992,21 @@ def _osc_pow_ratio(osc_mat):
 
 
 def _osc_peak(centers, osc_low, osc_high):
-	"""
+	"""Find the peak-frequency of a vector of center frequencies.
+
+	Inputs:
+		centers 		-
+		osc_low 		-
+		osc_high 		-
+
+	Outputs:
+		peak 			-
 	"""
 
 	#
 	osc_inds = (centers > osc_low) & (centers < osc_high)
 	osc_cens = centers[osc_inds]
 	peak = np.mean(osc_cens)
+	#peak = np.median(osc_cens)
 
 	return peak
