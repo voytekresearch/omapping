@@ -3,6 +3,7 @@ import os
 import csv
 import pickle
 import numpy as np
+import pandas as pd
 import scipy.io as sio
 import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
@@ -717,78 +718,265 @@ class GroupMegData(MegData):
 		return corr_vec, p_vec
 
 
-########################################################################################
-############################### OMEGAMAPPING - FUNCTIONS ###############################
-########################################################################################
+class MapComp():
+	"""  """
 
 
-def clean_file_list(files_in, string):
-    """Takes a list of file names (strings), returns only those with 'string' in them.
+	def __init__(self):
+		
+		#
+		self.maps_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/'
 
-    Inputs:
-    	files_in 		-
-    	string 			-
+		# 
+		self.oscs_path = os.path.join(self.maps_path, 'Oscs')
+		self.genes_path = os.path.join(self.maps_path, 'Genes')
+		self.terms_path = os.path.join(self.maps_path, 'Terms')
 
-    Outputs:
-    	files_out		-
-    """
-    
-    files_out = []
+		#
+		self.term_names = _get_map_names('ns_terms.csv', self.terms_path)
+		self.gene_names = _get_map_names('real_gene_names.csv', self.genes_path)
 
-    #
-    for i in range(0, len(files_in)):
-        if(string in files_in[i]):
-            files_out.append(files_in[i])
-            
-    return files_out
+		#
+		self.nTerms = len(self.term_names)
+		self.nGenes = len(self.gene_names)
 
+		#
+		self.th_map = np.array([])
+		self.al_map = np.array([])
+		self.be_map = np.array([])
+		self.lg_map = np.array([])
 
-def get_sub_nums(files_in):
-	"""Takes a list of files. Returns a list of subject numbers. 
+		#
+		self.term_maps = np.array([])
 
-	Inputs:
-		files_in 		- list of files
+		# 
+		self.gene_maps = np.array([])
 
-	Outputs:
-		subnums 		- list of subject numbers
-	"""
+		#
+		self.corrs = dict([ ('TermsTheta', np.array([])), ('TermsAlpha',    np.array([])), 
+							('TermsBeta',  np.array([])), ('TermsLowGamma', np.array([])),
+							('GenesTheta', np.array([])), ('GenesAlpha',    np.array([])), 
+							('GenesBeta',  np.array([])), ('GenesLowGamma', np.array([])),
+						])
 
-	# Intialize variable to store subject numbers
-	subnums = []
+		#
+		self.ps = dict([('TermsTheta', np.array([])), ('TermsAlpha',    np.array([])), 
+						('TermsBeta',  np.array([])), ('TermsLowGamma', np.array([])),
+						('GenesTheta', np.array([])), ('GenesAlpha',    np.array([])), 
+						('GenesBeta',  np.array([])), ('GenesLowGamma', np.array([])),
+					])
 
-	#
-	for f in files_in:
-		str_split = f.split('_', 1)
-		subnums.append(int(str_split[0]))
+		# 
+		self.osc_loaded = False
+		self.genes_loaded = False
+		self.terms_loaded = False
 
-	return subnums
-
-
-def get_cur_subj(cur_subj, files):
-    """Takes an int, and a list of file names (strings), returns the file name with the number in it.
-
-    Inputs:
-    	cur_subj 		- subject number to search for in given file list (int)
-    	files 			- list of files
-
-    Outputs:
-    	subj_file 		- file name of subject file
-    """
-    
-    #
-    cur_subj_str = str(cur_subj)
-    
-    #
-    for i in range(0, len(files)):
-        if(cur_subj_str in files[i]):
-            return files[i]
+		#
+		self.term_corrs_calc = False
+		self.gene_corrs_calc = False
 
 
-def run_par_foof():
-	""" NOT YET IMPLEMENTED.
-	"""
+	def check_files(self, print_files=True):
+		"""   """
 
-	pass
+		#
+		osc_files = clean_file_list(os.listdir(self.oscs_path), '.npz')
+		term_files = clean_file_list(os.listdir(self.genes_path), '.csv')
+		gene_files = clean_file_list(os.listdir(self.terms_path), '.csv')
+
+		#
+		if print_files:
+			print('Oscillation Files: \n', '\n'.join(osc_files), '\n')
+			print('Terms Files: \n', '\n'.join(term_files), '\n')
+			print('Genes Files: \n', '\n'.join(gene_files), '\n')
+
+		else:
+			return osc_files, terms_files, gene_files
+
+
+	def load_osc_maps(self, osc_file):
+		"""   """
+		
+		#
+		oscs_map_file = os.path.join(self.oscs_path, osc_file)
+
+		#
+		with np.load(oscs_map_file) as data:
+			self.th_map = data['osc_score_theta']
+			self.al_map = data['osc_score_alpha']
+			self.be_map = data['osc_score_beta']
+			self.lg_map = data['osc_score_lowgamma']
+
+		#
+		self.oscs_loaded = True
+
+
+	def load_gene_maps(self, genes_file_names):
+		"""   """ 
+		
+		if len(genes_file_names) == 1:
+			self.gene_maps = pd.read_csv(genes_file_names[0], header=None)
+
+		else:
+			for i in range(0, len(genes_file_names)):
+				if i == 0:
+					genes_csv = os.path.join(self.genes_path, genes_file_names[0])
+					self.gene_maps = pd.read_csv(genes_csv, header=None)
+				else:
+					genes_csv = os.path.join(self.genes_path, genes_file_names[i])
+					temp_df = pd.read_csv(genes_csv, header=None)
+					self.gene_maps = pd.concat([self.gene_maps, temp_df])
+
+		#
+		self.genes_loaded = True
+
+
+	def load_term_maps(self, term_file_name):
+		"""   """
+		
+		#
+		terms_csv = os.path.join(self.terms_path, term_file_name)
+
+		#
+		self.term_maps = pd.read_csv(terms_csv, header=None)
+
+		#
+		self.terms_loaded = True
+
+
+	def calc_corrs(self, dat_type):
+		""" """
+
+		#
+		if dat_type is 'Terms':
+			nComps = self.nTerms
+			dat_df = self.term_maps
+			self.term_corrs_calc = True
+		elif dat_type is 'Genes':
+			nComps = self.nGenes
+			dat_df = self.gene_maps
+			self.gene_corrs_calc = True
+		else:
+			print("Improper Data Type. Fix it.")
+			return
+
+		# 
+		th_corr = np.zeros([nComps, 1]); th_p = np.zeros([nComps, 1])
+		al_corr = np.zeros([nComps, 1]); al_p = np.zeros([nComps, 1])
+		be_corr = np.zeros([nComps, 1]); be_p = np.zeros([nComps, 1])
+		lg_corr = np.zeros([nComps, 1]); lg_p = np.zeros([nComps, 1])
+
+		#
+		for v in range(0, nComps):
+
+			#
+			dat = np.array(dat_df.ix[:, v])
+
+			#
+			inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) == False]
+
+			#
+			[th_corr[v], th_p[v]] = pearsonr(dat[inds_non_nan], self.th_map[inds_non_nan])
+			[al_corr[v], al_p[v]] = pearsonr(dat[inds_non_nan], self.al_map[inds_non_nan])
+			[be_corr[v], be_p[v]] = pearsonr(dat[inds_non_nan], self.be_map[inds_non_nan])
+			[lg_corr[v], lg_p[v]] = pearsonr(dat[inds_non_nan], self.lg_map[inds_non_nan])
+
+    	#
+		self.corrs[dat_type+'Theta'] 	= th_corr; 	self.ps[dat_type+'Theta'] 	 = th_p
+		self.corrs[dat_type+'Alpha'] 	= al_corr; 	self.ps[dat_type+'Alpha'] 	 = al_p
+		self.corrs[dat_type+'Beta'] 	= be_corr; 	self.ps[dat_type+'Beta'] 	 = be_p
+		self.corrs[dat_type+'LowGamma'] = lg_corr; 	self.ps[dat_type+'LowGamma'] = lg_p
+
+
+	def check_corrs(self, dat_type, osc_band, nCheck = 20, top = True):
+		""" """
+
+		# 
+		if dat_type is 'Terms':
+			names = self.term_names
+			la_str = ' <30'
+			if not self.term_corrs_calc: print("Term corrs not yet calculated"); return
+		elif dat_type is 'Genes':
+			names = self.gene_names
+			la_str = ' <55'
+			if not self.gene_corrs_calc: print("Gene corrs not calculated"); return
+		else:
+			print("Data type not understood. Fix it.")
+
+		#
+		osc_corr = np.squeeze(self.corrs[dat_type + osc_band])
+		osc_p = np.squeeze(self.ps[dat_type + osc_band])
+
+		#
+		inds_max = np.argsort(osc_corr, axis=0)
+
+		# Print Header Rows
+		print("\n\nCorrelations for ",  str(dat_type), " &  ", str(osc_band), ': \n')
+		print('# \t', format(dat_type, la_str), '\t R-Vals \t P-vals \n')
+
+		# 
+		if top:
+			for i in range(1, nCheck):
+				ind = int(inds_max[-i])
+				print(str(i), '\t', format(names[ind][:50], la_str), '\t', format(osc_corr[ind], '1.5f'), '\t', format(osc_p[ind], '1.4e'))
+
+		# 
+		else:
+			for i in range(0, nCheck):
+				ind = int(inds_max[i])
+				print(str(i), '\t', format(names[ind][:50], la_str), '\t', format(osc_corr[ind], '1.5f'), '\t', format(osc_p[ind], '1.4e'))
+
+
+	def unload_data(self, dat_type):
+		"""   """
+
+		if dat_type is 'Terms':
+
+			# Check if terms are currently loaded. Return if not.
+			if not self.terms_loaded:
+				print("Terms are not loaded - can not unload.")
+
+			# Unload terms by resetting map variable as empty
+			self.term_maps = np.array([])
+
+			# Update boolean that terms are not loaded
+			self.terms_loaded = False
+
+		elif dat_type is 'Genes':
+
+			# Check if genes are currently loaded. Return if not.
+			if not self.genes_loaded:
+				print("Genes are not loaded - can not unload.")
+
+			# Unload genes by resetting map variable as empty
+			self.gene_maps = np.array([])
+
+			# Update boolean that genes are not loaded
+			self.genes_loaded = True
+
+		else:
+			print('Data type not understood. Try again.')
+
+
+	def plot_corrs(self, dat_type, osc_band):
+		""" """
+
+		osc_corrs = np.squeeze(self.corrs[dat_type + osc_band])
+		osc_ps = np.squeeze(self.ps[dat_type + osc_band])
+		
+		#
+		f, ax = plt.subplots(1, 2, figsize=(12, 6))
+
+		plt.suptitle('Corr Stats for ' + dat_type + ' ' + osc_band, fontsize=20, fontweight='bold')
+
+		#
+		ax[0].plot(osc_corrs, '.')
+		ax[0].set_title('R Values', {'fontsize': 16, 'fontweight': 'bold'})
+		ax[0].set_ylim([-0.41, 0.41])
+
+		#
+		ax[1].plot(osc_ps, '.')
+		ax[1].set_title('P Values', {'fontsize': 16, 'fontweight': 'bold'})
 
 
 ########################################################################################
@@ -1010,3 +1198,91 @@ def _osc_peak(centers, osc_low, osc_high):
 	#peak = np.median(osc_cens)
 
 	return peak
+
+def _get_map_names(names_file, path):
+	"""   """
+
+	# Get path to csv file
+	csv_path = os.path.join(path, names_file)
+
+	# Open csv file
+	with open(csv_path, 'rb') as f:
+		reader = csv.reader(f, delimiter=',')
+		# Get list of names from first row in csv
+		names = list(reader)[0]
+
+	return names
+
+
+########################################################################################
+############################### OMEGAMAPPING - FUNCTIONS ###############################
+########################################################################################
+
+
+def clean_file_list(files_in, string):
+    """Takes a list of file names (strings), returns only those with 'string' in them.
+
+    Inputs:
+    	files_in 		-
+    	string 			-
+
+    Outputs:
+    	files_out		-
+    """
+    
+    files_out = []
+
+    #
+    for i in range(0, len(files_in)):
+        if(string in files_in[i]):
+            files_out.append(files_in[i])
+            
+    return files_out
+
+
+def get_sub_nums(files_in):
+	"""Takes a list of files. Returns a list of subject numbers. 
+
+	Inputs:
+		files_in 		- list of files
+
+	Outputs:
+		subnums 		- list of subject numbers
+	"""
+
+	# Intialize variable to store subject numbers
+	subnums = []
+
+	#
+	for f in files_in:
+		str_split = f.split('_', 1)
+		subnums.append(int(str_split[0]))
+
+	return subnums
+
+
+def get_cur_subj(cur_subj, files):
+    """Takes an int, and a list of file names (strings), returns the file name with the number in it.
+
+    Inputs:
+    	cur_subj 		- subject number to search for in given file list (int)
+    	files 			- list of files
+
+    Outputs:
+    	subj_file 		- file name of subject file
+    """
+    
+    #
+    cur_subj_str = str(cur_subj)
+    
+    #
+    for i in range(0, len(files)):
+        if(cur_subj_str in files[i]):
+            return files[i]
+
+
+def run_par_foof():
+	""" NOT YET IMPLEMENTED. """
+
+	pass
+
