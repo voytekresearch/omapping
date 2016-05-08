@@ -795,14 +795,13 @@ class MapComp():
 		self.nTerms = len(self.term_names)
 		self.nGenes = len(self.gene_names)
 
-		#
-		self.th_map = np.array([])
-		self.al_map = np.array([])
-		self.be_map = np.array([])
-		self.lg_map = np.array([])
-
-		#
-		self.chis_map = np.array([])
+		# 
+		self.meg_maps = dict([  ('Theta',	  np.array([])),
+								('Alpha',	  np.array([])),
+								('Beta',	  np.array([])),
+								('LowGamma', np.array([])),
+								('Slopes',	  np.array([]))
+								])
 
 		#
 		self.term_maps = np.array([])
@@ -825,22 +824,12 @@ class MapComp():
 						('GenesBeta',   np.array([])),  ('GenesLowGamma', np.array([])),
 						('TermsSlopes', np.array([])),  ('GenesSlopes',   np.array([]))
 					])
-
-		#
-		#self.slope_corrs = dict([('TermsSlopes', np.array([])), ('GenesSlopes',   np.array([]))])
-		#self.slope_ps = dict([('TermsSlopes', np.array([])),  ('GenesSlopes',   np.array([]))])
 									
 		# 
 		self.osc_loaded = False
 		self.slopes_loaded = False
 		self.genes_loaded = False
 		self.terms_loaded = False
-
-		#
-		self.osc_term_corrs_calc = False
-		self.osc_gene_corrs_calc = False
-		self.slope_term_corrs_calc = False
-		self.slope_gene_corrs_calc = False
 
 
 	def check_files(self, print_files=True, return_files=False):
@@ -874,10 +863,12 @@ class MapComp():
 
 			#
 			with np.load(oscs_map_file) as data:
-				self.th_map = data['osc_score_theta']
-				self.al_map = data['osc_score_alpha']
-				self.be_map = data['osc_score_beta']
-				self.lg_map = data['osc_score_lowgamma']
+
+				#
+				self.meg_maps['Theta'] 		= data['osc_score_theta']
+				self.meg_maps['Alpha'] 		= data['osc_score_alpha']
+				self.meg_maps['Beta']		= data['osc_score_beta']
+				self.meg_maps['LowGamma'] 	= data['osc_score_lowgamma']
 
 			#
 			self.oscs_loaded = True
@@ -890,7 +881,9 @@ class MapComp():
 
 			#
 			with np.load(slopes_map_file) as data:
-				self.chis_map = data['chis']
+
+				#
+				self.meg_maps['Slopes'] 	= data['chis']
 
 			#
 			self.slopes_loaded = True
@@ -930,7 +923,7 @@ class MapComp():
 
 
 	def calc_osc_corrs(self, dat_type):
-		""" """
+		""" OLD: UNUSED """
 
 		#
 		if dat_type is 'Terms':
@@ -974,7 +967,7 @@ class MapComp():
 
 
 	def calc_slope_corrs(self, dat_type):
-		"""   """
+		""" OLD: UNUSED """
 
 		#
 		if dat_type is 'Terms':
@@ -1008,6 +1001,45 @@ class MapComp():
 		self.corrs[dat_type + 'Slopes'] = chi_corr; self.ps[dat_type + 'Slopes'] = chi_p
 
 
+	def calc_corrs(self, dat_type, meg_dat):
+		"""   """
+
+		#
+		if dat_type is 'Terms':
+			nComps = self.nTerms
+			dat_df = self.term_maps
+		elif dat_type is 'Genes':
+			nComps = self.nGenes
+			dat_df = self.gene_maps
+		else:
+			print("Improper Data Type. Fix it.")
+			return
+
+		# 
+		try:
+			meg_map = self.meg_maps[meg_dat]
+		except KeyError:
+			print('MEG Data not understood. Fix it.')
+
+		#
+		corr_vals = np.zeros([nComps, 1]); p_vals = np.zeros([nComps, 1])
+
+		#
+		for v in range(0, nComps):
+
+			#
+			dat = np.array(dat_df.ix[:, v])
+
+			#
+			inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) == False]
+
+			#
+			[corr_vals[v], p_vals[v]] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
+
+		#
+		self.corrs[dat_type + meg_dat] = corr_vals; self.ps[dat_type + meg_dat] = p_vals
+
+
 	def check_corrs(self, dat_type, meg_dat, nCheck = 20, top = True):
 		"""   """
 
@@ -1015,13 +1047,16 @@ class MapComp():
 		if dat_type is 'Terms':
 			names = self.term_names
 			la_str = ' <30'
-			#if not self.osc_term_corrs_calc: print("Term corrs not yet calculated"); return
 		elif dat_type is 'Genes':
 			names = self.gene_names
 			la_str = ' <55'
-			#if not self.osc_gene_corrs_calc: print("Gene corrs not calculated"); return
 		else:
 			print("Data type not understood. Fix it.")
+
+		# Check that asked for correlations have been computed
+		if not self.corrs[dat_type + meg_dat]:
+			print("Those correlations not calculated. Quitting.")
+			return
 
 		#
 		meg_corr = np.squeeze(self.corrs[dat_type + meg_dat])
@@ -1050,6 +1085,7 @@ class MapComp():
 	def unload_data(self, dat_type):
 		"""   """
 
+		#
 		if dat_type is 'Terms':
 
 			# Check if terms are currently loaded. Return if not.
@@ -1062,6 +1098,7 @@ class MapComp():
 			# Update boolean that terms are not loaded
 			self.terms_loaded = False
 
+		#
 		elif dat_type is 'Genes':
 
 			# Check if genes are currently loaded. Return if not.
@@ -1074,12 +1111,18 @@ class MapComp():
 			# Update boolean that genes are not loaded
 			self.genes_loaded = True
 
+		#
 		else:
 			print('Data type not understood. Try again.')
 
 
 	def plot_corrs(self, dat_type, meg_dat):
 		"""   """
+
+		# Check that asked for correlations have been computed
+		if not self.corrs[dat_type + meg_dat]:
+			print("Those correlations not calculated. Quitting.")
+			return
 
 		#
 		meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
@@ -1088,6 +1131,7 @@ class MapComp():
 		#
 		f, ax = plt.subplots(1, 2, figsize=(12, 6))
 
+		#
 		plt.suptitle('Corr Stats for ' + dat_type + ' ' + meg_dat, fontsize=20, fontweight='bold')
 
 		#
@@ -1106,12 +1150,15 @@ class MapComp():
 		# 
 		if dat_type is 'Terms':
 			names = self.term_names
-			#if not self.osc_term_corrs_calc: print("Term corrs not yet calculated. Can't save."); return
 		elif dat_type is 'Genes':
 			names = self.gene_names
-			#if not self.osc_gene_corrs_calc: print("Gene corrs not calculated. Can't save."); return
 		else:
 			print("Data type not understood. Fix it.")
+
+		# Check that asked for correlations have been computed
+		if not self.corrs[dat_type + meg_dat]:
+			print("Those correlations not calculated. Quitting.")
+			return
 
 		# Get the correlation data of interest
 		meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
