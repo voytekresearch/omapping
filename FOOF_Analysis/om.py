@@ -113,7 +113,8 @@ class MegData():
 
 		# Loop through FOOF results, pulling out individual findings
 		for i in range(0, self.nPSDs):
-		    self.chis[i, 0] = results[i][0]
+		    self.chis[i] = results[i][0]
+		    #self.chis[i, 0] = results[i][0]
 		    self.centers[i, 0:len(results[i][1])] = results[i][1]
 		    self.powers[i, 0:len(results[i][2])] = results [i][2]
 		    self.bws[i, 0:len(results[i][3])] = results[i][3]
@@ -397,8 +398,8 @@ class GroupMegData(MegData):
 		self.osc_score_done = False
 
 
-	def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, add_vertex_oscs=False):
-		"""Adds a new subject to the GroupMegData object. 
+	def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, add_vertex_oscs=False, add_vertex_slopes=False):
+		"""Adds a new subject to the GroupMegData object.
 
 		Inputs:
 			new_subj			- MEG subject (instance of MegData)
@@ -451,6 +452,14 @@ class GroupMegData(MegData):
 				self.powers = np.dstack([self.powers, new_subj.powers])
 				self.bws = np.dstack([self.bws, new_subj.bws])
 
+		#
+		if add_vertex_slopes:
+
+			if self.nsubjs == 0:
+				self.gr_chis = new_subj.chis
+			else:
+				self.gr_chis = np.hstack([self.gr_chis, new_subj.chis])
+
 		# Update subj count and subject number list
 		self.nsubjs += 1
 		self.subjs = np.append(self.subjs, new_subj.subnum)
@@ -481,6 +490,40 @@ class GroupMegData(MegData):
 
 		# Update boolean that oscillation probability has been computed
 		self.osc_prob_done = True
+
+
+	def group_slope(self, save_out=False, file_name=None, set_viz=False):
+		"""   """
+
+		# Calculate the average slope value per vertex
+		self.chis_avg = np.median(self.gr_chis, axis=1)
+
+		# Save map out, if required
+		if save_out:
+			
+			#
+			npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Slopes/'
+			npz_file_name = file_name + '.npz'
+			npz_save_name = os.path.join(npz_save_path, npz_file_name)
+
+			#
+			np.savez(npz_save_name, chis=self.chis_avg, nSubjs=self.nsubjs)
+
+		# Save out as matfile for visualization with matlab, if required
+		if set_viz:
+
+			# Set up paths to save to
+			save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
+			save_name = 'Group_Slopes'
+			save_file = os.path.join(save_path, save_name)
+
+			# Save desired outputs into a dictionary
+			save_dict = {}
+			save_dict['chis'] = self.chis_avg
+			save_dict['nsubjs'] = self.nsubjs
+
+			# Save the dicionary out to a .mat file
+			sio.savemat(save_file, save_dict)
 
 
 	def set_prob_vis(self):
@@ -540,6 +583,29 @@ class GroupMegData(MegData):
 		return corrs
 
 
+	def osc_score(self):
+		"""Calculate the oscillation score for each frequency band."""
+
+		# Check if osc-prob is calculated. Can't proceed if it isnt. 
+		if not self.osc_prob_done:
+			print("Oscillation probability not computed. Can't continue.")
+
+		# Compute power ratio for each oscillatory band
+		self.theta_pow_ratio = _osc_pow_ratio(self.gr_thetas)
+		self.alpha_pow_ratio = _osc_pow_ratio(self.gr_alphas)
+		self.beta_pow_ratio = _osc_pow_ratio(self.gr_betas)
+		self.lowgamma_pow_ratio = _osc_pow_ratio(self.gr_lowgammas)
+
+		# Compute oscillation score for each oscillatory band
+		self.theta_score = self.theta_pow_ratio * self.theta_prob
+		self.alpha_score = self.alpha_pow_ratio * self.alpha_prob
+		self.beta_score = self.beta_pow_ratio * self.beta_prob
+		self.lowgamma_score = self.lowgamma_pow_ratio * self.lowgamma_prob
+
+		# Set boolean that osc-score has been computed
+		self.osc_score_done = True
+
+
 	def osc_score_corrs(self):
 		"""Calculates the correlations between oscillations scores."""
 
@@ -578,27 +644,15 @@ class GroupMegData(MegData):
 		return corrs
 
 
-	def osc_score(self):
-		"""Calculate the oscillation score for each frequency band."""
+	def save_osc_score(self, file_name):
+		"""   """
 
-		# Check if osc-prob is calculated. Can't proceed if it isnt. 
-		if not self.osc_prob_done:
-			print("Oscillation probability not computed. Can't continue.")
-
-		# Compute power ratio for each oscillatory band
-		self.theta_pow_ratio = _osc_pow_ratio(self.gr_thetas)
-		self.alpha_pow_ratio = _osc_pow_ratio(self.gr_alphas)
-		self.beta_pow_ratio = _osc_pow_ratio(self.gr_betas)
-		self.lowgamma_pow_ratio = _osc_pow_ratio(self.gr_lowgammas)
-
-		# Compute oscillation score for each oscillatory band
-		self.theta_score = self.theta_pow_ratio * self.theta_prob
-		self.alpha_score = self.alpha_pow_ratio * self.alpha_prob
-		self.beta_score = self.beta_pow_ratio * self.beta_prob
-		self.lowgamma_score = self.lowgamma_pow_ratio * self.lowgamma_prob
-
-		# Set boolean that osc-score has been computed
-		self.osc_score_done = True
+		#
+		npz_save_path = 'Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Oscs/'
+		npz_file_name = file_name + '.npz'
+		npz_save_name = os.path.join(npz_save_path, npz_file_name)
+		npz_savez(npz_save_name, osc_score_theta=self.theta_score, osc_score_alpha=self.alpha_score, 
+					osc_score_beta=self.beta_score, osc_score_lowgamma=self.lowgamma_score)
 
 
 	def set_score_vis(self):
@@ -719,7 +773,7 @@ class GroupMegData(MegData):
 
 
 class MapComp():
-	"""  """
+	"""Class for storing and comparing spatial topographies."""
 
 
 	def __init__(self):
@@ -731,6 +785,7 @@ class MapComp():
 		self.oscs_path = os.path.join(self.maps_path, 'Oscs')
 		self.genes_path = os.path.join(self.maps_path, 'Genes')
 		self.terms_path = os.path.join(self.maps_path, 'Terms')
+		self.slopes_path = os.path.join(self.maps_path, 'Slopes')
 
 		#
 		self.term_names = _get_map_names('ns_terms.csv', self.terms_path)
@@ -747,68 +802,98 @@ class MapComp():
 		self.lg_map = np.array([])
 
 		#
+		self.chis_map = np.array([])
+
+		#
 		self.term_maps = np.array([])
 
 		# 
 		self.gene_maps = np.array([])
 
 		#
-		self.corrs = dict([ ('TermsTheta', np.array([])), ('TermsAlpha',    np.array([])), 
-							('TermsBeta',  np.array([])), ('TermsLowGamma', np.array([])),
-							('GenesTheta', np.array([])), ('GenesAlpha',    np.array([])), 
-							('GenesBeta',  np.array([])), ('GenesLowGamma', np.array([])),
+		self.corrs = dict([ ('TermsTheta',  np.array([])), ('TermsAlpha',    np.array([])), 
+							('TermsBeta',   np.array([])), ('TermsLowGamma', np.array([])),
+							('GenesTheta',  np.array([])), ('GenesAlpha',    np.array([])),
+							('GenesBeta',   np.array([])), ('GenesLowGamma', np.array([])),
+							('TermsSlopes', np.array([])), ('GenesSlopes',   np.array([]))
 						])
 
 		#
-		self.ps = dict([('TermsTheta', np.array([])), ('TermsAlpha',    np.array([])), 
-						('TermsBeta',  np.array([])), ('TermsLowGamma', np.array([])),
-						('GenesTheta', np.array([])), ('GenesAlpha',    np.array([])), 
-						('GenesBeta',  np.array([])), ('GenesLowGamma', np.array([])),
+		self.ps = dict([('TermsTheta',  np.array([])),  ('TermsAlpha',    np.array([])),
+						('TermsBeta',   np.array([])),  ('TermsLowGamma', np.array([])),
+						('GenesTheta',  np.array([])),  ('GenesAlpha',    np.array([])),
+						('GenesBeta',   np.array([])),  ('GenesLowGamma', np.array([])),
+						('TermsSlopes', np.array([])),  ('GenesSlopes',   np.array([]))
 					])
 
+		#
+		#self.slope_corrs = dict([('TermsSlopes', np.array([])), ('GenesSlopes',   np.array([]))])
+		#self.slope_ps = dict([('TermsSlopes', np.array([])),  ('GenesSlopes',   np.array([]))])
+									
 		# 
 		self.osc_loaded = False
+		self.slopes_loaded = False
 		self.genes_loaded = False
 		self.terms_loaded = False
 
 		#
-		self.term_corrs_calc = False
-		self.gene_corrs_calc = False
+		self.osc_term_corrs_calc = False
+		self.osc_gene_corrs_calc = False
+		self.slope_term_corrs_calc = False
+		self.slope_gene_corrs_calc = False
 
 
-	def check_files(self, print_files=True):
+	def check_files(self, print_files=True, return_files=False):
 		"""   """
 
 		#
 		osc_files = clean_file_list(os.listdir(self.oscs_path), '.npz')
+		slope_files = clean_file_list(os.listdir(self.slopes_path), '.npz')
 		term_files = clean_file_list(os.listdir(self.genes_path), '.csv')
 		gene_files = clean_file_list(os.listdir(self.terms_path), '.csv')
 
 		#
 		if print_files:
 			print('Oscillation Files: \n', '\n'.join(osc_files), '\n')
+			print('Slope Files: \n', '\n'.join(slope_files), '\n')
 			print('Terms Files: \n', '\n'.join(term_files), '\n')
 			print('Genes Files: \n', '\n'.join(gene_files), '\n')
 
-		else:
-			return osc_files, terms_files, gene_files
+		if return_files:
+			return osc_files, slope_files, terms_files, gene_files
 
 
-	def load_osc_maps(self, osc_file):
+	def load_meg_maps(self, osc_file=None, slope_file=None):
 		"""   """
 		
 		#
-		oscs_map_file = os.path.join(self.oscs_path, osc_file)
+		if osc_file is not None:
+			
+			#
+			oscs_map_file = os.path.join(self.oscs_path, osc_file + '.npz')
 
-		#
-		with np.load(oscs_map_file) as data:
-			self.th_map = data['osc_score_theta']
-			self.al_map = data['osc_score_alpha']
-			self.be_map = data['osc_score_beta']
-			self.lg_map = data['osc_score_lowgamma']
+			#
+			with np.load(oscs_map_file) as data:
+				self.th_map = data['osc_score_theta']
+				self.al_map = data['osc_score_alpha']
+				self.be_map = data['osc_score_beta']
+				self.lg_map = data['osc_score_lowgamma']
 
-		#
-		self.oscs_loaded = True
+			#
+			self.oscs_loaded = True
+
+		# 
+		if slope_file is not None:
+
+			#
+			slopes_map_file = os.path.join(self.slopes_path, slope_file + '.npz')
+
+			#
+			with np.load(slopes_map_file) as data:
+				self.chis_map = data['chis']
+
+			#
+			self.slopes_loaded = True
 
 
 	def load_gene_maps(self, genes_file_names):
@@ -844,18 +929,18 @@ class MapComp():
 		self.terms_loaded = True
 
 
-	def calc_corrs(self, dat_type):
+	def calc_osc_corrs(self, dat_type):
 		""" """
 
 		#
 		if dat_type is 'Terms':
 			nComps = self.nTerms
 			dat_df = self.term_maps
-			self.term_corrs_calc = True
+			self.osc_term_corrs_calc = True
 		elif dat_type is 'Genes':
 			nComps = self.nGenes
 			dat_df = self.gene_maps
-			self.gene_corrs_calc = True
+			self.osc_gene_corrs_calc = True
 		else:
 			print("Improper Data Type. Fix it.")
 			return
@@ -888,43 +973,78 @@ class MapComp():
 		self.corrs[dat_type+'LowGamma'] = lg_corr; 	self.ps[dat_type+'LowGamma'] = lg_p
 
 
-	def check_corrs(self, dat_type, osc_band, nCheck = 20, top = True):
-		""" """
+	def calc_slope_corrs(self, dat_type):
+		"""   """
+
+		#
+		if dat_type is 'Terms':
+			nComps = self.nTerms
+			dat_df = self.term_maps
+			self.slope_term_corrs_calc = True
+		elif dat_type is 'Genes':
+			nComps = self.nGenes
+			dat_df = self.gene_maps
+			self.slope_gene_corrs_calc = True
+		else:
+			print("Improper Data Type. Fix it.")
+			return
+
+		#
+		chi_corr = np.zeros([nComps, 1]); chi_p = np.zeros([nComps, 1])
+
+		#
+		for v in range(0, nComps):
+
+			#
+			dat = np.array(dat_df.ix[:, v])
+
+			#
+			inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) == False]
+
+			#
+			[chi_corr[v], chi_p[v]] = pearsonr(dat[inds_non_nan], self.chis_map[inds_non_nan])
+
+		#
+		self.corrs[dat_type + 'Slopes'] = chi_corr; self.ps[dat_type + 'Slopes'] = chi_p
+
+
+	def check_corrs(self, dat_type, meg_dat, nCheck = 20, top = True):
+		"""   """
 
 		# 
 		if dat_type is 'Terms':
 			names = self.term_names
 			la_str = ' <30'
-			if not self.term_corrs_calc: print("Term corrs not yet calculated"); return
+			#if not self.osc_term_corrs_calc: print("Term corrs not yet calculated"); return
 		elif dat_type is 'Genes':
 			names = self.gene_names
 			la_str = ' <55'
-			if not self.gene_corrs_calc: print("Gene corrs not calculated"); return
+			#if not self.osc_gene_corrs_calc: print("Gene corrs not calculated"); return
 		else:
 			print("Data type not understood. Fix it.")
 
 		#
-		osc_corr = np.squeeze(self.corrs[dat_type + osc_band])
-		osc_p = np.squeeze(self.ps[dat_type + osc_band])
+		meg_corr = np.squeeze(self.corrs[dat_type + meg_dat])
+		meg_p = np.squeeze(self.ps[dat_type + meg_dat])
 
 		#
-		inds_max = np.argsort(osc_corr, axis=0)
+		inds_max = np.argsort(meg_corr, axis=0)
 
 		# Print Header Rows
-		print("\n\nCorrelations for ",  str(dat_type), " &  ", str(osc_band), ': \n')
+		print("\n\nCorrelations for ",  str(dat_type), " &  ", str(meg_dat), ': \n')
 		print('# \t', format(dat_type, la_str), '\t R-Vals \t P-vals \n')
 
 		# 
 		if top:
-			for i in range(1, nCheck):
+			for i in range(1, nCheck+1):
 				ind = int(inds_max[-i])
-				print(str(i), '\t', format(names[ind][:50], la_str), '\t', format(osc_corr[ind], '1.5f'), '\t', format(osc_p[ind], '1.4e'))
+				print(str(i), '\t', format(names[ind][:50], la_str), '\t', format(meg_corr[ind], '1.5f'), '\t', format(meg_p[ind], '1.4e'))
 
 		# 
 		else:
 			for i in range(0, nCheck):
 				ind = int(inds_max[i])
-				print(str(i), '\t', format(names[ind][:50], la_str), '\t', format(osc_corr[ind], '1.5f'), '\t', format(osc_p[ind], '1.4e'))
+				print(str(i), '\t', format(names[ind][:50], la_str), '\t', format(meg_corr[ind], '1.5f'), '\t', format(meg_p[ind], '1.4e'))
 
 
 	def unload_data(self, dat_type):
@@ -958,25 +1078,90 @@ class MapComp():
 			print('Data type not understood. Try again.')
 
 
-	def plot_corrs(self, dat_type, osc_band):
-		""" """
+	def plot_corrs(self, dat_type, meg_dat):
+		"""   """
 
-		osc_corrs = np.squeeze(self.corrs[dat_type + osc_band])
-		osc_ps = np.squeeze(self.ps[dat_type + osc_band])
+		#
+		meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
+		meg_ps = np.squeeze(self.ps[dat_type + meg_dat])
 		
 		#
 		f, ax = plt.subplots(1, 2, figsize=(12, 6))
 
-		plt.suptitle('Corr Stats for ' + dat_type + ' ' + osc_band, fontsize=20, fontweight='bold')
+		plt.suptitle('Corr Stats for ' + dat_type + ' ' + meg_dat, fontsize=20, fontweight='bold')
 
 		#
-		ax[0].plot(osc_corrs, '.')
+		ax[0].plot(meg_corrs, '.')
 		ax[0].set_title('R Values', {'fontsize': 16, 'fontweight': 'bold'})
 		ax[0].set_ylim([-0.41, 0.41])
 
 		#
-		ax[1].plot(osc_ps, '.')
+		ax[1].plot(meg_ps, '.')
 		ax[1].set_title('P Values', {'fontsize': 16, 'fontweight': 'bold'})
+
+
+	def save_corrs(self, dat_type, meg_dat, save_as_npz=True, save_as_csv=True):
+		"""   """
+
+		# 
+		if dat_type is 'Terms':
+			names = self.term_names
+			#if not self.osc_term_corrs_calc: print("Term corrs not yet calculated. Can't save."); return
+		elif dat_type is 'Genes':
+			names = self.gene_names
+			#if not self.osc_gene_corrs_calc: print("Gene corrs not calculated. Can't save."); return
+		else:
+			print("Data type not understood. Fix it.")
+
+		# Get the correlation data of interest
+		meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
+		meg_ps = np.squeeze(self.ps[dat_type + meg_dat])
+
+		#
+		file_name = 'Corrs_' + dat_type + meg_dat
+		save_path = os.path.join('/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/', dat_type)
+
+		#
+		if save_as_npz:
+
+			#
+			npz_path = os.path.join(save_path, 'npz', '')
+			outfile_npz = npz_path + file_name + '.npz'
+
+			#
+			np.savez(outfile_npz, dat_type=dat_type, meg_dat=meg_dat, names=names, meg_corrs=meg_corrs, meg_ps=meg_ps)
+
+		#
+		if save_as_csv:
+
+			#
+			csv_path = os.path.join(save_path, 'csv', '')
+			outfile_csv = csv_path + file_name + '.csv'
+
+			csv_file = open(outfile_csv, 'w')
+        	
+			# Write Header
+			csv_file.write('Name, R-Value, P-Value' + '\n')
+
+			#
+			nRows = len(names)
+
+			#
+			inds_max = np.argsort(meg_corrs, axis=0)
+
+			# 
+			for i in range(1, nRows+1):
+
+				#
+				ind = int(inds_max[-i])
+
+				#
+				out_list = [names[ind].replace(',', ' '), str(meg_corrs[ind]), str(meg_ps[ind])];
+				out_list = ",".join(out_list)
+				csv_file.write(out_list + '\n')
+
+			#
+			csv_file.close()
 
 
 ########################################################################################
