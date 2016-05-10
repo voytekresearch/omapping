@@ -49,6 +49,18 @@ foof_labels = {'xx', 'Theta_Score', 'Alpha_Score', 'Beta_Score', 'LowGamma_Score
 
 disp('Data Loaded')
 
+%% Load FOOF Data - Slopes
+
+% Set filename
+filename = 'Group_Slopes.mat';
+
+% Load Slope data
+load([datapath, filename]);
+foof_dat = {chis};
+foof_labels = {'Slopes'};
+
+disp('Data Loaded');
+
 %% Set FOOF Data
 
 for i = 1:length(foof_dat)
