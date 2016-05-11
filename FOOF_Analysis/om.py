@@ -927,10 +927,10 @@ class MapComp():
             genes_file_names    - list of files containing gene data
 
         Note:
-            Input must be a list. If gene data in single file, use single item list. 
-            If list contains multiple files, these files will be loaded and 
+            Input must be a list. If gene data in single file, use single item list.
+            If list contains multiple files, these files will be loaded and
                 concatenated to form the full gene maps.
-            Order: First file should be first set of files. 
+            Order: First file should be first set of files.
         """
         
         # If one file given, load this as the gene map
@@ -957,7 +957,7 @@ class MapComp():
 
     def load_term_maps(self, term_file_name):
         """Load the spatial maps of term data."""
-        
+
         # Get full path for the csv file
         terms_csv = os.path.join(self.terms_path, term_file_name)
 
@@ -1056,14 +1056,14 @@ class MapComp():
         if top:
             for i in range(1, n_check+1):
                 ind = int(inds_max[-i])
-                print(str(i), '\t', format(names[ind][:50], la_str), '\t', 
+                print(str(i), '\t', format(names[ind][:50], la_str), '\t',
                       format(meg_corr[ind], '1.5f'), '\t', format(meg_p[ind], '1.4e'))
 
         # Print out the bottom group (highest negative correlations)
         else:
             for i in range(0, n_check):
                 ind = int(inds_max[i])
-                print(str(i), '\t', format(names[ind][:50], la_str), '\t', 
+                print(str(i), '\t', format(names[ind][:50], la_str), '\t',
                       format(meg_corr[ind], '1.5f'), '\t', format(meg_p[ind], '1.4e'))
 
 
@@ -1172,8 +1172,9 @@ class MapComp():
             npz_path = os.path.join(save_path, 'npz', '')
             outfile_npz = npz_path + file_name + '.npz'
 
-            #
-            np.savez(outfile_npz, dat_type=dat_type, meg_dat=meg_dat, names=names, meg_corrs=meg_corrs, meg_p_vals=meg_p_vals)
+            # Save out npz file
+            np.savez(outfile_npz, dat_type=dat_type, meg_dat=meg_dat, names=names, 
+                     meg_corrs=meg_corrs, meg_p_vals=meg_p_vals)
 
         # Save a csv file
         if save_as_csv:
@@ -1440,19 +1441,20 @@ def clean_file_list(files_in, string):
     Outputs:
         files_out       -
     """
-    
+
+    # Initialize variable of files to return
     files_out = []
 
-    #
+    # Loop through given files, keeping those that contain string
     for i in range(0, len(files_in)):
         if string in files_in[i]:
             files_out.append(files_in[i])
-            
+
     return files_out
 
 
 def get_sub_nums(files_in):
-    """Takes a list of files. Returns a list of subject numbers. 
+    """Takes a list of files. Returns a list of subject numbers.
 
     Inputs:
         files_in        - list of files
@@ -1464,7 +1466,7 @@ def get_sub_nums(files_in):
     # Intialize variable to store subject numbers
     subnums = []
 
-    #
+    # Loop through files, extracting subject numbers
     for f_name in files_in:
         str_split = f_name.split('_', 1)
         subnums.append(int(str_split[0]))
@@ -1473,7 +1475,7 @@ def get_sub_nums(files_in):
 
 
 def get_cur_subj(cur_subj, files):
-    """Takes an int, and a list of file names (strings), returns the file name with the number in it.
+    """Returns the file name with the given number in it.
 
     Inputs:
         cur_subj        - subject number to search for in given file list (int)
@@ -1482,11 +1484,11 @@ def get_cur_subj(cur_subj, files):
     Outputs:
         subj_file       - file name of subject file
     """
-    
-    #
+
+    # Make sure given number is a string
     cur_subj_str = str(cur_subj)
-    
-    #
+
+    # Loop through files, looking for one which contains #
     for i in range(0, len(files)):
         if cur_subj_str in files[i]:
             return files[i]
