@@ -810,24 +810,24 @@ class MapComp():
 
     def __init__(self):
 
-        #
+        # Set root path for where all map data is stored
         self.maps_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/'
 
-        # 
+        # Set specific paths for different data types
         self.oscs_path = os.path.join(self.maps_path, 'Oscs')
         self.genes_path = os.path.join(self.maps_path, 'Genes')
         self.terms_path = os.path.join(self.maps_path, 'Terms')
         self.slopes_path = os.path.join(self.maps_path, 'Slopes')
 
-        #
+        # Import the vectors of gene & term names
         self.term_names = _get_map_names('ns_terms.csv', self.terms_path)
         self.gene_names = _get_map_names('real_gene_names.csv', self.genes_path)
 
-        #
+        # Get number of terms and genes used
         self.n_terms = len(self.term_names)
         self.n_genes = len(self.gene_names)
 
-        #
+        # Initialize a dictionary to store maps of meg data (oscillations & slopes)
         self.meg_maps = dict([('Theta',     np.array([])),
                               ('Alpha',     np.array([])),
                               ('Beta',      np.array([])),
@@ -835,13 +835,13 @@ class MapComp():
                               ('Slopes',    np.array([]))
                              ])
 
-        #
+        # Initialize variable to store the term maps
         self.term_maps = np.array([])
 
-        #
+        # Initialize variable to store the gene maps
         self.gene_maps = np.array([])
 
-        #
+        # Initialize a dictionary to store all the R-value results from spatial correlations
         self.corrs = dict([('TermsTheta',  np.array([])), ('TermsAlpha',    np.array([])),
                            ('TermsBeta',   np.array([])), ('TermsLowGamma', np.array([])),
                            ('GenesTheta',  np.array([])), ('GenesAlpha',    np.array([])),
@@ -849,7 +849,7 @@ class MapComp():
                            ('TermsSlopes', np.array([])), ('GenesSlopes',   np.array([]))
                           ])
 
-        #
+        # Initialize a dictionary to store all the p-value results from spatial correlations
         self.p_vals = dict([('TermsTheta',  np.array([])),  ('TermsAlpha',    np.array([])),
                             ('TermsBeta',   np.array([])),  ('TermsLowGamma', np.array([])),
                             ('GenesTheta',  np.array([])),  ('GenesAlpha',    np.array([])),
@@ -857,7 +857,7 @@ class MapComp():
                             ('TermsSlopes', np.array([])),  ('GenesSlopes',   np.array([]))
                             ])
 
-        #
+        # Initialize booleans that keep track of what is loaded
         self.oscs_loaded = False
         self.slopes_loaded = False
         self.genes_loaded = False
@@ -865,7 +865,7 @@ class MapComp():
 
 
     def check_files(self, print_files=True, return_files=False):
-        """   """
+        """Gets the list of files in the map directories. Can return and/or print."""
 
         #
         osc_files = clean_file_list(os.listdir(self.oscs_path), '.npz')
@@ -885,81 +885,100 @@ class MapComp():
 
 
     def load_meg_maps(self, osc_file=None, slope_file=None):
-        """   """
+        """Load the spatial maps of MEG data (oscillations and slopes)."""
 
-        #
+        # If a filename is provided, load oscillation data
         if osc_file is not None:
 
-            #
+            # Get the full path for the file name
             oscs_map_file = os.path.join(self.oscs_path, osc_file + '.npz')
 
-            #
+            # Load osc file data
             with np.load(oscs_map_file) as data:
 
-                #
+                # Load osc maps into the meg_map dictionary
                 self.meg_maps['Theta']      = data['osc_score_theta']
                 self.meg_maps['Alpha']      = data['osc_score_alpha']
                 self.meg_maps['Beta']       = data['osc_score_beta']
                 self.meg_maps['LowGamma']   = data['osc_score_lowgamma']
 
-            #
+            # Update boolean that oscs are loaded
             self.oscs_loaded = True
 
-        # 
+        # If a filename is provided, load slope data
         if slope_file is not None:
 
-            #
+            # Get the full path for the file name
             slopes_map_file = os.path.join(self.slopes_path, slope_file + '.npz')
 
-            #
+            # Load slope file data
             with np.load(slopes_map_file) as data:
 
-                #
+                # Load the slope map into the meg_map dictionary
                 self.meg_maps['Slopes']     = data['chis']
 
-            #
+            # Update boolean that slopes are loaded
             self.slopes_loaded = True
 
 
     def load_gene_maps(self, genes_file_names):
-        """   """
+        """Load the spatial maps of gene data.
+        Inputs:
+            genes_file_names    - list of files containing gene data
+
+        Note:
+            Input must be a list. If gene data in single file, use single item list. 
+            If list contains multiple files, these files will be loaded and 
+                concatenated to form the full gene maps.
+            Order: First file should be first set of files. 
+        """
         
-        #
+        # If one file given, load this as the gene map
         if len(genes_file_names) == 1:
             self.gene_maps = pd.read_csv(genes_file_names[0], header=None)
 
-        #
+        # If multiple files, load them all and concatenate
         else:
+            # Loop through all files given
             for i in range(0, len(genes_file_names)):
+                # If first file, initialize as first part of the gene map
                 if i == 0:
                     genes_csv = os.path.join(self.genes_path, genes_file_names[0])
                     self.gene_maps = pd.read_csv(genes_csv, header=None)
+                # For all subsequent files, concatenate to end of gene map
                 else:
                     genes_csv = os.path.join(self.genes_path, genes_file_names[i])
                     temp_df = pd.read_csv(genes_csv, header=None)
                     self.gene_maps = pd.concat([self.gene_maps, temp_df])
 
-        #
+        # Update boolean that genes are loaded
         self.genes_loaded = True
 
 
     def load_term_maps(self, term_file_name):
-        """   """
+        """Load the spatial maps of term data."""
         
-        #
+        # Get full path for the csv file
         terms_csv = os.path.join(self.terms_path, term_file_name)
 
-        #
+        # Load the terms map
         self.term_maps = pd.read_csv(terms_csv, header=None)
 
-        #
+        # Update boolean that terms are loaded
         self.terms_loaded = True
 
 
     def calc_corrs(self, dat_type, meg_dat):
-        """   """
+        """Calculate correlations between spatial maps.
 
-        #
+        Inputs:
+            dat_type        - Type of data to correlate with meg data
+                                'Terms' or 'Genes' only
+            meg_dat         - Specific type of meg data to correlate
+                                osc_band or 'Slopes' only
+        """
+
+        # Check with data type and set data accordingly
         if dat_type is 'Terms':
             n_comps = self.n_terms
             dat_df = self.term_maps
@@ -970,37 +989,44 @@ class MapComp():
             print("Improper Data Type. Fix it.")
             return
 
-        #
+        # Get the specified meg map
         try:
             meg_map = self.meg_maps[meg_dat]
         except KeyError:
             print('MEG Data not understood. Fix it.')
 
-        #
+        # Initialize vectors to store correlation results
         corr_vals = np.zeros([n_comps, 1])
         p_vals = np.zeros([n_comps, 1])
 
-        #
-        for vertex in range(0, n_comps):
+        # Loop through all comparisons to run
+        for comp in range(0, n_comps):
 
-            #
-            dat = np.array(dat_df.ix[:, vertex])
+            # Pull out specific data (single term or gene)
+            dat = np.array(dat_df.ix[:, comp])
 
-            #
+            # Get inds of data that contains numbers
             inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) == False]
 
-            #
-            [corr_vals[vertex], p_vals[vertex]] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
+            # Calculate correlation between data and meg map
+            [corr_vals[comp], p_vals[comp]] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
 
-        #
+        # Save correlations results to MapComp object
         self.corrs[dat_type + meg_dat] = corr_vals
         self.p_vals[dat_type + meg_dat] = p_vals
 
 
     def check_corrs(self, dat_type, meg_dat, n_check=20, top=True):
-        """   """
+        """Check (print out) highest or lowest oscillations.
 
-        # 
+        Inputs:
+            dat_type        - Data type (Terms or Genes) of corrs to check
+            meg_dat         - Specific MEG data of corrs to check
+            n_check         - Number of correlations to check
+            top             - Get Top (True) or Bottom (False) set of correlations
+        """
+
+        # Check which type of data and set names accordingly
         if dat_type is 'Terms':
             names = self.term_names
             la_str = ' <30'
@@ -1015,25 +1041,25 @@ class MapComp():
             print("Those correlations not calculated. Quitting.")
             return
 
-        #
+        # Get R and p values of specified correlations
         meg_corr = np.squeeze(self.corrs[dat_type + meg_dat])
         meg_p = np.squeeze(self.p_vals[dat_type + meg_dat])
 
-        #
+        # Sort the corr vector
         inds_max = np.argsort(meg_corr, axis=0)
 
         # Print Header Rows
         print("\n\nCorrelations for ", str(dat_type), " &  ", str(meg_dat), ': \n')
         print('# \t', format(dat_type, la_str), '\t R-Vals \t P-vals \n')
 
-        #
+        # Print out the top group (highest positive correlations)
         if top:
             for i in range(1, n_check+1):
                 ind = int(inds_max[-i])
                 print(str(i), '\t', format(names[ind][:50], la_str), '\t', 
                       format(meg_corr[ind], '1.5f'), '\t', format(meg_p[ind], '1.4e'))
 
-        #
+        # Print out the bottom group (highest negative correlations)
         else:
             for i in range(0, n_check):
                 ind = int(inds_max[i])
@@ -1042,9 +1068,9 @@ class MapComp():
 
 
     def unload_data(self, dat_type):
-        """   """
+        """Unload specified data from MapComp object."""
 
-        #
+        # Unload Term data
         if dat_type is 'Terms':
 
             # Check if terms are currently loaded. Return if not.
@@ -1057,7 +1083,7 @@ class MapComp():
             # Update boolean that terms are not loaded
             self.terms_loaded = False
 
-        #
+        # Unload Gene data
         elif dat_type is 'Genes':
 
             # Check if genes are currently loaded. Return if not.
@@ -1070,43 +1096,55 @@ class MapComp():
             # Update boolean that genes are not loaded
             self.genes_loaded = True
 
-        #
+        # Otherwise, data type was not understood
         else:
             print('Data type not understood. Try again.')
 
 
     def plot_corrs(self, dat_type, meg_dat):
-        """   """
+        """Plot the R and p values of specified correlation results.
+
+        Inputs:
+            dat_type        - Data type to plot corrs for (Terms or Genes)
+            meg_dat         - Specific meg map to plot corrs for
+        """
 
         # Check that asked for correlations have been computed
         if not self.corrs[dat_type + meg_dat]:
             print("Those correlations not calculated. Quitting.")
             return
 
-        #
+        # Get the specified data
         meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
         meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])
         
-        #
+        # Initialize subplot figure
         fig, ax = plt.subplots(1, 2, figsize=(12, 6))
 
-        #
+        # Set supertitle for the plot
         plt.suptitle('Corr Stats for ' + dat_type + ' ' + meg_dat, fontsize=20, fontweight='bold')
 
-        #
+        # Plot R values
         ax[0].plot(meg_corrs, '.')
         ax[0].set_title('R Values', {'fontsize': 16, 'fontweight': 'bold'})
-        ax[0].set_ylim([-0.41, 0.41])
+        ax[0].set_ylim([-0.5, 0.5])
 
-        #
+        # Plot the p values
         ax[1].plot(meg_p_vals, '.')
         ax[1].set_title('P Values', {'fontsize': 16, 'fontweight': 'bold'})
 
 
     def save_corrs(self, dat_type, meg_dat, save_as_npz=True, save_as_csv=True):
-        """   """
+        """Save out the correlation results.
 
-        # 
+        Inputs:
+            dat_type            - Data type to save corrs for ('Terms' or 'Genes')
+            meg_dat             - MEG data to save corrs for
+            save_as_npz         - Boolean of whether to save an npz file
+            save_as_csv         - Boolean of whether to save a csv file
+        """
+
+        # Check which type of data and set names accordingly
         if dat_type is 'Terms':
             names = self.term_names
         elif dat_type is 'Genes':
@@ -1123,50 +1161,51 @@ class MapComp():
         meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
         meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])
 
-        #
+        # Set basic file name to save data as
         file_name = 'Corrs_' + dat_type + meg_dat
         save_path = os.path.join('/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/', dat_type)
 
-        #
+        # Save a numpy npz file
         if save_as_npz:
 
-            #
+            # Set up specific name/path for npz file
             npz_path = os.path.join(save_path, 'npz', '')
             outfile_npz = npz_path + file_name + '.npz'
 
             #
             np.savez(outfile_npz, dat_type=dat_type, meg_dat=meg_dat, names=names, meg_corrs=meg_corrs, meg_p_vals=meg_p_vals)
 
-        #
+        # Save a csv file
         if save_as_csv:
 
-            #
+            # Set up specific name/path for csv file
             csv_path = os.path.join(save_path, 'csv', '')
             outfile_csv = csv_path + file_name + '.csv'
 
+            # Open the csv file
             csv_file = open(outfile_csv, 'w')
 
             # Write Header
             csv_file.write('Name, R-Value, P-Value' + '\n')
 
-            #
+            # Get number of rows of data to save out
             n_rows = len(names)
 
-            #
+            # Sort data to save out in sorted order
             inds_max = np.argsort(meg_corrs, axis=0)
 
-            # 
+            # Loop through each row of data, saving out to file
             for i in range(1, n_rows+1):
 
-                #
+                # Get index of next data to save
                 ind = int(inds_max[-i])
 
-                #
+                # Set data as string to print out to csv file
                 out_list = [names[ind].replace(',', ' '), str(meg_corrs[ind]), str(meg_p_vals[ind])]
                 out_list = ",".join(out_list)
                 csv_file.write(out_list + '\n')
 
-            #
+            # Close the csv file
             csv_file.close()
 
 
@@ -1203,11 +1242,6 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
 
     # Get number of oscillations in the frequency band.
     n_oscs = len(osc_cens)
-
-    # OLD: Get single oscillation. This just returned the first (lowest freq) osc.
-    #cen, n_oscs = _get_single_osc(osc_cens)
-    #power, x = _get_single_osc(osc_pows)
-    #bw, x = _get_single_osc(osc_bws)
 
     # Get highest power oscillation in band
     cen, power, bw = _get_single_osc_power(osc_cens, osc_pows, osc_bws)
