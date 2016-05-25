@@ -752,6 +752,7 @@ class GroupMegData(MegData):
 
     def freq_corr(self, f_win):
         """Calculates the correlation between adjacent frequency bands.
+        Uses oscillation probabilities. 
 
         Inputs:
             f_win       - Size of frequency window to use
@@ -792,10 +793,6 @@ class GroupMegData(MegData):
         # Initialize vectors to store correlations and p-values
         corr_vec = np.zeros([n_freqs-1])
         p_vec = np.zeros([n_freqs-1])
-
-        # Compute corr between f and f+1 start windows
-        #for f in range(0, n_freqs-1):
-            #corr_vec[f], p_vec[f] = pearsonr(prob_mat[:, f], prob_mat[:, f+1])
 
         # Compute corr between f and f+f_win start windows
         for f_ind in range(0, n_freqs-f_win):
@@ -1037,9 +1034,9 @@ class MapComp():
             print("Data type not understood. Fix it.")
 
         # Check that asked for correlations have been computed
-        if not self.corrs[dat_type + meg_dat]:
-            print("Those correlations not calculated. Quitting.")
-            return
+        #if not self.corrs[dat_type + meg_dat]:
+        #    print("Those correlations not calculated. Quitting.")
+        #    return
 
         # Get R and p values of specified correlations
         meg_corr = np.squeeze(self.corrs[dat_type + meg_dat])
@@ -1110,9 +1107,9 @@ class MapComp():
         """
 
         # Check that asked for correlations have been computed
-        if not self.corrs[dat_type + meg_dat]:
-            print("Those correlations not calculated. Quitting.")
-            return
+        #if not self.corrs[dat_type + meg_dat]:
+        #    print("Those correlations not calculated. Quitting.")
+        #    return
 
         # Get the specified data
         meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
@@ -1153,9 +1150,9 @@ class MapComp():
             print("Data type not understood. Fix it.")
 
         # Check that asked for correlations have been computed
-        if not self.corrs[dat_type + meg_dat]:
-            print("Those correlations not calculated. Quitting.")
-            return
+        #if not self.corrs[dat_type + meg_dat]:
+        #    print("Those correlations not calculated. Quitting.")
+        #    return
 
         # Get the correlation data of interest
         meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
