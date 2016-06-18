@@ -14,6 +14,7 @@ from scipy.stats.stats import pearsonr
 
 class Osc:
     """Class to store oscillations parameters."""
+    
     def __init__(self):
 
         # Theta
@@ -370,7 +371,9 @@ class MegData():
 
 
     def save_pickle(self):
-        """Save current meg data object as a pickled object."""
+        """Save current meg data object as a pickled object.
+        NOTE: NOT YET IMPLEMENTED. 
+        """
 
         pass
 
