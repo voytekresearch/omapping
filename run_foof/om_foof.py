@@ -9,6 +9,9 @@ sys.path.append('/Users/thomasdonoghue/Documents/GitCode/')
 from foof import syn
 from foof.fit import FOOF
 
+# Import Parallelization Packages
+from multiprocessing import Pool, freeze_support
+
 ###############################
 ###### OM_FOOF Functions ######
 ###############################
@@ -61,29 +64,28 @@ def extract_psd(psd, freqs, f_low, f_high):
 
     return psd_ext, freqs_ext
 
-def meg_foof(psd, freqs, method, min_p, freq_res):
+def meg_foof(psd_ext, freqs_ext, method, min_p, freq_res):
     """   """
 
     # Check how many PSDs there are
-    [nPSDs, nFreqs] = np.shape(psd)
+    [nPSDs, nFreqs] = np.shape(psd_ext)
 
-    # FOOF Settings
-    min_p = 0.1
-    foof = FOOF(min_p=min_p, res=freq_res, fmin=freqs.min(), fmax=freqs.max())
+    # Initialize foof
+    foof = FOOF(min_p=min_p, res=freq_res, fmin=freqs_ext.min(), fmax=freqs_ext.max())
 
     # Set up PSD as a list of 2-D np arrays
-    psd_list = list(psd)
+    psd_list = list(psd_ext)
     for i in range(0, nPSDs):
-        psd_list[i] = np.reshape(psd_list[i], [len(freqs), 1])
+        psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
 
     #
     if method is 'linear':
-        results = [_run_foof(freqs, psd) for psd in psd_list]
+        results = [_run_foof_l(foof, freqs_ext, psd) for psd in psd_list]
 
     #
     if method is 'parallel':
-        pool = Pool(8)
-        results = pool.map(_run_foof, psd_list[0:10])
+        pool = Pool(4)
+        results = pool.map(_run_foof_p, psd_list)
         pool.close()
         pool.join()
 
@@ -97,13 +99,25 @@ def save_pickle(results, save_path, subj):
     foof_save_path = os.path.join(save_path, save_name)
     pickle.dump(results, open(foof_save_path, 'wb'))
 
+#######################################################
+############## OM_FOOF Private Functions ##############
+#######################################################
 
-#def foof_par(psd):
-def _run_foof(freqs, psd):
+def _run_foof_l(foof, freqs_ext, psd_ext):
     """   """
 
     # Fit FOOF
-    foof.model(freqs, psd)
+    foof.model(freqs_ext, psd_ext)
+    
+    # Store vals in tuple and return
+    return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
+
+
+def _run_foof_p(psd_ext):
+    """   """
+
+    # Fit FOOF
+    foof.model(freqs_ext, psd_ext)
     
     # Store vals in tuple and return
     return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
