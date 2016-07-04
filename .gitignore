@@ -2,3 +2,5 @@
 *.pyc
 # Ignore ipynb checkpoint files
 **/.ipynb_checkpoints
+# Ignore files marked as old
+*_old
