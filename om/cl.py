@@ -89,7 +89,19 @@ class MegData():
 
 
     def import_foof(self, subnum, get_demo=True, load_type='pickle'):
-        """Import FOOF results to MegData object."""
+        """Import FOOF results to MegData object.
+
+        Parameters
+        ----------
+        self : ?
+            XX
+        subnum : int
+            XX
+        get_demo : boolean, optional
+            XX
+        load_type : str, optional
+            XX
+        """
 
         # Check if object already has data
         if self.has_data:
@@ -148,9 +160,12 @@ class MegData():
         """Groups oscillations at each vertex in distinct frequency bands.
         Stores band specific oscillations in (self.){thetas, alphas, betas, lowgammas}.
 
-        Inputs:
-            self        - MegData object
-            osc         - An object containing frequency bands to use
+        Parameters
+        ----------
+        self : MegData object
+            MegData object. 
+        osc : Osc object
+            An object containing frequency bands to use. 
         """
 
         ## Re-Initialize matrices to right size to save results
@@ -231,8 +246,10 @@ class MegData():
     def peak_freq(self, osc):
         """Calculates the peak frequency for each oscillatory band.
 
-        Inputs:
-            osc         - object with oscillation frequency details
+        Parameters
+        ----------
+        osc : Osc object
+            Object with oscillation frequency details
         """
 
         # Get peak frequency within each frequency band
@@ -445,11 +462,18 @@ class GroupMegData(MegData):
     def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, add_vertex_oscs=False, add_vertex_slopes=False):
         """Adds a new subject to the GroupMegData object.
 
-        Inputs:
-            new_subj            - MEG subject (instance of MegData)
-            add_all_oscs        -
-            add_vertex_bands    -
-            add_vertex_oscs     -
+        Parameters
+        ----------
+        self : XX
+            XX
+        new_subj : MegData() Object
+            MEG subject (instance of MegData)
+        add_all_oscs : boolean, optional
+            XX
+        add_vertex_bands : boolean, optional
+            XX
+        add_vertex_oscs : boolean, optional
+            XX
         """
 
         # Check if subject has data
@@ -536,7 +560,20 @@ class GroupMegData(MegData):
 
 
     def group_slope(self, save_out=False, file_name=None, set_viz=False):
-        """   """
+        """   
+
+        Parameters
+        ----------
+        self : MegData() Object
+            XX
+        save_out : boolean, optional
+            XX
+        file_name : str
+            XX
+        set_viz : boolean, optional
+            XX
+
+        """
 
         # Calculate the average slope value per vertex
         self.chis_avg = np.median(self.gr_chis, axis=1)
@@ -765,8 +802,10 @@ class GroupMegData(MegData):
         """Calculates the correlation between adjacent frequency bands.
         Uses oscillation probabilities. 
 
-        Inputs:
-            f_win       - Size of frequency window to use
+        Parameters
+        ----------
+        f_win : float
+            Size of frequency window to use. 
         """
 
         # Get # vertices, # of subjects to loop through
@@ -893,7 +932,16 @@ class MapComp():
 
 
     def load_meg_maps(self, osc_file=None, slope_file=None):
-        """Load the spatial maps of MEG data (oscillations and slopes)."""
+        """Load the spatial maps of MEG data (oscillations and slopes).
+
+        Parameters
+        ----------
+        osc_file : str, optional
+            XX
+        slope_file : str, optional
+            XX
+
+        """
 
         # If a filename is provided, load oscillation data
         if osc_file is not None:
@@ -931,8 +979,11 @@ class MapComp():
 
     def load_gene_maps(self, genes_file_names):
         """Load the spatial maps of gene data.
-        Inputs:
-            genes_file_names    - list of files containing gene data
+
+        Parameters
+        ----------
+        genes_file_names : list (str)
+            list of files containing gene data
 
         Note:
             Input must be a list. If gene data in single file, use single item list.
@@ -964,7 +1015,14 @@ class MapComp():
 
 
     def load_term_maps(self, term_file_name):
-        """Load the spatial maps of term data."""
+        """Load the spatial maps of term data.
+
+        Parameters
+        ----------
+        term_file_name : str
+            XX
+
+        """
 
         # Get full path for the csv file
         terms_csv = os.path.join(self.terms_path, term_file_name)
@@ -979,11 +1037,14 @@ class MapComp():
     def calc_corrs(self, dat_type, meg_dat):
         """Calculate correlations between spatial maps.
 
-        Inputs:
-            dat_type        - Type of data to correlate with meg data
-                                'Terms' or 'Genes' only
-            meg_dat         - Specific type of meg data to correlate
-                                osc_band or 'Slopes' only
+        Parameters
+        ----------
+        dat_type : str
+            Type of data to correlate with meg data
+                'Terms' or 'Genes' only
+        meg_dat : str
+            Specific type of meg data to correlate
+                osc_band or 'Slopes' only
         """
 
         # Check with data type and set data accordingly
@@ -1027,11 +1088,16 @@ class MapComp():
     def check_corrs(self, dat_type, meg_dat, n_check=20, top=True):
         """Check (print out) highest or lowest oscillations.
 
-        Inputs:
-            dat_type        - Data type (Terms or Genes) of corrs to check
-            meg_dat         - Specific MEG data of corrs to check
-            n_check         - Number of correlations to check
-            top             - Get Top (True) or Bottom (False) set of correlations
+        Parameters
+        ----------
+        dat_type : str
+            Data type (Terms or Genes) of corrs to check
+        meg_dat : str
+            Specific MEG data of corrs to check
+        n_check : int, optional
+            Number of correlations to check
+        top :
+            Get Top (True) or Bottom (False) set of correlations
         """
 
         # Check which type of data and set names accordingly
@@ -1076,7 +1142,14 @@ class MapComp():
 
 
     def unload_data(self, dat_type):
-        """Unload specified data from MapComp object."""
+        """Unload specified data from MapComp object.
+
+        Parameters
+        ----------
+        dat_type : str
+            XX
+
+        """
 
         # Unload Term data
         if dat_type is 'Terms':
@@ -1112,9 +1185,13 @@ class MapComp():
     def plot_corrs(self, dat_type, meg_dat):
         """Plot the R and p values of specified correlation results.
 
-        Inputs:
-            dat_type        - Data type to plot corrs for (Terms or Genes)
-            meg_dat         - Specific meg map to plot corrs for
+        Parameters
+        ----------
+        dat_type : str
+            Data type to plot corrs for (Terms or Genes). 
+        meg_dat : str
+            Specific meg map to plot corrs for. 
+
         """
 
         # Check that asked for correlations have been computed
@@ -1145,11 +1222,17 @@ class MapComp():
     def save_corrs(self, dat_type, meg_dat, save_as_npz=True, save_as_csv=True):
         """Save out the correlation results.
 
-        Inputs:
-            dat_type            - Data type to save corrs for ('Terms' or 'Genes')
-            meg_dat             - MEG data to save corrs for
-            save_as_npz         - Boolean of whether to save an npz file
-            save_as_csv         - Boolean of whether to save a csv file
+        Parameters
+        ----------
+        dat_type : str
+            Data type to save corrs for ('Terms' or 'Genes'). 
+        meg_dat : str
+            MEG data to save corrs for. 
+        save_as_npz : boolean, optional
+            Whether to save an npz file. Default is True. 
+        save_as_csv : boolean, optional
+            Whether to save a csv file. Default is True. 
+
         """
 
         # Check which type of data and set names accordingly
@@ -1228,16 +1311,23 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
     Returns a single oscillation in that band.
     Helper function for osc_per_vertex in MegData.
 
-    Inputs:
-        centers         - vector of oscillation centers
-        powers          - vector of oscillation powers
-        bws             - vector of oscillation bandwidths
-        osc_low         -
-        osc_high        -
+    Parameters
+    ----------
+    centers : 1d array
+        Vector of oscillation centers.
+    powers : 1d array
+        Vector of oscillation powers.
+    bws : 1d array
+        Vector of oscillation bandwidths.
+    osc_low : float
+        Lower bound of frequency band to extract.
+    osc_high : float
+        Upper bound of frequency band to extract.
 
-    Outputs:
-        osc_out         - Tuple
-                            [centers, powers, bws, number of oscillations]
+    Returns
+    -------
+    osc_out : tuple
+        Osc data, form: [centers, powers, bws, # oscillations]. 
 
     """
 
@@ -1287,12 +1377,18 @@ def _get_all_osc(centers, osc_low, osc_high):
 def _get_demo_csv(subnum):
     """Get demographic information from csv file for specified subject.
 
-    Inputs:
-        subnum      - Subject number to get demographic info for
+    Parameters
+    ----------
+    subnum : int
+        Subject number to get demographic info for. 
 
-    Outputs:
-        sex         - Sex ['M'/'F'] of specified subject
-        age         - Age (in whole years) of specified subject
+    Returns
+    -------
+    sex : str
+        Sex ['M'/'F'] of specified subject. 
+    age : int
+        Age (in whole years) of specified subject. 
+
     """
 
     # Set up paths for demographic info csv file
@@ -1315,15 +1411,24 @@ def _get_demo_csv(subnum):
 def _get_single_osc_power(osc_cens, osc_pows, osc_bws):
     """Return the highest power oscillation in a given range.
 
-    Inputs:
-        osc_cens        - Vector of oscillation centers
-        osc_pows        - Vector of oscillation powers
-        osc_bws         - Vector of oscillation bandwidths
+    Parameters
+    ----------
+    osc_cens : 1d array
+        Vector of oscillation centers.
+    osc_pows : 1d array
+        Vector of oscillation powers.
+    osc_bws : 1d array
+        Vector of oscillation bandwidths.
 
-    Outputs:
-        center          - Center frequency value of highest power oscillation
-        power           - Power value of highest power oscillation
-        bw              - Bandwidth of highest power oscillation
+    Returns
+    -------
+    center : float
+        Center frequency value of highest power oscillation.
+    power : float
+        Power value of highest power oscillation.
+    bw : float
+        Bandwidth of highest power oscillation.
+    
     """
 
     # Return zeros if there are no oscillations in given vectors
@@ -1341,11 +1446,16 @@ def _get_single_osc_power(osc_cens, osc_pows, osc_bws):
 def _osc_prob(osc_mat):
     """Takes a 3D matrix of oscillations across subjects, calculates probability of oscillation.
 
-    Inputs:
-        osc_mat         - Matrix of
-                            [n_vertex, n_dim, n_subj]
-    Outputs:
-        prob            - Vector with probability of given oscillation at each vertex
+    Parameters
+    ----------
+    osc_mat : ??
+        Matrix of [n_vertex, n_dim, n_subj]
+    
+    Returns
+    -------
+    prob : ??
+        Vector with probability of given oscillation at each vertex.
+
     """
 
     # Check how many vertices and subjects in group
@@ -1366,11 +1476,15 @@ def _osc_pow_ratio(osc_mat):
     Power ratio is a score between [0, 1] power relative to
         max power in that frequency band.
 
-    Inputs:
-        osc_mat         -
+    Parameters
+    ----------
+    osc_mat : ??
+        XX
 
-    Outputs:
-        pow_ratio       -
+    Returns
+    -------
+    pow_ratio : ??
+        xx
     """
 
     # Check how many vertices and subjects in group
@@ -1408,13 +1522,20 @@ def _osc_pow_ratio(osc_mat):
 def _osc_peak(centers, osc_low, osc_high):
     """Find the peak-frequency of a vector of center frequencies.
 
-    Inputs:
-        centers         -
-        osc_low         -
-        osc_high        -
+    Parameters
+    ----------
+    centers : ?
+        XX
+    osc_low : ?
+        XX
+    osc_high : ?
+        XX
 
-    Outputs:
-        peak            -
+    Returns
+    -------
+    peak : ?
+        xx
+    
     """
 
     #
@@ -1427,7 +1548,21 @@ def _osc_peak(centers, osc_low, osc_high):
 
 
 def _get_map_names(names_file, path):
-    """   """
+    """
+
+    Parameters
+    ----------
+    names_files : ??
+        XX
+    path : ?
+        XX
+
+    Returns
+    -------
+    names : ?
+        XX
+
+    """
 
     # Get path to csv file
     csv_path = os.path.join(path, names_file)
