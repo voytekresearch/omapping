@@ -6,8 +6,7 @@ This project has two main objectives:
 
 Code:
 - Scripts_Omega: Scripts to process MEG data. Main Developer: Priya
-- run_foof: Scripts to run FOOF on pre-processed MEG data. Main Developer: Tom
-- om_analysis: Scripts to analyze MEG-FOOF results, and compare to other datasets. Main Developer: Tom
+- om: Custom python code to run and analyze MEG-FOOF, and compare to other datasets. Main Developer: Tom
 - Torben: Some notebooks developed by Torben to look at MEG-FOOF data. Main Developer: Torben
 - power_scripts: Scripts to calculate power over scouts/time-windows. (??)
 
