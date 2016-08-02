@@ -194,51 +194,71 @@ def save_csv(results, save_path, subj):
 
     Parameters
     ----------
-
-    Returns
-    -------
+    results : list
+        xx
+    save_path : str
+        xx
+    subj : int
+        xx
 
     """
 
-    pass
+    #
+    i_cen = 1
+    i_amp = 2
+    i_bw = 3
+
+    #
+    nVert = len(results)
+
+    #
+    csv_sl_fname = save_path + '/csv/' + str(subj) + '_Slopes.csv'
+    csv_osc_fname = save_path + '/csv/' + str(subj) + '_Oscs.csv'
+
+    #
+    sl_csv = open(csv_sl_fname, 'w')
+    osc_csv = open(csv_osc_fname, 'w')
+
+    #
+    for vert in range(0, nVert):
+
+        #
+        sl_csv.write(str(results[vert][0]) + '\n')
+
+        #
+        nOscs = len(results[vert][1])
+
+        # 
+        for osc in range(0, nOscs):
+
+            cur_osc_dat = list([vert + 1, results[vert][i_cen][osc], 
+                results[vert][i_amp][osc], results[vert][i_bw][osc]])
+            osc_csv.write( (", ".join( repr(el) for el in cur_osc_dat )) + '\n')
+
 
 def load_pickle(save_path, sub_num):
     """   """
     
-    subj_path = os.path.join()
+    # Get list of available files
+    files = os.listdir(os.path.join(save_path, 'pickle'))
+    files = clean_file_list(files, 'Foof_Vertex')
 
+    # Get specific subject file
+    cur_subj_file = get_cur_subj(sub_num, files)
+    subj_path = os.path.join(save_path, 'pickle', cur_subj_file)
+
+    # Load file
     results = pickle.load(open(subj_path, 'rb'))
+    
     return results
+
 
 def load_csv():
     """   
     NOTE: Not yet implemented. 
     """
+
     pass
-
-def conv_pickle_csv():
-    """   
-    NOTE: Not yet implemented. 
-    """
-    pass
-
-    # Load pickle file
-
-    # Convert to format for csv (??)
-
-    # Save as csv file
-
-def conv_csv_pickle():
-    """
-    NOTE: Not yet implemented. 
-    """
-    pass
-
-    # Load csv file
-
-    # Convert to format for pickle (??)
-
-    # Save as pickle file
 
 
 def get_sub_nums(files_in):
@@ -261,7 +281,7 @@ def get_sub_nums(files_in):
     # Loop through files, extracting subject numbers
     for f_name in files_in:
         str_split = f_name.split('_', 1)
-        subnums.append(int(str_split[0]))
+        subnums.append(int(str_split[1]))
 
     return subnums
 
