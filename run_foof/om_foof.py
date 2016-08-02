@@ -12,15 +12,31 @@ from foof.fit import FOOF
 # Import Parallelization Packages
 from multiprocessing import Pool, freeze_support
 
-###############################
-###### OM_FOOF Functions ######
-###############################
+###############################################################
+###################### OM_FOOF Functions ######################
+###############################################################
 
 def clean_file_list(files_in, string):
-    """"   """
+    """"Takes a list of files and returns only a specified set of files. 
+
+    Parameters
+    ----------
+    files_in : list (str)
+        A list of strings, each one being a file name.
+    string : str
+        A string to look for in file list, to keep those who have it.
+
+    Returns
+    -------
+    files_out : list (str)
+        A list of the file names that contain the given string.
+
+    """
     
+    # Initialize variable of files to return
     files_out = []
 
+    # Loop through given files, keeping those that contain string
     for i in range(0, len(files_in)):
         if(string in files_in[i]):
             files_out.append(files_in[i])
@@ -28,14 +44,30 @@ def clean_file_list(files_in, string):
     return files_out
 
 
-def load_meg_dat(meg_path, subj_num):
-    """   """
+def load_meg_psds(meg_path, subj_num):
+    """Loads a requested subject's PSD-MEG data.
 
-    #
+    Parameters
+    ----------
+    meg_path : str
+        Path where data to load is located. 
+    subj_num : int
+        Subject identifier number. 
+
+    Returns
+    -------
+    psd : array
+
+    freqs : array
+        A vector of the 
+
+    """
+
+    # Set file name and get full path
     mat_file = 'psd_source_median_' + str(subj_num)
     file_name = os.path.join((meg_path + 'Subject_' + str(subj_num)), mat_file)
 
-    #
+    # Load MEG PSD data from matfile
     data_mat = sio.loadmat(file_name, appendmat=True, struct_as_record=False, squeeze_me=True)
 
     # Pull out data from dictionary
@@ -45,12 +77,30 @@ def load_meg_dat(meg_path, subj_num):
     # Label data is also available: Scout names if it's scout data, or Sensor/vertex numbers. 
     #labels = data_mat['RowNames']
 
-    #
     return psd, freqs
 
 
 def extract_psd(psd, freqs, f_low, f_high):
-    """   """
+    """   
+
+    Parameters
+    ----------
+    psd : 2d array
+
+    freqs : 1d array
+
+    f_low : float
+        Lower bound of frequencies to extract. 
+    f_high : float
+        Upper bound of frequencies to extract. 
+
+    Returns
+    -------
+    psd_ext : 2d array
+
+    freqs_ext : 1d array
+
+    """
 
     # Drop frequencies below f_low
     f_low_mask = freqs > f_low
@@ -64,8 +114,30 @@ def extract_psd(psd, freqs, f_low, f_high):
 
     return psd_ext, freqs_ext
 
-def meg_foof(psd_ext, freqs_ext, method, min_p, freq_res):
-    """   """
+def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
+    """Run FOOF on MEG-PSD data. 
+
+    Parameters
+    ----------
+    psd_ext : 2d array
+        xx
+    freqs_ext : 1d array
+        xx
+    min_p : float
+        xx
+    freqs_res : float
+        xx
+    method : str
+        Which method to use to run FOOF. 
+        Options:
+            'linear', 'parallel'
+
+    Returns
+    -------
+    results : ?
+        xx
+
+    """
 
     # Check how many PSDs there are
     [nPSDs, nFreqs] = np.shape(psd_ext)
@@ -78,11 +150,11 @@ def meg_foof(psd_ext, freqs_ext, method, min_p, freq_res):
     for i in range(0, nPSDs):
         psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
 
-    #
+    # Run FOOF linearly
     if method is 'linear':
         results = [_run_foof_l(foof, freqs_ext, psd) for psd in psd_list]
 
-    #
+    # Run FOOF in parallel
     if method is 'parallel':
         pool = Pool(4)
         results = pool.map(_run_foof_p, psd_list)
@@ -92,19 +164,83 @@ def meg_foof(psd_ext, freqs_ext, method, min_p, freq_res):
     return results
 
 
-def save_pickle(results, save_path, subj):
-    """   """
+def save_pickle(results, save_path, sub_num):
+    """Save out the FOOF results as a pickle file. 
 
-    save_name = str(subj) + '_Foof_vertex.p'
+
+    Parameters
+    ----------
+    results : ?
+    save_path: str
+    sub_num : int
+
+    Returns
+    -------
+
+    """
+
+    # Set save name and path
+    save_name = str(sub_num) + '_Foof_vertex.p'
     foof_save_path = os.path.join(save_path, save_name)
+    
+    # Save out data to pickle file
     pickle.dump(results, open(foof_save_path, 'wb'))
+
+
+def save_csv(results, save_path, subj):
+    """Save out the FOOF results as a csv file. 
+    NOTE: Not yet implemented. 
+
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    """
+
+    pass
+
+def load_pickle(save_path, sub_num):
+    """   """
+    
+    subj_path = os.path.join()
+
+    results = pickle.load(open(subj_path, 'rb'))
+    return results
+
+def load_csv():
+    """   """
+    pass
+
+def conv_pickle_csv():
+    """   """
+    pass
+
+    # Load pickle file
+
+    # Convert to format for csv (??)
+
+    # Save as csv file
+
+def conv_csv_pickle():
+    """   """
+    pass
+
+    # Load csv file
+
+    # Convert to format for pickle (??)
+
+    # Save as pickle file
 
 #######################################################
 ############## OM_FOOF Private Functions ##############
 #######################################################
 
 def _run_foof_l(foof, freqs_ext, psd_ext):
-    """   """
+    """
+    """
 
     # Fit FOOF
     foof.model(freqs_ext, psd_ext)
@@ -114,7 +250,8 @@ def _run_foof_l(foof, freqs_ext, psd_ext):
 
 
 def _run_foof_p(psd_ext):
-    """   """
+    """   
+    """
 
     # Fit FOOF
     foof.model(freqs_ext, psd_ext)
