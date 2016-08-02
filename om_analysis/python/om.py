@@ -39,6 +39,9 @@ class MegData():
 
     def __init__(self):
 
+        # Set data paths
+        self.foof_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/Colin/pickle/'
+
         # Initialize subject number
         self.subnum = int()
         self.n_PSDs = int()
@@ -84,8 +87,8 @@ class MegData():
         self.peak_lowgamma = np.array([])
 
 
-    def import_foof(self, subnum, get_demo=True):
-        """Import FOOF results from pickle file."""
+    def import_foof(self, subnum, get_demo=True, load_type='pickle'):
+        """Import FOOF results to MegData object."""
 
         # Check if object already has data
         if self.has_data:
@@ -97,16 +100,20 @@ class MegData():
         self.title = 'S-' + str(self.subnum)
 
         # Set up paths, get list of files for available subjects
-        foof_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/'
-        files = os.listdir(foof_data_path)
+        files = os.listdir(os.path.join(self.foof_path, load_type))
         files = clean_file_list(files, 'Foof_Vertex')
 
         # Get specific file path for specific subject
         cur_subj_file = get_cur_subj(subnum, files)
-        cur_subj_path = os.path.join(foof_data_path, cur_subj_file)
+        cur_subj_path = os.path.join(foof_data_path, load_type, cur_subj_file)
 
-        # Load pickle file and check the number of PSDs
-        results = pickle.load(open(cur_subj_path, 'rb'))
+        # Load data file
+        if load_type is 'pickle':
+            results = _load_foof_pickle(cur_subj_path)
+        elif load_type is 'csv':
+            results = _load_foof_csv(cur_subj_path)
+
+        # Check how many 
         self.n_PSDs = len(results)
 
         # Initialize numpy arrays to pull out different result params
@@ -1253,12 +1260,20 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
 def _get_all_osc(centers, osc_low, osc_high):
     """Returns all the oscillations in a specified frequency band.
 
-    Inputs:
-        centers         - Vector of oscillation centers
-        osc_low         - Lower bound for frequency range
-        osc_high        - Upper bound for frequency range
-    Outputs:
-        osc_cens        - Osc centers in specified frequency band
+    Parameters
+    ----------
+    centers : 1d array
+        Vector of oscillation centers
+    osc_low : int
+        Lower bound for frequency range
+    osc_high : int
+        Upper bound for frequency range
+
+    Returns
+    -------
+    osc_cens : 1d array
+        Osc centers in specified frequency band
+
     """
 
     #
@@ -1409,6 +1424,7 @@ def _osc_peak(centers, osc_low, osc_high):
 
     return peak
 
+
 def _get_map_names(names_file, path):
     """   """
 
@@ -1424,6 +1440,21 @@ def _get_map_names(names_file, path):
         names = list(reader)[0]
 
     return names
+
+
+def _load_foof_pickle(path):
+    """   """
+
+    results = pickle.load(open(cur_subj_path, 'rb'))
+    return results
+
+
+def _load_foof_csv(path):
+    """   
+    NOTE: not yet implemented
+    """
+    
+    pass
 
 
 ########################################################################################
