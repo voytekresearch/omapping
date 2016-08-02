@@ -12,9 +12,9 @@ from foof.fit import FOOF
 # Import Parallelization Packages
 from multiprocessing import Pool, freeze_support
 
-###############################################################
-###################### OM_FOOF Functions ######################
-###############################################################
+#######################################################################
+########################## OM_FOOF Functions ##########################
+#######################################################################
 
 def clean_file_list(files_in, string):
     """"Takes a list of files and returns only a specified set of files. 
@@ -56,10 +56,10 @@ def load_meg_psds(meg_path, subj_num):
 
     Returns
     -------
-    psd : array
-
-    freqs : array
-        A vector of the 
+    psd : 2d array
+        xx
+    freqs : 1d array
+        xx
 
     """
 
@@ -81,14 +81,14 @@ def load_meg_psds(meg_path, subj_num):
 
 
 def extract_psd(psd, freqs, f_low, f_high):
-    """   
+    """Extract frequency range of interest from PSD data. 
 
     Parameters
     ----------
     psd : 2d array
-
+        xx
     freqs : 1d array
-
+        xx
     f_low : float
         Lower bound of frequencies to extract. 
     f_high : float
@@ -97,9 +97,9 @@ def extract_psd(psd, freqs, f_low, f_high):
     Returns
     -------
     psd_ext : 2d array
-
+        xx
     freqs_ext : 1d array
-
+        xx
     """
 
     # Drop frequencies below f_low
@@ -171,11 +171,11 @@ def save_pickle(results, save_path, sub_num):
     Parameters
     ----------
     results : ?
+        xx
     save_path: str
+        xx
     sub_num : int
-
-    Returns
-    -------
+        xx
 
     """
 
@@ -211,11 +211,15 @@ def load_pickle(save_path, sub_num):
     return results
 
 def load_csv():
-    """   """
+    """   
+    NOTE: Not yet implemented. 
+    """
     pass
 
 def conv_pickle_csv():
-    """   """
+    """   
+    NOTE: Not yet implemented. 
+    """
     pass
 
     # Load pickle file
@@ -225,7 +229,9 @@ def conv_pickle_csv():
     # Save as csv file
 
 def conv_csv_pickle():
-    """   """
+    """
+    NOTE: Not yet implemented. 
+    """
     pass
 
     # Load csv file
@@ -234,9 +240,60 @@ def conv_csv_pickle():
 
     # Save as pickle file
 
-#######################################################
-############## OM_FOOF Private Functions ##############
-#######################################################
+
+def get_sub_nums(files_in):
+    """Takes a list of files. Returns a list of subject numbers.
+
+    Parameters
+    ----------
+    files_in : list (str)
+        List of filenames.
+    
+    Returns
+    -------
+    subnums : list (int)
+        List of subject numbers. 
+    """
+
+    # Intialize variable to store subject numbers
+    subnums = []
+
+    # Loop through files, extracting subject numbers
+    for f_name in files_in:
+        str_split = f_name.split('_', 1)
+        subnums.append(int(str_split[0]))
+
+    return subnums
+
+
+def get_cur_subj(cur_subj, files):
+    """Returns the file name with the given number in it.
+
+    Parameters
+    ----------
+    cur_subj : int
+        Subject number to search for in given file list.
+    files : list (str)
+        List of files to search through. 
+
+    Returns
+    -------
+    subj_file
+        File name of specific subject's file. 
+    """
+
+    # Make sure given number is a string
+    cur_subj_str = str(cur_subj)
+
+    # Loop through files, looking for one which contains #
+    for i in range(0, len(files)):
+        if cur_subj_str in files[i]:
+            return files[i]
+
+
+################################################################
+################## OM GEN - Private Functions ##################
+################################################################
 
 def _run_foof_l(foof, freqs_ext, psd_ext):
     """
@@ -258,7 +315,4 @@ def _run_foof_p(psd_ext):
     
     # Store vals in tuple and return
     return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
-
-
-
 
