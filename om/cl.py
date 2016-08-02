@@ -7,6 +7,7 @@ import pandas as pd
 import scipy.io as sio
 import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
+from om.gen import clean_file_list, get_cur_subj
 
 ########################################################################################
 ###############################  OMEGAMAPPING - CLASSES  ###############################
@@ -40,7 +41,7 @@ class MegData():
     def __init__(self):
 
         # Set data paths
-        self.foof_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/Colin/pickle/'
+        self.foof_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/Colin/'
 
         # Initialize subject number
         self.subnum = int()
@@ -105,7 +106,7 @@ class MegData():
 
         # Get specific file path for specific subject
         cur_subj_file = get_cur_subj(subnum, files)
-        cur_subj_path = os.path.join(foof_data_path, load_type, cur_subj_file)
+        cur_subj_path = os.path.join(self.foof_path, load_type, cur_subj_file)
 
         # Load data file
         if load_type is 'pickle':
@@ -1217,9 +1218,9 @@ class MapComp():
             csv_file.close()
 
 
-########################################################################################
-###############################  OM - PRIVATE FUNCTIONS  ###############################
-########################################################################################
+##########################################################################################
+###############################  OM CL - PRIVATE FUNCTIONS  ##############################
+##########################################################################################
 
 
 def _get_osc(centers, powers, bws, osc_low, osc_high):
@@ -1445,7 +1446,7 @@ def _get_map_names(names_file, path):
 def _load_foof_pickle(path):
     """   """
 
-    results = pickle.load(open(cur_subj_path, 'rb'))
+    results = pickle.load(open(path, 'rb'))
     return results
 
 
@@ -1454,78 +1455,4 @@ def _load_foof_csv(path):
     NOTE: not yet implemented
     """
     
-    pass
-
-
-########################################################################################
-############################### OMEGAMAPPING - FUNCTIONS ###############################
-########################################################################################
-
-
-def clean_file_list(files_in, string):
-    """Takes a list of file names (strings), returns only those with 'string' in them.
-
-    Inputs:
-        files_in        -
-        string          -
-
-    Outputs:
-        files_out       -
-    """
-
-    # Initialize variable of files to return
-    files_out = []
-
-    # Loop through given files, keeping those that contain string
-    for i in range(0, len(files_in)):
-        if string in files_in[i]:
-            files_out.append(files_in[i])
-
-    return files_out
-
-
-def get_sub_nums(files_in):
-    """Takes a list of files. Returns a list of subject numbers.
-
-    Inputs:
-        files_in        - list of files
-
-    Outputs:
-        subnums         - list of subject numbers
-    """
-
-    # Intialize variable to store subject numbers
-    subnums = []
-
-    # Loop through files, extracting subject numbers
-    for f_name in files_in:
-        str_split = f_name.split('_', 1)
-        subnums.append(int(str_split[0]))
-
-    return subnums
-
-
-def get_cur_subj(cur_subj, files):
-    """Returns the file name with the given number in it.
-
-    Inputs:
-        cur_subj        - subject number to search for in given file list (int)
-        files           - list of files
-
-    Outputs:
-        subj_file       - file name of subject file
-    """
-
-    # Make sure given number is a string
-    cur_subj_str = str(cur_subj)
-
-    # Loop through files, looking for one which contains #
-    for i in range(0, len(files)):
-        if cur_subj_str in files[i]:
-            return files[i]
-
-
-def run_par_foof():
-    """ NOT YET IMPLEMENTED. """
-
     pass
