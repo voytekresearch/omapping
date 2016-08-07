@@ -199,7 +199,6 @@ def save_csv(results, save_path, sub_num):
         xx
     sub_num : int
         Subject identifier number. 
-
     """
 
     #
@@ -235,16 +234,29 @@ def save_csv(results, save_path, sub_num):
             osc_csv.write( (", ".join( repr(el) for el in cur_osc_dat )) + '\n')
 
 
-def load_pickle(save_path, sub_num):
-    """   """
+def load_pickle(dat_path, sub_num):
+    """Load FOOF data from pickle file. 
+
+    Parameters
+    ----------
+    save_path : ?
+        xx
+    sub_num : int
+        Subject identifier number. 
+
+    Returns
+    -------
+    results : ?
+        xx
+    """
     
-    # Get list of available files
-    files = os.listdir(os.path.join(save_path, 'pickle'))
+    # Get list of available files to load
+    files = os.listdir(os.path.join(dat_path, 'pickle'))
     files = clean_file_list(files, 'Foof_Vertex')
 
     # Get specific subject file
     cur_subj_file = get_cur_subj(sub_num, files)
-    subj_path = os.path.join(save_path, 'pickle', cur_subj_file)
+    subj_path = os.path.join(dat_path, 'pickle', cur_subj_file)
 
     # Load file
     results = pickle.load(open(subj_path, 'rb'))
@@ -349,7 +361,7 @@ def _run_foof_l(foof, freqs_ext, psd_ext):
 
 
 def _run_foof_p(psd_ext):
-    """   
+    """ ???
     """
 
     # Fit FOOF
