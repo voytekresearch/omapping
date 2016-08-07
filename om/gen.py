@@ -120,13 +120,13 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
     Parameters
     ----------
     psd_ext : 2d array
-        xx
+        Matrix of PSDs in the form of [nVerts, nFreqs].
     freqs_ext : 1d array
-        xx
+        Vector of the frequency values for each power value in psd_ext. 
     min_p : float
-        xx
+        Minimum probability for splitting peaks. Parameter for FOOF. 
     freqs_res : float
-        xx
+        Frequency resolution. 
     method : str
         Which method to use to run FOOF. 
         Options:
@@ -134,9 +134,9 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
 
     Returns
     -------
-    results : ?
-        xx
-
+    results : list
+        List of tuples of FOOF results. Length of list is number of vertices. 
+            Each tuple is (slope value, centers (list), amps (list), bws (list)).
     """
 
     # Check how many PSDs there are
@@ -156,8 +156,11 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
 
     # Run FOOF in parallel
     if method is 'parallel':
+
+        # Set up Pool and run
         pool = Pool(4)
         results = pool.map(_run_foof_p, psd_list)
+        #results = pool.map(_run_foof_l, [foof, psd_list, freqs_ext])
         pool.close()
         pool.join()
 
@@ -167,16 +170,14 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
 def save_pickle(results, save_path, sub_num):
     """Save out the FOOF results as a pickle file. 
 
-
     Parameters
     ----------
-    results : ?
+    results : list
         xx
     save_path: str
-        xx
+        Filepath of where to save out the file. 
     sub_num : int
-        xx
-
+        Subject identifier number. 
     """
 
     # Set save name and path
@@ -187,10 +188,8 @@ def save_pickle(results, save_path, sub_num):
     pickle.dump(results, open(foof_save_path, 'wb'))
 
 
-def save_csv(results, save_path, subj):
+def save_csv(results, save_path, sub_num):
     """Save out the FOOF results as a csv file. 
-    NOTE: Not yet implemented. 
-
 
     Parameters
     ----------
@@ -198,8 +197,8 @@ def save_csv(results, save_path, subj):
         xx
     save_path : str
         xx
-    subj : int
-        xx
+    sub_num : int
+        Subject identifier number. 
 
     """
 
@@ -212,8 +211,8 @@ def save_csv(results, save_path, subj):
     nVert = len(results)
 
     #
-    csv_sl_fname = save_path + '/csv/' + str(subj) + '_Slopes.csv'
-    csv_osc_fname = save_path + '/csv/' + str(subj) + '_Oscs.csv'
+    csv_sl_fname = save_path + '/csv/' + str(sub_num) + '_Slopes.csv'
+    csv_osc_fname = save_path + '/csv/' + str(sub_num) + '_Oscs.csv'
 
     #
     sl_csv = open(csv_sl_fname, 'w')
@@ -261,13 +260,16 @@ def load_csv():
     pass
 
 
-def get_sub_nums(files_in):
+def get_sub_nums(files_in, f_l):
     """Takes a list of files. Returns a list of subject numbers.
 
     Parameters
     ----------
     files_in : list (str)
         List of filenames.
+    f_l : str
+        Whether subject numbers are first or last in file name. 
+        Options: 'first', 'last'
     
     Returns
     -------
@@ -281,7 +283,10 @@ def get_sub_nums(files_in):
     # Loop through files, extracting subject numbers
     for f_name in files_in:
         str_split = f_name.split('_', 1)
-        subnums.append(int(str_split[1]))
+        if f_l is 'first':
+            subnums.append(int(str_split[0]))
+        elif f_l is 'last':
+            subnums.append(int(str_split[1]))
 
     return subnums
 
@@ -316,7 +321,24 @@ def get_cur_subj(cur_subj, files):
 ################################################################
 
 def _run_foof_l(foof, freqs_ext, psd_ext):
-    """
+    """Local helper function to run FOOF linearly. 
+
+    Used by meg_foof(). 
+
+    Parameters
+    ----------
+    foof : FOOF() object
+        FOOF object to model 1/f & oscillations. 
+    freqs_ext : 1d vector
+        Vector of frequency values for the psd. 
+    psd_ext : 1d vector
+        Vector of power values for the psd. 
+
+    Returns
+    -------
+    out : tuple
+        Tuple of FOOF results. 
+            Tuple is (slope value, centers (list), amps (list), bws (list)).
     """
 
     # Fit FOOF
