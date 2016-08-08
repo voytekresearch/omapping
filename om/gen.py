@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import os
 import pickle
 import numpy as np
@@ -40,6 +41,10 @@ def clean_file_list(files_in, string):
     for i in range(0, len(files_in)):
         if(string in files_in[i]):
             files_out.append(files_in[i])
+
+    # Check if list is empty
+    if not files_out:
+        print('No files found!')
             
     return files_out
 
@@ -181,7 +186,7 @@ def save_pickle(results, save_path, sub_num):
     """
 
     # Set save name and path
-    save_name = str(sub_num) + '_Foof_vertex.p'
+    save_name = str(sub_num) + '_Foof_Vertex.p'
     foof_save_path = os.path.join(save_path, save_name)
     
     # Save out data to pickle file
