@@ -93,14 +93,15 @@ class MegData():
 
         Parameters
         ----------
-        self : ?
-            XX
+        self : MegData() object
+            Object to store MEG FOOF data. 
         subnum : int
-            XX
+            Number of the subject to import. 
         get_demo : boolean, optional
-            XX
+            Whether to load demographic data from csv file. 
         load_type : str, optional
-            XX
+            What type of file to load data from. 
+                Options: 'pickle', 'csv'
         """
 
         # Check if object already has data
@@ -465,7 +466,7 @@ class GroupMegData(MegData):
         Parameters
         ----------
         self : XX
-            XX
+            GroupMegData() object. 
         new_subj : MegData() Object
             MEG subject (instance of MegData)
         add_all_oscs : boolean, optional
@@ -474,6 +475,8 @@ class GroupMegData(MegData):
             XX
         add_vertex_oscs : boolean, optional
             XX
+        add_vertex_slopes : boolean, optional
+            xx
         """
 
         # Check if subject has data
@@ -912,21 +915,30 @@ class MapComp():
 
 
     def check_files(self, print_files=True, return_files=False):
-        """Gets the list of files in the map directories. Can return and/or print."""
+        """Gets the list of files in the map directories. Can return and/or print.
 
-        #
+        Parameters
+        ----------
+        print_files : boolean, optional
+            Whether or not to print out available file names. 
+        return_files : boolean, optional
+            Whether or not to return lists of filenames. 
+        """
+
+        # Get lists of files from data directories
         osc_files = clean_file_list(os.listdir(self.oscs_path), '.npz')
         slope_files = clean_file_list(os.listdir(self.slopes_path), '.npz')
-        term_files = clean_file_list(os.listdir(self.genes_path), '.csv')
-        gene_files = clean_file_list(os.listdir(self.terms_path), '.csv')
+        gene_files = clean_file_list(os.listdir(self.genes_path), '.csv')
+        term_files = clean_file_list(os.listdir(self.terms_path), '.csv')
 
-        #
+        # If asked for, print out lists of files
         if print_files:
             print('Oscillation Files: \n', '\n'.join(osc_files), '\n')
             print('Slope Files: \n', '\n'.join(slope_files), '\n')
             print('Terms Files: \n', '\n'.join(term_files), '\n')
             print('Genes Files: \n', '\n'.join(gene_files), '\n')
 
+        # If asked for, return lists of files
         if return_files:
             return osc_files, slope_files, term_files, gene_files
 
@@ -937,10 +949,9 @@ class MapComp():
         Parameters
         ----------
         osc_file : str, optional
-            XX
+            File path to the file with oscillations data. 
         slope_file : str, optional
-            XX
-
+            File path to the file with slope data. 
         """
 
         # If a filename is provided, load oscillation data
@@ -980,16 +991,18 @@ class MapComp():
     def load_gene_maps(self, genes_file_names):
         """Load the spatial maps of gene data.
 
-        Parameters
-        ----------
-        genes_file_names : list (str)
-            list of files containing gene data
-
         Note:
             Input must be a list. If gene data in single file, use single item list.
             If list contains multiple files, these files will be loaded and
                 concatenated to form the full gene maps.
             Order: First file should be first set of files.
+
+        Parameters
+        ----------
+        self : MapComp() object
+            Object for storing and comparing map data. 
+        genes_file_names : list (str)
+            list of files containing gene data
         """
         
         # If one file given, load this as the gene map
@@ -1019,9 +1032,10 @@ class MapComp():
 
         Parameters
         ----------
+        self : MapComp() object
+            Object for storing and comparing map data. 
         term_file_name : str
-            XX
-
+            File name of term data file.
         """
 
         # Get full path for the csv file
@@ -1039,6 +1053,8 @@ class MapComp():
 
         Parameters
         ----------
+        self : MapComp() object
+            Object for storing and comparing map data. 
         dat_type : str
             Type of data to correlate with meg data
                 'Terms' or 'Genes' only
@@ -1090,14 +1106,16 @@ class MapComp():
 
         Parameters
         ----------
+        self : MapComp() object
+            Object for storing and comparing map data. 
         dat_type : str
-            Data type (Terms or Genes) of corrs to check
+            Data type (Terms or Genes) of corrs to check. 
         meg_dat : str
-            Specific MEG data of corrs to check
+            Specific MEG data of corrs to check. 
         n_check : int, optional
-            Number of correlations to check
+            Number of correlations to check. 
         top :
-            Get Top (True) or Bottom (False) set of correlations
+            Get Top (True) or Bottom (False) set of correlations.
         """
 
         # Check which type of data and set names accordingly
@@ -1146,9 +1164,11 @@ class MapComp():
 
         Parameters
         ----------
+        self : MapComp() object
+            Object for storing and comparing map data. 
         dat_type : str
-            XX
-
+            Indicator of which set of data to unload from object. 
+                Options: 'Terms', 'Genes'
         """
 
         # Unload Term data
@@ -1187,6 +1207,8 @@ class MapComp():
 
         Parameters
         ----------
+        self : MapComp() object
+            Object for storing and comparing map data. 
         dat_type : str
             Data type to plot corrs for (Terms or Genes). 
         meg_dat : str
@@ -1224,6 +1246,8 @@ class MapComp():
 
         Parameters
         ----------
+        self : MapComp() object
+            Object for storing and comparing map data. 
         dat_type : str
             Data type to save corrs for ('Terms' or 'Genes'). 
         meg_dat : str
@@ -1232,7 +1256,6 @@ class MapComp():
             Whether to save an npz file. Default is True. 
         save_as_csv : boolean, optional
             Whether to save a csv file. Default is True. 
-
         """
 
         # Check which type of data and set names accordingly
@@ -1354,16 +1377,16 @@ def _get_all_osc(centers, osc_low, osc_high):
     Parameters
     ----------
     centers : 1d array
-        Vector of oscillation centers
+        Vector of oscillation centers.
     osc_low : int
-        Lower bound for frequency range
+        Lower bound for frequency range.
     osc_high : int
-        Upper bound for frequency range
+        Upper bound for frequency range.
 
     Returns
     -------
     osc_cens : 1d array
-        Osc centers in specified frequency band
+        Osc centers in specified frequency band.
 
     """
 
@@ -1388,7 +1411,6 @@ def _get_demo_csv(subnum):
         Sex ['M'/'F'] of specified subject. 
     age : int
         Age (in whole years) of specified subject. 
-
     """
 
     # Set up paths for demographic info csv file
@@ -1428,7 +1450,6 @@ def _get_single_osc_power(osc_cens, osc_pows, osc_bws):
         Power value of highest power oscillation.
     bw : float
         Bandwidth of highest power oscillation.
-    
     """
 
     # Return zeros if there are no oscillations in given vectors
@@ -1455,7 +1476,6 @@ def _osc_prob(osc_mat):
     -------
     prob : ??
         Vector with probability of given oscillation at each vertex.
-
     """
 
     # Check how many vertices and subjects in group
@@ -1535,7 +1555,6 @@ def _osc_peak(centers, osc_low, osc_high):
     -------
     peak : ?
         xx
-    
     """
 
     #
@@ -1561,7 +1580,6 @@ def _get_map_names(names_file, path):
     -------
     names : ?
         XX
-
     """
 
     # Get path to csv file
@@ -1579,7 +1597,13 @@ def _get_map_names(names_file, path):
 
 
 def _load_foof_pickle(path):
-    """   """
+    """Loads FOOF data from a pickle file. 
+
+    Parameters
+    ----------
+    path : str
+        xx
+    """
 
     results = pickle.load(open(path, 'rb'))
     return results
