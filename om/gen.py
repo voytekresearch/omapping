@@ -172,7 +172,7 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
     return results
 
 
-def save_pickle(results, save_path, sub_num):
+def save_foof_pickle(results, save_path, sub_num):
     """Save out the FOOF results as a pickle file. 
 
     Parameters
@@ -193,7 +193,7 @@ def save_pickle(results, save_path, sub_num):
     pickle.dump(results, open(foof_save_path, 'wb'))
 
 
-def save_csv(results, save_path, sub_num):
+def save_foof_csv(results, save_path, sub_num):
     """Save out the FOOF results as a csv file. 
 
     Parameters
@@ -239,7 +239,7 @@ def save_csv(results, save_path, sub_num):
             osc_csv.write( (", ".join( repr(el) for el in cur_osc_dat )) + '\n')
 
 
-def load_pickle(dat_path, sub_num):
+def load_foof_pickle(dat_path, sub_num):
     """Load FOOF data from pickle file. 
 
     Parameters
@@ -269,7 +269,7 @@ def load_pickle(dat_path, sub_num):
     return results
 
 
-def load_csv():
+def load_foof_csv():
     """   
     NOTE: Not yet implemented. 
     """
