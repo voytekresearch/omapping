@@ -896,9 +896,9 @@ class MapComp():
 
         # Set specific paths for different data types
         self.oscs_path = os.path.join(self.maps_path, 'Oscs')
-        self.genes_path = os.path.join(self.maps_path, 'Genes')
-        self.terms_path = os.path.join(self.maps_path, 'Terms')
         self.slopes_path = os.path.join(self.maps_path, 'Slopes')
+        self.terms_path = os.path.join(self.maps_path, 'Terms')
+        self.genes_path = os.path.join(self.maps_path, 'Genes')
 
         # Import the vectors of gene & term names
         self.term_names = _get_map_names('ns_terms.csv', self.terms_path)
@@ -941,8 +941,8 @@ class MapComp():
         # Initialize booleans that keep track of what is loaded
         self.oscs_loaded = False
         self.slopes_loaded = False
-        self.genes_loaded = False
         self.terms_loaded = False
+        self.genes_loaded = False
 
 
     def check_files(self, print_files=True, return_files=False):
@@ -963,6 +963,7 @@ class MapComp():
         slope_files = clean_file_list(os.listdir(self.slopes_path), '.npz')
         gene_files = clean_file_list(os.listdir(self.genes_path), '.csv')
         term_files = clean_file_list(os.listdir(self.terms_path), '.csv')
+        anat_files = clean_file_list(os.listdir(self.anat_path), '.mat')
 
         # If asked for, print out lists of files
         if print_files:
@@ -970,10 +971,11 @@ class MapComp():
             print('Slope Files: \n', '\n'.join(slope_files), '\n')
             print('Terms Files: \n', '\n'.join(term_files), '\n')
             print('Genes Files: \n', '\n'.join(gene_files), '\n')
+            print('Anatomy Files: \n', '\n'.join(anat_files), '\n')
 
         # If asked for, return lists of files
         if return_files:
-            return osc_files, slope_files, term_files, gene_files
+            return osc_files, slope_files, term_files, gene_files, anat_files
 
 
     def load_meg_maps(self, osc_file=None, slope_file=None):
@@ -1357,6 +1359,78 @@ class MapComp():
 
             # Close the csv file
             csv_file.close()
+
+
+class MapCompROI(MapComp):
+    """Class for storing and comparing spatial topographies in ROIs."""
+
+    def __init__(self):
+
+        # Inherit from MapComp() class
+        MapComp.__init__(self)
+
+        # Initialize var to store number of ROIs
+        self.nROIs = int()
+
+        # Add path for anatomy data
+        self.anat_path = os.path.join(self.maps_path, 'Anat')
+
+        # Add boolean for whether anat data is loaded
+        self.anat_loaded = False
+
+        # Initialize list to store ROI labels
+        roi_labels = list()
+
+        # Initialize matrix for connectivity data
+        anat_con = np.ndarray(0)
+
+
+    def load_anat_maps(self, anat_file_name):
+        """Load the spatial maps of anatomilcal data. 
+
+        Parameters
+        ----------
+        self : MapComp() object
+            Object for storing and comparing map data. 
+        anat_file_name : str
+            File name of anat data file.
+        """
+
+        # Get full path for the anat mat file
+        anat_mat_file = os.path.join(self.anat_path, anat_file_name)
+
+        # Load the anat data
+        dat = sio.loadmat(anat_mat_file)
+
+        # Pull out data from mat dictionary
+        self.roi_labels = dat['roi_labels'].tolist()
+        self.anat_con = dat['connectivity']
+
+        # Get number of ROIs
+        self.nROIs = len(self.roi_labels)
+
+        # Loop through and fix roi labels
+        for r in range(0, self.nROIs):
+            self.roi_labels[r] = str(self.roi_labels[r][0][0])
+
+        # Update boolean that anat data is loaded
+        self.anat_loaded = True
+
+
+    def conv_meg_rois(self):
+        """Convert MEG data to ROIs. 
+        NOTE: Not yet implemented.
+        """
+
+        pass
+
+
+    def comp_meg_anat():
+        """Compare anatomical connectivity to oscillation data. 
+        NOTE: Not yet implemented.
+        """
+
+        pass
 
 
 ##########################################################################################
