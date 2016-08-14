@@ -1375,14 +1375,18 @@ class MapCompROI(MapComp):
         # Add path for anatomy data
         self.anat_path = os.path.join(self.maps_path, 'Anat')
 
-        # Add boolean for whether anat data is loaded
-        self.anat_loaded = False
+        # Addd vars to save ROIs from each data type
+        self.anat_rois = list()
+        self.elec_rois = list()
 
         # Initialize list to store ROI labels
-        roi_labels = list()
+        self.roi_labels = list()
 
         # Initialize matrix for connectivity data
-        anat_con = np.ndarray(0)
+        self.anat_con = np.ndarray(0)
+
+        # Add boolean for whether anat data is loaded
+        self.anat_loaded = False
 
 
     def load_anat_maps(self, anat_file_name):
@@ -1403,7 +1407,7 @@ class MapCompROI(MapComp):
         dat = sio.loadmat(anat_mat_file)
 
         # Pull out data from mat dictionary
-        self.roi_labels = dat['roi_labels'].tolist()
+        self.anat_rois = dat['roi_labels'].tolist()
         self.anat_con = dat['connectivity']
 
         # Get number of ROIs
@@ -1411,15 +1415,44 @@ class MapCompROI(MapComp):
 
         # Loop through and fix roi labels
         for r in range(0, self.nROIs):
-            self.roi_labels[r] = str(self.roi_labels[r][0][0])
+            self.anat_rois[r] = str(self.anat_rois[r][0][0])
 
         # Update boolean that anat data is loaded
         self.anat_loaded = True
 
 
+    def load_elec_rois(self, roi_file_name):
+        """Load the ROI file for the MEG data. 
+        
+        NOTE: NOT YET IMPLEMENTED. 
+
+        Parameters
+        ----------
+        self : ?
+            xx
+        roi_file_name : ?
+            xx
+        """
+
+        # Load ROI dat from mat file
+        dat = sio.loadmat(roi_file_name)
+
+        # Pull out data from mat file
+        scout = dat['Scouts']
+
+
+    def comb_rois(self):
+        """
+        NOTE: NOT YET IMPLEMENTED. 
+        """
+
+        pass
+
+
     def conv_meg_rois(self):
         """Convert MEG data to ROIs. 
-        NOTE: Not yet implemented.
+
+        NOTE: NOT YET IMPLEMENTED. 
         """
 
         pass
@@ -1427,6 +1460,7 @@ class MapCompROI(MapComp):
 
     def comp_meg_anat():
         """Compare anatomical connectivity to oscillation data. 
+        
         NOTE: Not yet implemented.
         """
 
