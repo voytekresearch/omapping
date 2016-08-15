@@ -1378,15 +1378,14 @@ class MapCompROI(MapComp):
         # Addd vars to save ROIs from each data type
         self.anat_roi_names = list()
         self.anat_nROIs = int
+        self.anat_con = np.ndarray(0)
+        
         self.elec_roi_names = list()
-        self.elec_roi_verts = list()
         self.elec_nROIs = int
-
+        self.elec_roi_verts = list()
+        
         # Initialize list to store ROI labels
         self.roi_labels = list()
-
-        # Initialize matrix for connectivity data
-        self.anat_con = np.ndarray(0)
 
         # Add boolean for whether anat data is loaded
         self.anat_loaded = False
