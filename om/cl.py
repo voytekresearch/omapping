@@ -1435,14 +1435,35 @@ class MapCompROI(MapComp):
         """
 
         # Load ROI dat from mat file
-        dat = sio.loadmat(roi_file_name)
+        dat = sio.loadmat(roi_file_name, struct_as_record=True)
 
         # Pull out data from mat file
-        scout = dat['Scouts']
+        scouts = np.squeeze(dat['Scouts'])
+
+        # Check how many ROIs there are
+        nROIs = len(scouts)
+
+        # Initiliaze vars to store scout names and vertices
+        sc_names = list()
+        sc_verts = list()
+
+        # Loop through, pull out names and verts into lists
+        for i in range(0, nROIs):
+            sc = scouts[i]
+            sc_verts.append(sc[0])
+            sc_names.append(str(sc[3]))
+
+            # Drop brackets in scout name
+            sc_names[i] = sc_names[i][3:-2]
+
+        # Attach data to object
+        self.elec_roi_names = sc_names
+        self.elec_roi_verts = sc_verts
 
 
-    def comb_rois(self):
-        """
+    def align_rois(self):
+        """Align ROIs used and names between anat and meg ROIs. 
+
         NOTE: NOT YET IMPLEMENTED. 
         """
 
