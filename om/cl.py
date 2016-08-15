@@ -1376,8 +1376,11 @@ class MapCompROI(MapComp):
         self.anat_path = os.path.join(self.maps_path, 'Anat')
 
         # Addd vars to save ROIs from each data type
-        self.anat_rois = list()
-        self.elec_rois = list()
+        self.anat_roi_names = list()
+        self.anat_nROIs = int
+        self.elec_roi_names = list()
+        self.elec_roi_verts = list()
+        self.elec_nROIs = int
 
         # Initialize list to store ROI labels
         self.roi_labels = list()
@@ -1407,15 +1410,16 @@ class MapCompROI(MapComp):
         dat = sio.loadmat(anat_mat_file)
 
         # Pull out data from mat dictionary
-        self.anat_rois = dat['roi_labels'].tolist()
+        roi_names = dat['roi_labels'].tolist()
         self.anat_con = dat['connectivity']
 
         # Get number of ROIs
-        self.nROIs = len(self.roi_labels)
+        #self.nROIs = len(self.roi_labels)
+        self.anat_nROIs = len(roi_names)
 
         # Loop through and fix roi labels
-        for r in range(0, self.nROIs):
-            self.anat_rois[r] = str(self.anat_rois[r][0][0])
+        for r in range(0, self.anat_nROIs):
+            self.anat_roi_names.append(str(roi_names[r][0][0]))
 
         # Update boolean that anat data is loaded
         self.anat_loaded = True
@@ -1441,14 +1445,14 @@ class MapCompROI(MapComp):
         scouts = np.squeeze(dat['Scouts'])
 
         # Check how many ROIs there are
-        nROIs = len(scouts)
+        self.elec_nROIs = len(scouts)
 
         # Initiliaze vars to store scout names and vertices
         sc_names = list()
         sc_verts = list()
 
         # Loop through, pull out names and verts into lists
-        for i in range(0, nROIs):
+        for i in range(0, self.elec_nROIs):
             sc = scouts[i]
             sc_verts.append(sc[0])
             sc_names.append(str(sc[3]))
