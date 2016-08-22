@@ -1554,19 +1554,28 @@ class MapCompROI(MapComp):
         """Convert MEG data to ROIs. 
         """
 
-        # Loop through all ROIs
-        for i in range(0, self.nROIs):
+        # Initialize dict for current ROI data
+        roi_meg_dat = _init_meg_map_dict(self.nROIs)
 
-            # Initialize dict for current ROI data
-            roi_meg_dat = _init_meg_map_dict()
+        # Loop through all ROIs
+        for r in range(0, self.nROIs):
 
             # Add current ROI data to dict
-            # 
+            # Loop through all oscs
             for key in self.meg_maps.keys():
-                roi_meg_dat[key] = self.meg_maps[key][(self.roi_verts[i]-1)]
 
-            # Add the current ROI data to object
-            self.meg_ROI_maps.append(roi_meg_dat)
+                # 
+                cur_verts = np.squeeze(self.roi_verts[r] - 1)
+                nVerts = len(cur_verts)
+
+                #
+                temp_dat = self.meg_maps[key][cur_verts]
+
+                # 
+                roi_meg_dat[key][r] = (sum(temp_dat) / nVerts)
+
+        # Add the current ROI data to object
+        self.meg_ROI_maps = roi_meg_dat
 
         # Update boolean that meg data has been converted to ROIs
         self.meg_ROIs = True
@@ -1860,15 +1869,23 @@ def _get_map_names(names_file, path):
     return names
 
 
-def _init_meg_map_dict():
+def _init_meg_map_dict(length=0):
     """   """
+    if length == 0:
+        meg_map = dict([('Theta',     np.array([])),
+                        ('Alpha',     np.array([])),
+                        ('Beta',      np.array([])),
+                        ('LowGamma',  np.array([])),
+                        ('Slopes',    np.array([]))
+                        ])
 
-    meg_map = dict([('Theta',     np.array([])),
-                    ('Alpha',     np.array([])),
-                    ('Beta',      np.array([])),
-                    ('LowGamma',  np.array([])),
-                    ('Slopes',    np.array([]))
-                    ])
+    else:
+        meg_map = dict([('Theta',     np.zeros(length)),
+                        ('Alpha',     np.zeros(length)),
+                        ('Beta',      np.zeros(length)),
+                        ('LowGamma',  np.zeros(length)),
+                        ('Slopes',    np.zeros(length))
+                        ])
 
     return meg_map
 
