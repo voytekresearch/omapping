@@ -1,19 +1,19 @@
 from __future__ import print_function, division
 import os
+import csv
 import numpy as np
 import pandas as pd
 import scipy.io as sio
 import matplotlib.pyplot as plt
-import scipy.stats.stats import pearsonr
+from scipy.stats.stats import pearsonr
 from om.gen import *
 
-##################################
-#### OMEGAMAPPIN - MC CLASSES ####
-##################################
+##################################################
+############ OMEGAMAPPIN - MC CLASSES ############
+##################################################
 
 class MapComp():
     """Class for storing and comparing spatial topographies."""
-
 
     def __init__(self):
 
@@ -91,7 +91,6 @@ class MapComp():
         slope_files = clean_file_list(os.listdir(self.slopes_path), '.npz')
         gene_files = clean_file_list(os.listdir(self.genes_path), '.csv')
         term_files = clean_file_list(os.listdir(self.terms_path), '.csv')
-        anat_files = clean_file_list(os.listdir(self.anat_path), '.mat')
 
         # If asked for, print out lists of files
         if print_files:
@@ -99,11 +98,10 @@ class MapComp():
             print('Slope Files: \n', '\n'.join(slope_files), '\n')
             print('Terms Files: \n', '\n'.join(term_files), '\n')
             print('Genes Files: \n', '\n'.join(gene_files), '\n')
-            print('Anatomy Files: \n', '\n'.join(anat_files), '\n')
 
         # If asked for, return lists of files
         if return_files:
-            return osc_files, slope_files, term_files, gene_files, anat_files
+            return osc_files, slope_files, term_files, gene_files
 
 
     def load_meg_maps(self, osc_file=None, slope_file=None):
@@ -714,3 +712,58 @@ class MapCompROI(MapComp):
         """
 
         pass
+
+
+#####################################################
+###### OMEGAMAPPIN - CL_MC - PRIVATE FUNCTIONS ######
+#####################################################
+
+def _get_map_names(names_file, path):
+    """
+
+    Parameters
+    ----------
+    names_files : ??
+        XX
+    path : ?
+        XX
+
+    Returns
+    -------
+    names : ?
+        XX
+    """
+
+    # Get path to csv file
+    csv_path = os.path.join(path, names_file)
+
+    # Open csv file
+    with open(csv_path, 'rb') as f_name:
+
+        reader = csv.reader(f_name, delimiter=',')
+
+        # Get list of names from first row in csv
+        names = list(reader)[0]
+
+    return names
+
+
+def _init_meg_map_dict(length=0):
+    """   """
+    if length == 0:
+        meg_map = dict([('Theta',     np.array([])),
+                        ('Alpha',     np.array([])),
+                        ('Beta',      np.array([])),
+                        ('LowGamma',  np.array([])),
+                        ('Slopes',    np.array([]))
+                        ])
+
+    else:
+        meg_map = dict([('Theta',     np.zeros(length)),
+                        ('Alpha',     np.zeros(length)),
+                        ('Beta',      np.zeros(length)),
+                        ('LowGamma',  np.zeros(length)),
+                        ('Slopes',    np.zeros(length))
+                        ])
+
+    return meg_map
