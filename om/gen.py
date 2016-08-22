@@ -24,14 +24,13 @@ def clean_file_list(files_in, string):
     ----------
     files_in : list (str)
         A list of strings, each one being a file name.
-    string : str
+    string : str OR list
         A string to look for in file list, to keep those who have it.
 
     Returns
     -------
     files_out : list (str)
         A list of the file names that contain the given string.
-
     """
     
     # Initialize variable of files to return
@@ -65,7 +64,6 @@ def load_meg_psds(meg_path, subj_num):
         xx
     freqs : 1d array
         xx
-
     """
 
     # Set file name and get full path
@@ -244,8 +242,8 @@ def load_foof_pickle(dat_path, sub_num):
 
     Parameters
     ----------
-    save_path : ?
-        xx
+    dat_path : str
+        File name for where data is stored to load from. 
     sub_num : int
         Subject identifier number. 
 
