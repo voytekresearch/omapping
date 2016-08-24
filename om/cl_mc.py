@@ -518,8 +518,14 @@ class MapCompROI(MapComp):
         self.roi_lr = list()
         self.nROIs = int
 
-        # Initialize list to store MEG ROI data
-        self.meg_ROI_maps = list()
+        # Initialize var to store MEG ROI data
+        self.meg_ROI_maps = dict()
+
+        # Initialize var to store MEG connectivity data
+        self.meg_con = dict()
+
+        # Initialize var to store meg stats data
+        self.meg_stats = dict()
 
         # Add boolean for whether anat data is loaded
         self.anat_loaded = False
@@ -705,18 +711,53 @@ class MapCompROI(MapComp):
         self.meg_ROIs = True
 
 
-    def comp_meg_anat(self):
+    def comp_meg_anat(self, print_out=True):
         """Compare anatomical connectivity to oscillation data. 
-        
-        NOTE: Not yet implemented.
         """
 
-        pass
+        # Initialize the dictionary to store MEG connectivity data
+        self.meg_con = _init_meg_map_dict()
+
+        # Calculate the meg connectivity data for each oscillation band
+        self.meg_con['Theta'] = _mat_mult(self.meg_ROI_maps['Theta'])
+        self.meg_con['Alpha'] = _mat_mult(self.meg_ROI_maps['Alpha'])
+        self.meg_con['Beta'] = _mat_mult(self.meg_ROI_maps['Beta'])
+        self.meg_con['LowGamma'] = _mat_mult(self.meg_ROI_maps['LowGamma'])
+
+        # Initialize a dictionary to store data 
+        meg_stats = _init_meg_map_dict(length=2, slopes=False)
+
+        # Calculate the correlations between each oscillation and anat data
+        [meg_stats['Theta'][0], meg_stats['Theta'][1]] = pearsonr(
+            self.meg_con['Theta'][np.triu_indices(self.nROIs, 1)],
+            self.anat_con[np.triu_indices(self.nROIs, 1)])
+        [meg_stats['Alpha'][0], meg_stats['Alpha'][1]] = pearsonr(
+            self.meg_con['Alpha'][np.triu_indices(self.nROIs, 1)],
+            self.anat_con[np.triu_indices(self.nROIs, 1)])
+        [meg_stats['Beta'][0], meg_stats['Beta'][1]] = pearsonr(
+            self.meg_con['Beta'][np.triu_indices(self.nROIs, 1)],
+            self.anat_con[np.triu_indices(self.nROIs, 1)])
+        [meg_stats['LowGamma'][0], meg_stats['LowGamma'][1]] = pearsonr(
+            self.meg_con['LowGamma'][np.triu_indices(self.nROIs, 1)],
+            self.anat_con[np.triu_indices(self.nROIs, 1)])
+
+        # Attach the meg stats dictionary to object
+        self.meg_stats = meg_stats
+
+        # Print out results, if asked for
+        if print_out:
+            print('Pearson correlations between meg connectivity and anatomical connectivity: \n')
+            
+            # Loop through each oscillation, and print out R-val and p-val
+            for key in self.meg_stats.keys():
+                print(key)
+                print('    R value: ', format(self.meg_stats[key][0], '1.4'))
+                print('    P value: ', format(self.meg_stats[key][1], '1.4'))
 
 
-#####################################################
-###### OMEGAMAPPIN - CL_MC - PRIVATE FUNCTIONS ######
-#####################################################
+#########################################################################################
+######################## OMEGAMAPPIN - CL_MC - PRIVATE FUNCTIONS ########################
+#########################################################################################
 
 def _get_map_names(names_file, path):
     """
@@ -748,22 +789,71 @@ def _get_map_names(names_file, path):
     return names
 
 
-def _init_meg_map_dict(length=0):
-    """   """
+def _init_meg_map_dict(length=0, slopes=True):
+    """Initialize a dictionary to store meg data 
+
+    Parameters
+    ----------
+    length : int, optional
+        If non-zero, length of zeros array to initialize. 
+            Defaults to 0, which initializes an empty array. 
+    slopes : boolean, optional
+        Whether to include the 'Slopes' key in the dictonary. 
+            Defaults to True
+
+    Returns
+    -------
+    meg_map : dictionary
+        Dictionary with fields for MEG oscillation data. 
+    """
+
+    # If length 0, initialize dict with empty arrays
     if length == 0:
         meg_map = dict([('Theta',     np.array([])),
                         ('Alpha',     np.array([])),
                         ('Beta',      np.array([])),
                         ('LowGamma',  np.array([])),
-                        ('Slopes',    np.array([]))
-                        ])
+                        ('Slopes',    np.array([]))])
 
+    # If given a number, initialize zeros arrays of given length
     else:
         meg_map = dict([('Theta',     np.zeros(length)),
                         ('Alpha',     np.zeros(length)),
                         ('Beta',      np.zeros(length)),
                         ('LowGamma',  np.zeros(length)),
-                        ('Slopes',    np.zeros(length))
-                        ])
+                        ('Slopes',    np.zeros(length))])
+
+    # If requested, drop the Slopes field
+    if not slopes:
+        meg_map.pop('Slopes')
 
     return meg_map
+
+
+def _mat_mult(vec):
+    """Multiply 
+
+    Parameters
+    ----------
+    vec : 1d array
+        XX
+
+    Returns
+    -------
+    out : 2d array
+        XX
+    """
+    
+    # Get length of first vector
+    l = len(vec)
+
+    # 
+    out = np.zeros([l, l])
+    
+    #
+    for i in range(0, l):
+        for j in range(0, l):
+            
+            out[i, j] = vec[i] * vec[j]
+    
+    return out
