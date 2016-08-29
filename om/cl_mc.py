@@ -83,7 +83,7 @@ class MapComp():
         # Get lists of files from data directories
         osc_files = clean_file_list(os.listdir(self.oscs_path), '.npz')
         slope_files = clean_file_list(os.listdir(self.slopes_path), '.npz')
-        gene_files = clean_file_list(os.listdir(self.genes_path), '.csv')
+        gene_files = clean_file_list(os.listdir(self.genes_path), 'gene')
         term_files = clean_file_list(os.listdir(self.terms_path), '.csv')
 
         # If asked for, print out lists of files
@@ -151,7 +151,7 @@ class MapComp():
             self.slopes_loaded = True
 
 
-    def load_gene_maps(self, genes_file_names):
+    def load_gene_maps(self, subject):
         """Load the spatial maps of gene data.
 
         Note:
@@ -164,25 +164,42 @@ class MapComp():
         ----------
         self : MapComp() object
             Object for storing and comparing map data. 
-        genes_file_names : list (str)
-            list of files containing gene data
+        subject : str
+            xx
+
+        #genes_file_names : list (str)
+        #    list of files containing gene data
         """
+
+        # Check if gene data already loaded - if so, unload
+        if self.genes_loaded:
+            self.unload_data('Genes')
+
+        # Make string for folder name of subject gene data directory
+        subj_str = subject + '_gene_estimations'
+
+        # Get list of files available for requested subject
+        genes_file_names = clean_file_list(os.listdir(os.path.join(self.genes_path, subj_str)), 'r10')
         
         # If one file given, load this as the gene map
         if len(genes_file_names) == 1:
+            genes_csv = os.path.join(self.genes_path, subj_str, genes_files_names[0])
             self.gene_maps = pd.read_csv(genes_file_names[0], header=None)
 
         # If multiple files, load them all and concatenate
         else:
+
             # Loop through all files given
             for i in range(0, len(genes_file_names)):
+
                 # If first file, initialize as first part of the gene map
                 if i == 0:
-                    genes_csv = os.path.join(self.genes_path, genes_file_names[0])
+                    genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[0])
                     self.gene_maps = pd.read_csv(genes_csv, header=None)
+                    
                 # For all subsequent files, concatenate to end of gene map
                 else:
-                    genes_csv = os.path.join(self.genes_path, genes_file_names[i])
+                    genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[i])
                     temp_df = pd.read_csv(genes_csv, header=None)
                     self.gene_maps = pd.concat([self.gene_maps, temp_df])
 
