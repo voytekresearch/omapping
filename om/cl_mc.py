@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
 from om.gen import *
 
-##################################################
-############ OMEGAMAPPIN - MC CLASSES ############
-##################################################
+###################################################################################
+######################## OMEGAMAPPIN - MAP COMPARE CLASSES ########################
+###################################################################################
 
 class MapComp():
     """Class for storing and comparing spatial topographies."""
@@ -35,14 +35,8 @@ class MapComp():
         self.n_genes = len(self.gene_names)
 
         # Initialize a dictionary to store maps of meg data (oscillations & slopes)
-        self.meg_maps = _init_meg_map_dict()
-
-        #self.meg_maps = dict([('Theta',     np.array([])),
-        #                      ('Alpha',     np.array([])),
-        #                      ('Beta',      np.array([])),
-        #                      ('LowGamma',  np.array([])),
-        #                      ('Slopes',    np.array([]))
-        #                     ])
+        self.meg_maps = dict()
+        #self.meg_maps = _init_meg_map_dict()
 
         # Initialize variable to store the term maps
         self.term_maps = np.array([])
@@ -116,6 +110,12 @@ class MapComp():
         slope_file : str, optional
             File path to the file with slope data. 
         """
+
+        # Initialize the var to store meg map data
+        if slope_file is not None:
+            self.meg_maps = _init_meg_map_dict()
+        else:
+            self.meg_maps = _init_meg_map_dict(slopes=False)
 
         # If a filename is provided, load oscillation data
         if osc_file is not None:
@@ -501,12 +501,14 @@ class MapCompROI(MapComp):
         # Add path for anatomy data
         self.anat_path = os.path.join(self.maps_path, 'Anat')
 
-        # Addd vars to save ROIs from each data type
+        # Add vars to save ROI data from anat data
         self.anat_roi_names = list()
         self.anat_roi_lrs = list()
         self.anat_nROIs = int
         self.anat_con = np.ndarray(0)
-        
+        self.anat_type = str()
+
+        # Add vars to save ROI data from MEG data
         self.elec_roi_names = list()
         self.elec_roi_lrs = list()
         self.elec_nROIs = int
@@ -534,7 +536,7 @@ class MapCompROI(MapComp):
         self.meg_ROIs = False
 
 
-    def load_anat_maps(self, anat_file_name):
+    def load_anat_maps(self, anat_file_name, anat_type):
         """Load the spatial maps of anatomilcal data. 
 
         Parameters
@@ -543,6 +545,8 @@ class MapCompROI(MapComp):
             Object for storing and comparing map data, in ROI format.
         anat_file_name : str
             File name of anat data file.
+        anat_type : str
+            Indicates which type of anat data is loaded. 
         """
 
         # Get full path for the anat mat file
@@ -561,6 +565,9 @@ class MapCompROI(MapComp):
         # Loop through and fix roi labels
         for r in range(0, self.anat_nROIs):
             self.anat_roi_names.append(str(roi_names[r][0][0]))
+
+        # Update which type of anatomy data is loaded
+        self.anat_type = anat_type
 
         # Update boolean that anat data is loaded
         self.anat_loaded = True
@@ -603,7 +610,7 @@ class MapCompROI(MapComp):
         self.elec_roi_names = sc_names
         self.elec_roi_verts = sc_verts
 
-        # 
+        # Update boolean that elec data is loaded
         self.elec_loaded = True
 
 
@@ -713,40 +720,37 @@ class MapCompROI(MapComp):
 
     def comp_meg_anat(self, print_out=True):
         """Compare anatomical connectivity to oscillation data. 
+
+        Parameters
+        ----------
+        print_out : boolean, optional
+            Whether to print out the stats results.
+                Defaults to True
         """
 
         # Initialize the dictionary to store MEG connectivity data
-        self.meg_con = _init_meg_map_dict()
+        self.meg_con = _init_meg_map_dict(slopes=False)
 
         # Calculate the meg connectivity data for each oscillation band
-        self.meg_con['Theta'] = _mat_mult(self.meg_ROI_maps['Theta'])
-        self.meg_con['Alpha'] = _mat_mult(self.meg_ROI_maps['Alpha'])
-        self.meg_con['Beta'] = _mat_mult(self.meg_ROI_maps['Beta'])
-        self.meg_con['LowGamma'] = _mat_mult(self.meg_ROI_maps['LowGamma'])
+        for key in self.meg_con.keys():
+            self.meg_con[key] = _mat_mult(self.meg_ROI_maps[key])
 
         # Initialize a dictionary to store data 
         meg_stats = _init_meg_map_dict(length=2, slopes=False)
 
         # Calculate the correlations between each oscillation and anat data
-        [meg_stats['Theta'][0], meg_stats['Theta'][1]] = pearsonr(
-            self.meg_con['Theta'][np.triu_indices(self.nROIs, 1)],
-            self.anat_con[np.triu_indices(self.nROIs, 1)])
-        [meg_stats['Alpha'][0], meg_stats['Alpha'][1]] = pearsonr(
-            self.meg_con['Alpha'][np.triu_indices(self.nROIs, 1)],
-            self.anat_con[np.triu_indices(self.nROIs, 1)])
-        [meg_stats['Beta'][0], meg_stats['Beta'][1]] = pearsonr(
-            self.meg_con['Beta'][np.triu_indices(self.nROIs, 1)],
-            self.anat_con[np.triu_indices(self.nROIs, 1)])
-        [meg_stats['LowGamma'][0], meg_stats['LowGamma'][1]] = pearsonr(
-            self.meg_con['LowGamma'][np.triu_indices(self.nROIs, 1)],
-            self.anat_con[np.triu_indices(self.nROIs, 1)])
+        for key in meg_stats.keys():
+            meg_stats[key][0], meg_stats[key][1] = pearsonr(
+                self.meg_con[key][np.triu_indices(self.nROIs, 1)],
+                self.anat_con[np.triu_indices(self.nROIs, 1)])
 
         # Attach the meg stats dictionary to object
         self.meg_stats = meg_stats
 
         # Print out results, if asked for
         if print_out:
-            print('Pearson correlations between meg connectivity and anatomical connectivity: \n')
+            print('Anatomical data used is: ', self.anat_type)
+            print('Correlation between MEG and anatomical connectivity: \n')
             
             # Loop through each oscillation, and print out R-val and p-val
             for key in self.meg_stats.keys():
@@ -755,24 +759,82 @@ class MapCompROI(MapComp):
                 print('    P value: ', format(self.meg_stats[key][1], '1.4'))
 
 
-#########################################################################################
-######################## OMEGAMAPPIN - CL_MC - PRIVATE FUNCTIONS ########################
-#########################################################################################
+    def plot_mat(self, dat, osc=None, section='all'):
+        """Plot the connectivity matrix. 
+
+        Parameters
+        ----------
+        self : MapCompROI() object
+            Object for storing and comparing map data, in ROI format.
+        dat : str
+            Which data type to plot. 
+                Options: 'anat', 'meg'
+        osc : str, optional
+            If data is MEG, which oscillation to plot. 
+                Options: 'Theta', 'Alpha', 'Beta', 'LowGamma'. Default is None.
+        section : str
+            Which part of the matrix to plot. 
+                Options: 'all', 'left', 'right'
+        """
+        
+        # Initialize figure
+        f = plt.figure(figsize=[12, 12])
+        ax = f.add_subplot(111)
+
+        # Set section to plot
+        if section is 'all':
+            ind_st = 0
+            ind_en = self.nROIs
+        elif section is 'left':
+            ind_st = self.roi_lr.index('L')
+            ind_en = _find_last(self.roi_lr, 'L')
+        elif section is 'right':
+            ind_st = self.roi_lr.index('R')
+            ind_en = _find_last(self.roi_lr, 'R')
+        else:
+            print('Section range unclear!')
+            return
+
+        # Create the figure
+        if dat is 'anat':
+            #m = ax.matshow(self.anat_con)
+            m = ax.imshow(self.anat_con[ind_st:ind_en, ind_st:ind_en], interpolation='none')
+        elif dat is 'meg':
+            #m = ax.matshow(self.meg_con[osc])
+            m = ax.imshow(self.meg_con[osc][ind_st:ind_en, ind_st:ind_en], interpolation='none')
+
+        # Add colour bar as a legend
+        f.colorbar(m)
+
+        # Add a title to the plot
+        if dat is 'anat':
+            plt.title('Anatomy Connectivity', fontsize=22, fontweight='bold')
+        elif dat is 'meg':
+            plt.title('MEG Connectivity', fontsize=22, fontweight='bold')
+
+        # Display the figure
+        plt.show()
+
+
+#################################################################################################
+############################ OMEGAMAPPIN - CL_MC - PRIVATE FUNCTIONS ############################
+#################################################################################################
+
 
 def _get_map_names(names_file, path):
-    """
+    """Get the map names from a given file. 
 
     Parameters
     ----------
-    names_files : ??
-        XX
-    path : ?
-        XX
+    names_file : str
+        File name to pull the map names from. 
+    path : str
+        Path of where the file is. 
 
     Returns
     -------
-    names : ?
-        XX
+    names : list(str)
+        A list of the map names
     """
 
     # Get path to csv file
@@ -831,29 +893,50 @@ def _init_meg_map_dict(length=0, slopes=True):
 
 
 def _mat_mult(vec):
-    """Multiply 
+    """Multiply a vector element by element with itself. 
 
     Parameters
     ----------
     vec : 1d array
-        XX
+        A vector to be multiplied by itself. 
 
     Returns
     -------
     out : 2d array
-        XX
+        A matrix of the input vector multiplied by itself. 
     """
     
     # Get length of first vector
     l = len(vec)
 
-    # 
+    # Initialize a matrix
     out = np.zeros([l, l])
     
-    #
+    # Loop through vector, multiplying each element
     for i in range(0, l):
         for j in range(0, l):
-            
             out[i, j] = vec[i] * vec[j]
     
     return out
+
+
+def _find_last(input_list, wanted):
+    """Find the index of the last instance of a wanted element. 
+
+    Parameters
+    ----------
+    input_list : list
+        A list to search through.
+    wanted : str
+        The element for which the last index is wanted. 
+
+
+    From here: http://stackoverflow.com/questions/6890170/how-to-find-the-last-occurrence-of-an-item-in-a-python-list
+    """
+
+    # Run through the list, backwards
+    for ind, el in enumerate(reversed(input_list)):
+
+        # If element is the wanted one, return index
+        if el == wanted:
+            return len(input_list) - 1 - ind
