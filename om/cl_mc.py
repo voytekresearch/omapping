@@ -718,11 +718,16 @@ class MapCompROI(MapComp):
         self.meg_ROIs = True
 
 
-    def comp_meg_anat(self, print_out=True):
+    def comp_meg_anat(self, section='all', print_out=True):
         """Compare anatomical connectivity to oscillation data. 
 
         Parameters
         ----------
+        self : MapCompROI() object
+            Object for storing and comparing map data, in ROI format.
+        section : str
+            Which section of data to compare. 
+                Options: 'all', 'left', 'right'
         print_out : boolean, optional
             Whether to print out the stats results.
                 Defaults to True
@@ -731,18 +736,27 @@ class MapCompROI(MapComp):
         # Initialize the dictionary to store MEG connectivity data
         self.meg_con = _init_meg_map_dict(slopes=False)
 
+        # Get section indices to run comparisons
+        ind_st, ind_en, x, x = _get_section(section, self.nROIs, self.roi_lr)
+
         # Calculate the meg connectivity data for each oscillation band
         for key in self.meg_con.keys():
-            self.meg_con[key] = _mat_mult(self.meg_ROI_maps[key])
+            self.meg_con[key] = _mat_mult(self.meg_ROI_maps[key][ind_st:ind_en])
 
         # Initialize a dictionary to store data 
         meg_stats = _init_meg_map_dict(length=2, slopes=False)
 
+        # Get nROIs used in comparison
+        nROIs_used = ind_en - ind_st
+
+        # Extract anat range to use
+        anat_comp = self.anat_con[ind_st:ind_en, ind_st:ind_en]
+
         # Calculate the correlations between each oscillation and anat data
         for key in meg_stats.keys():
             meg_stats[key][0], meg_stats[key][1] = pearsonr(
-                self.meg_con[key][np.triu_indices(self.nROIs, 1)],
-                self.anat_con[np.triu_indices(self.nROIs, 1)])
+                self.meg_con[key][np.triu_indices(nROIs_used, 1)],
+                anat_comp[np.triu_indices(nROIs_used, 1)])
 
         # Attach the meg stats dictionary to object
         self.meg_stats = meg_stats
@@ -781,29 +795,8 @@ class MapCompROI(MapComp):
         f = plt.figure(figsize=[12, 12])
         ax = f.add_subplot(111)
 
-        # Set section to plot
-        if section is 'all':
-            ind_st_a = ind_st_b = 0
-            ind_en_a = ind_en_b = self.nROIs
-        elif section is 'left':
-            ind_st_a = ind_st_b = self.roi_lr.index('L')
-            ind_en_a = ind_en_b = _find_last(self.roi_lr, 'L')
-        elif section is 'right':
-            ind_st_a = ind_st_b = self.roi_lr.index('R')
-            ind_en_a = ind_en_b =  _find_last(self.roi_lr, 'R')
-        elif section is 'lr':
-            ind_st_a = self.roi_lr.index('L')
-            ind_en_a = _find_last(self.roi_lr, 'L')
-            ind_st_b = self.roi_lr.index('R')
-            ind_en_b = _find_last(self.roi_lr, 'R')
-        elif section is 'rl':
-            ind_st_a = self.roi_lr.index('R')
-            ind_en_a = _find_last(self.roi_lr, 'R')
-            ind_st_b = self.roi_lr.index('L')
-            ind_en_b = _find_last(self.roi_lr, 'L') 
-        else:
-            print('Section range unclear!')
-            return
+        # Get indices for section to plot
+        ind_st_a, ind_en_a, ind_st_b, ind_en_b = _get_section(section, self.nROIs, self.roi_lr)
 
         # Create the figure
         if dat is 'anat':
@@ -930,6 +923,47 @@ def _mat_mult(vec):
     return out
 
 
+def _get_section(section, nROIs, roi_lr):
+    """Get indices for desired section. 
+
+    Parameters
+    ----------
+    section : str
+        Which section to get indices for. 
+    nROIs : int
+        The number of ROIs.
+    roi_lr : list(str)
+        List of L/R for each ROI. 
+    """
+
+    # Set section indices
+    if section is 'all':
+        ind_st_a = ind_st_b = 0
+        ind_en_a = ind_en_b = nROIs
+    elif section is 'left':
+        ind_st_a = ind_st_b = roi_lr.index('L')
+        ind_en_a = ind_en_b = _find_last(roi_lr, 'L')
+    elif section is 'right':
+        ind_st_a = ind_st_b = roi_lr.index('R')
+        ind_en_a = ind_en_b =  _find_last(roi_lr, 'R')
+    elif section is 'lr':
+        ind_st_a = roi_lr.index('L')
+        ind_en_a = _find_last(roi_lr, 'L')
+        ind_st_b = roi_lr.index('R')
+        ind_en_b = _find_last(roi_lr, 'R')
+    elif section is 'rl':
+        ind_st_a = roi_lr.index('R')
+        ind_en_a = _find_last(roi_lr, 'R')
+        ind_st_b = roi_lr.index('L')
+        ind_en_b = _find_last(roi_lr, 'L') 
+    else:
+        print('Section range unclear!')
+        ind_st_a = ind_en_a = ind_st_b = ind_en_b = 0
+
+    # Return indices
+    return ind_st_a, ind_en_a, ind_st_b, ind_en_b
+
+
 def _find_last(input_list, wanted):
     """Find the index of the last instance of a wanted element. 
 
@@ -939,7 +973,6 @@ def _find_last(input_list, wanted):
         A list to search through.
     wanted : str
         The element for which the last index is wanted. 
-
 
     From here: http://stackoverflow.com/questions/6890170/how-to-find-the-last-occurrence-of-an-item-in-a-python-list
     """
