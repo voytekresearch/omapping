@@ -774,7 +774,7 @@ class MapCompROI(MapComp):
                 Options: 'Theta', 'Alpha', 'Beta', 'LowGamma'. Default is None.
         section : str
             Which part of the matrix to plot. 
-                Options: 'all', 'left', 'right'
+                Options: 'all', 'left', 'right', 'lr', 'rl'
         """
         
         # Initialize figure
@@ -783,14 +783,24 @@ class MapCompROI(MapComp):
 
         # Set section to plot
         if section is 'all':
-            ind_st = 0
-            ind_en = self.nROIs
+            ind_st_a = ind_st_b = 0
+            ind_en_a = ind_en_b = self.nROIs
         elif section is 'left':
-            ind_st = self.roi_lr.index('L')
-            ind_en = _find_last(self.roi_lr, 'L')
+            ind_st_a = ind_st_b = self.roi_lr.index('L')
+            ind_en_a = ind_en_b = _find_last(self.roi_lr, 'L')
         elif section is 'right':
-            ind_st = self.roi_lr.index('R')
-            ind_en = _find_last(self.roi_lr, 'R')
+            ind_st_a = ind_st_b = self.roi_lr.index('R')
+            ind_en_a = ind_en_b =  _find_last(self.roi_lr, 'R')
+        elif section is 'lr':
+            ind_st_a = self.roi_lr.index('L')
+            ind_en_a = _find_last(self.roi_lr, 'L')
+            ind_st_b = self.roi_lr.index('R')
+            ind_en_b = _find_last(self.roi_lr, 'R')
+        elif section is 'rl':
+            ind_st_a = self.roi_lr.index('R')
+            ind_en_a = _find_last(self.roi_lr, 'R')
+            ind_st_b = self.roi_lr.index('L')
+            ind_en_b = _find_last(self.roi_lr, 'L') 
         else:
             print('Section range unclear!')
             return
@@ -798,10 +808,10 @@ class MapCompROI(MapComp):
         # Create the figure
         if dat is 'anat':
             #m = ax.matshow(self.anat_con)
-            m = ax.imshow(self.anat_con[ind_st:ind_en, ind_st:ind_en], interpolation='none')
+            m = ax.imshow(self.anat_con[ind_st_a:ind_en_a, ind_st_b:ind_en_b], interpolation='none')
         elif dat is 'meg':
             #m = ax.matshow(self.meg_con[osc])
-            m = ax.imshow(self.meg_con[osc][ind_st:ind_en, ind_st:ind_en], interpolation='none')
+            m = ax.imshow(self.meg_con[osc][ind_st_a:ind_en_a, ind_st_b:ind_en_b], interpolation='none')
 
         # Add colour bar as a legend
         f.colorbar(m)
