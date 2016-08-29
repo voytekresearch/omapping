@@ -13,9 +13,9 @@ from foof.fit import FOOF
 # Import Parallelization Packages
 from multiprocessing import Pool, freeze_support
 
-###############################################################
-################ OMEGAMAPPIN - GENERAL CLASSES ################
-###############################################################
+###########################################################################
+###################### OMEGAMAPPIN - GENERAL CLASSES ######################
+###########################################################################
 
 class Osc:
     """Class to store oscillations parameters."""
