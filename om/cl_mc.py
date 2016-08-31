@@ -81,10 +81,10 @@ class MapComp():
         """
 
         # Get lists of files from data directories
-        osc_files = clean_file_list(os.listdir(self.oscs_path), '.npz')
-        slope_files = clean_file_list(os.listdir(self.slopes_path), '.npz')
+        osc_files = clean_file_list(os.listdir(self.oscs_path), 'osc')
+        slope_files = clean_file_list(os.listdir(self.slopes_path), 'slope')
         gene_files = clean_file_list(os.listdir(self.genes_path), 'gene')
-        term_files = clean_file_list(os.listdir(self.terms_path), '.csv')
+        term_files = clean_file_list(os.listdir(self.terms_path), 'terms')
 
         # If asked for, print out lists of files
         if print_files:
@@ -154,21 +154,12 @@ class MapComp():
     def load_gene_maps(self, subject):
         """Load the spatial maps of gene data.
 
-        Note:
-            Input must be a list. If gene data in single file, use single item list.
-            If list contains multiple files, these files will be loaded and
-                concatenated to form the full gene maps.
-            Order: First file should be first set of files.
-
         Parameters
         ----------
         self : MapComp() object
             Object for storing and comparing map data. 
         subject : str
-            xx
-
-        #genes_file_names : list (str)
-        #    list of files containing gene data
+            Which subject of gene data to load. Of the form 'sub#'
         """
 
         # Check if gene data already loaded - if so, unload
@@ -189,8 +180,11 @@ class MapComp():
         # If multiple files, load them all and concatenate
         else:
 
+            # Check how many files there are
+            nFiles = len(genes_file_names)
+
             # Loop through all files given
-            for i in range(0, len(genes_file_names)):
+            for i in range(0, nFiles):
 
                 # If first file, initialize as first part of the gene map
                 if i == 0:
@@ -202,6 +196,12 @@ class MapComp():
                     genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[i])
                     temp_df = pd.read_csv(genes_csv, header=None)
                     self.gene_maps = pd.concat([self.gene_maps, temp_df])
+
+                # Print loading status
+                print('Loading file #', str(i+1), ' of ', str(nFiles))
+
+        # Print status
+        print('All files loaded!')
 
         # Update boolean that genes are loaded
         self.genes_loaded = True
@@ -228,7 +228,7 @@ class MapComp():
         self.terms_loaded = True
 
 
-    def calc_corrs(self, dat_type, meg_dat):
+    def calc_corrs(self, dat_type, meg_dat, method='linear'):
         """Calculate correlations between spatial maps.
 
         Parameters
@@ -241,6 +241,9 @@ class MapComp():
         meg_dat : str
             Specific type of meg data to correlate
                 osc_band or 'Slopes' only
+        method : str
+            Run method (linear or parallel) to use. 
+                Options: {'linear', 'parallel'}. Default: 'linear'. 
         """
 
         # Check with data type and set data accordingly
@@ -264,17 +267,31 @@ class MapComp():
         corr_vals = np.zeros([n_comps, 1])
         p_vals = np.zeros([n_comps, 1])
 
-        # Loop through all comparisons to run
-        for comp in range(0, n_comps):
+        # Run linearly
+        if method is 'linear':
 
-            # Pull out specific data (single term or gene)
-            dat = np.array(dat_df.ix[:, comp])
+            # Loop through all comparisons to run
+            for comp in range(0, n_comps):
 
-            # Get inds of data that contains numbers
-            inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) == False]
+                # Pull out specific data (single term or gene)
+                dat = np.array(dat_df.ix[:, comp])
 
-            # Calculate correlation between data and meg map
-            [corr_vals[comp], p_vals[comp]] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
+                # Get inds of data that contains numbers
+                inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) == False]
+
+                # Calculate correlation between data and meg map
+                [corr_vals[comp], p_vals[comp]] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
+
+        # Run in parallel
+        elif method is 'parallel':
+
+            """ NOTE: parallel method is not yet implemented! """
+            
+            # Initialize pool of workers
+            pool = multiprocessing.Pool(processes=4)
+
+            #
+            out = pool.Map(_corr_par(), dat_in) # _corr_par not yet implemented!
 
         # Save correlations results to MapComp object
         self.corrs[dat_type + meg_dat] = corr_vals
