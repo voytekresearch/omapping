@@ -13,9 +13,9 @@ from foof.fit import FOOF
 # Import Parallelization Packages
 from multiprocessing import Pool, freeze_support
 
-###########################################################################
-###################### OMEGAMAPPIN - GENERAL CLASSES ######################
-###########################################################################
+###################################################################################
+########################## OMEGAMAPPIN - GENERAL CLASSES ##########################
+###################################################################################
 
 class Osc:
     """Class to store oscillations parameters."""
@@ -39,9 +39,9 @@ class Osc:
         self.lowgamma_high = 40
 
 
-#######################################################################
-########################## OM_FOOF Functions ##########################
-#######################################################################
+###############################################################################
+############################## OM_FOOF Functions ##############################
+###############################################################################
 
 def clean_file_list(files_in, string):
     """"Takes a list of files and returns only a specified set of files. 
@@ -64,7 +64,8 @@ def clean_file_list(files_in, string):
 
     # Loop through given files, keeping those that contain string
     for i in range(0, len(files_in)):
-        if(string in files_in[i]):
+        #if(string in files_in[i]):
+        if(string in files_in[i].lower()):
             files_out.append(files_in[i])
 
     # Check if list is empty
