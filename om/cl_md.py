@@ -1,13 +1,12 @@
 from __future__ import print_function, division
 import os
-#import csv
+import csv
 import pickle
 import numpy as np
-#import pandas as pd
+#import pandas as pd   #NOTE: check if used / needed
 import scipy.io as sio
 import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
-#from om.gen import clean_file_list, get_cur_subj
 from om.gen import *
 
 ##########################################################################################
