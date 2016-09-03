@@ -3,7 +3,6 @@ import os
 import csv
 import pickle
 import numpy as np
-#import pandas as pd   #NOTE: check if used / needed
 import scipy.io as sio
 import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
@@ -56,7 +55,7 @@ class MegData():
         self.sex = []
         self.age = np.array([])
 
-        #
+        # Initialize oscillation count
         self.osc_count = int()
 
         # Initialize peak frequency variables
@@ -84,7 +83,7 @@ class MegData():
 
         # Check if object already has data
         if self.has_data:
-            print("Subject object already contains add. Can't add")
+            print("Subject object already contains data. Can't add")
             return
 
         # Set subject number for current data object
@@ -176,7 +175,7 @@ class MegData():
 
 
     def save_viz(self):
-        """Saves a matfile of frequency information to be loaded with Brainstorm for visualization."""
+        """Saves a matfile of frequency information to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
         save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
@@ -222,17 +221,17 @@ class MegData():
         self.all_osc = True
 
 
-    def peak_freq(self, osc):
+    def peak_freq(self, osc, avg='mean'):
         """Calculates the peak frequency for each oscillatory band.
 
         Parameters
         ----------
         osc : Osc object
             Object with oscillation frequency details
+        avg : str
+            Which type of averaging to do. 
+                Options: {'mean', 'median'}
         """
-
-        # Set average type
-        avg = 'mean'
 
         # Get peak frequency within each frequency band
         self.peak_theta = _osc_peak(self.centers_all, osc.theta_low, osc.theta_high, avg)
@@ -242,7 +241,7 @@ class MegData():
 
 
     def plot_all_oscs(self):
-        """Plots histogram distributions of oscillation centers, powers and bws."""
+        """Plots histogram distributions of oscillation centers, powers and bws. """
 
         # Check if all_oscs computed
         if not self.all_osc:
@@ -250,10 +249,10 @@ class MegData():
             return
 
         # Plot Settings
-        n_bins = 160        # Number of bins for histograms
-        st_fs = 20          # Super Title Font Size
-        sp_fs = 18          # Subplot Title Font Size
-        ax_fs = 16          # Axis Label Font Size
+        n_bins = 160         # Number of bins for histograms
+        st_fs = 20           # Super Title Font Size
+        sp_fs = 18           # Subplot Title Font Size
+        ax_fs = 16           # Axis Label Font Size
 
         # Set up subplots
         fig, ax = plt.subplots(3, 1, figsize=(15, 15))
@@ -283,12 +282,12 @@ class MegData():
 
 
     def plot_hist_count(self):
-        """Plots a histogram of the osc_count vector."""
+        """Plots a histogram of the osc_count vector. """
 
         # Plot Settings
-        n_bins = 25         # Number of bins for histograms
-        t_fs = 18           # Title font size
-        ax_fs = 16          # Axis label font size
+        n_bins = 25          # Number of bins for histograms
+        t_fs = 18            # Title font size
+        ax_fs = 16           # Axis label font size
 
         # Create histogram
         plt.hist(self.osc_count, n_bins, range=[0, 8])
@@ -298,12 +297,12 @@ class MegData():
 
 
     def plot_slopes(self):
-        """Plots a histogram of the chi values for all vertices."""
+        """Plots a histogram of the chi values for all vertices. """
 
         # Plot Settings
-        n_bins = 100        # Number of bins for histograms
-        t_fs = 20           # Title font size
-        ax_fs = 16          # Axis label font size
+        n_bins = 100         # Number of bins for histograms
+        t_fs = 20            # Title font size
+        ax_fs = 16           # Axis label font size
 
         # Create histogram
         plt.hist(self.chis, n_bins)
@@ -371,14 +370,14 @@ class MegData():
         # Save correlation results to list to return
         corrs = [['Center - B.W.'   , corr_cen_bw , pcorr_cen_bw ],
                  ['Center - Power'  , corr_cen_pow, pcorr_cen_pow],
-                 ['B.W. - Power '   , corr_bw_pow , pcorr_bw_pow ],
-                 ]
+                 ['B.W. - Power '   , corr_bw_pow , pcorr_bw_pow ]]
 
         return corrs
 
 
     def save_pickle(self):
         """Save current meg data object as a pickled object.
+
         NOTE: NOT YET IMPLEMENTED. 
         """
 
@@ -531,7 +530,7 @@ class GroupMegData(MegData):
 
 
     def osc_prob(self):
-        """Calculates the probability (per vertex / across subjects) of an oscillation in a specific band."""
+        """Calculates the probability (per vertex / across subjects) of an oscillation in a specific band. """
 
         # For each frequency band, compute the probability of oscillation in that band. 
         self.theta_prob = _osc_prob(self.gr_thetas)
@@ -564,12 +563,12 @@ class GroupMegData(MegData):
         # Save map out, if required
         if save_out:
             
-            #
+            # Set up 
             npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Slopes/'
             npz_file_name = file_name + '.npz'
             npz_save_name = os.path.join(npz_save_path, npz_file_name)
 
-            #
+            # Save out an npz file
             np.savez(npz_save_name, chis=self.chis_avg, n_subjs=self.n_subjs)
 
         # Save out as matfile for visualization with matlab, if required
@@ -590,7 +589,7 @@ class GroupMegData(MegData):
 
 
     def set_prob_vis(self):
-        """Saves out a matfile (of osc-probs) to be loaded with Brainstorm for visualization."""
+        """Saves out a matfile (of osc-probs) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
         save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
@@ -613,9 +612,8 @@ class GroupMegData(MegData):
 
         Returns
         -------
-        corrs : ?
-            xx
-
+        corrs : dict
+            Contains the correlations between all oscillation probabilities. 
         """
 
         # Check if oscillation probabilities have been calculated. 
@@ -647,14 +645,17 @@ class GroupMegData(MegData):
                  ['Theta-LG'   , r_th_lg, p_th_lg],
                  ['Alpha-Beta' , r_al_be, p_al_be],
                  ['Alpha-LG'   , r_al_lg, p_al_lg],
-                 ['Beta-LG'    , r_be_lg, p_be_lg]
-                ]
+                 ['Beta-LG'    , r_be_lg, p_be_lg]]
 
         return corrs
 
 
     def osc_score(self):
-        """Calculate the oscillation score for each frequency band."""
+        """Calculate the oscillation score for each frequency band. 
+
+        The oscillation score is .... XXXXX
+
+        """
 
         # Check if osc-prob is calculated. Can't proceed if it isnt. 
         if not self.osc_prob_done:
@@ -681,8 +682,8 @@ class GroupMegData(MegData):
 
         Returns
         -------
-        corrs : ?
-            xx
+        corrs : dict
+            Contains the results of the correlations across oscillation scores. 
         """
 
         # Check if oscillation probabilities have been calculated. 
@@ -714,8 +715,7 @@ class GroupMegData(MegData):
                  ['Theta-LG'   , r_th_lg, p_th_lg],
                  ['Alpha-Beta' , r_al_be, p_al_be],
                  ['Alpha-LG'   , r_al_lg, p_al_lg],
-                 ['Beta-LG'    , r_be_lg, p_be_lg],
-                 ]
+                 ['Beta-LG'    , r_be_lg, p_be_lg]]
 
         return corrs
 
@@ -728,11 +728,11 @@ class GroupMegData(MegData):
         self : GroupMegData() object. 
             Object to store map data across a group of subjects. 
         file_name : str
-            xx
+            Name to save the file as. 
         """
 
-        #
-        npz_save_path = 'Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Oscs/'
+        # Create full file path and save file as an npz file
+        npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Oscs/'
         npz_file_name = file_name + '.npz'
         npz_save_name = os.path.join(npz_save_path, npz_file_name)
         np.savez(npz_save_name, osc_score_theta=self.theta_score, osc_score_alpha=self.alpha_score,
@@ -740,7 +740,7 @@ class GroupMegData(MegData):
 
 
     def set_score_vis(self):
-        """Saves a matfile (of osc-scores) to be loaded with Brainstorm for visualization."""
+        """Saves a matfile (of osc-scores) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
         save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
@@ -763,8 +763,8 @@ class GroupMegData(MegData):
 
         Returns
         -------
-        corrs : ?
-            xx
+        corrs : dict
+            A dictionary containing correlations results comparing age to oscillations. 
         """
 
         # Plot settings
@@ -802,14 +802,14 @@ class GroupMegData(MegData):
         corrs = [['Theta Peak - Age' , r_age_th_peak, p_age_th_peak],
                  ['Alpha Peak - Age' , r_age_al_peak, p_age_al_peak],
                  ['Beta Peak - Age'  , r_age_be_peak, p_age_be_peak],
-                 ['LG Peak - Age'    , r_age_lg_peak, p_age_lg_peak]
-                ]
+                 ['LG Peak - Age'    , r_age_lg_peak, p_age_lg_peak]]
 
         return corrs
 
 
     def freq_corr(self, f_win):
         """Calculates the correlation between adjacent frequency bands.
+
         Uses oscillation probabilities. 
 
         Parameters
@@ -818,6 +818,13 @@ class GroupMegData(MegData):
             Object to store map data across a group of subjects. 
         f_win : float
             Size of frequency window to use. 
+
+        Returns
+        -------
+        corr_vec : 1d array
+            Vector of the correlation coefficients between all adjacent frequency bands. 
+        p_vec : 1d array
+            Vector of the p-values for the correlations between adjacent frequency bands. 
         """
 
         # Get # vertices, # of subjects to loop through
@@ -862,12 +869,15 @@ class GroupMegData(MegData):
 
         return corr_vec, p_vec
 
-#####################################################
-###### OMEGAMAPPIN - OM_MD - PRIVATE FUNCTIONS ######
-#####################################################
+
+#################################################################################################
+############################ OMEGAMAPPIN - OM_MD - PRIVATE FUNCTIONS ############################
+#################################################################################################
+
 
 def _get_osc(centers, powers, bws, osc_low, osc_high):
     """ Searches for an oscillations of specified frequency band.
+
     Returns a single oscillation in that band.
     Helper function for osc_per_vertex in MegData.
 
@@ -888,7 +898,6 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
     -------
     osc_out : tuple
         Osc data, form: [centers, powers, bws, # oscillations]. 
-
     """
 
     # Find indices of oscillations in the specified range
@@ -924,10 +933,9 @@ def _get_all_osc(centers, osc_low, osc_high):
     -------
     osc_cens : 1d array
         Osc centers in specified frequency band.
-
     """
 
-    #
+    # Get inds of desired oscs and pull out from input data
     osc_inds = (centers > osc_low) & (centers < osc_high)
     osc_cens = centers[osc_inds]
 
@@ -992,9 +1000,11 @@ def _get_single_osc_power(osc_cens, osc_pows, osc_bws):
     # Return zeros if there are no oscillations in given vectors
     if len(osc_cens) == 0:
         return 0., 0., 0.
+
     # If singular oscillation, return that oscillation
     elif len(osc_cens) == 1:
         return osc_cens, osc_pows, osc_bws
+
     # If multiple oscillations, return the one with the highest power
     else:
         high_ind = np.argmax(osc_pows)
@@ -1030,6 +1040,7 @@ def _osc_prob(osc_mat):
 
 def _osc_pow_ratio(osc_mat):
     """Calculate the power ratio of an oscillation.
+
     Power ratio is a score between [0, 1] power relative to
         max power in that frequency band.
 
@@ -1089,7 +1100,7 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
         Upper bound of frequency range to check. 
     avg : str
         What kind of average to take.
-            Options: 'mean', 'median'
+            Options: {'mean', 'median'}
 
     Returns
     -------
