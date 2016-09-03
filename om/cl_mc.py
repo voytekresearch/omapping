@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
 from om.gen import *
 
-###################################################################################
-######################## OMEGAMAPPIN - MAP COMPARE CLASSES ########################
-###################################################################################
+###########################################################################################
+############################ OMEGAMAPPIN - MAP COMPARE CLASSES ############################
+###########################################################################################
 
 class MapComp():
     """Class for storing and comparing spatial topographies."""
@@ -257,6 +257,9 @@ class MapComp():
         except KeyError:
             print('MEG Data not understood. Fix it.')
 
+        # Print out status
+        print('Calculating corrs between', str(dat_type), ' and ', str(meg_dat))
+
         # Initialize vectors to store correlation results
         corr_vals = np.zeros([n_comps, 1])
         p_vals = np.zeros([n_comps, 1])
@@ -279,7 +282,9 @@ class MapComp():
         # Run in parallel
         elif method is 'parallel':
 
-            """ NOTE: parallel method is not yet implemented! """
+            """ NOTE: parallel method is not yet implemented! 
+            Relevant libraries not imported. 
+            """
             
             # Initialize pool of workers
             pool = multiprocessing.Pool(processes=4)
@@ -305,7 +310,7 @@ class MapComp():
             Specific MEG data of corrs to check. 
         n_check : int, optional
             Number of correlations to check. 
-        top :
+        top : boolean, optional. 
             Get Top (True) or Bottom (False) set of correlations.
         """
 
@@ -405,7 +410,6 @@ class MapComp():
             Data type to plot corrs for (Terms or Genes). 
         meg_dat : str
             Specific meg map to plot corrs for. 
-
         """
 
         # Check that asked for correlations have been computed
@@ -613,8 +617,8 @@ class MapCompROI(MapComp):
         ----------
         self : MapCompROI() object
             Object for storing and comparing map data, in ROI format.
-        roi_file_name : ?
-            xx
+        roi_file_name : str
+            File name (including path) to the matlab scout definition file. 
         """
 
         # Load ROI dat from mat file
@@ -650,7 +654,9 @@ class MapCompROI(MapComp):
     def align_rois(self):
         """Align ROIs used and names between anat and meg ROIs. 
 
-        XXXX
+        NOTES
+        -----
+        xxxxxxxx
         """
 
         # Check if ROIs loaded - return if not
@@ -664,9 +670,11 @@ class MapCompROI(MapComp):
             # Check if left side scout
             if(self.elec_roi_names[r][-1] is 'L'):
                 self.elec_roi_lrs.append('L')
+
             # Check if right side scout
             elif(self.elec_roi_names[r][-1] is 'R'):
                 self.elec_roi_lrs.append('R')
+
             else:
                 pass
 
@@ -680,10 +688,12 @@ class MapCompROI(MapComp):
             if(self.anat_roi_names[r][0] is 'l'):
                 self.anat_roi_lrs.append('L')
                 self.anat_roi_names[r] = self.anat_roi_names[r][5:]
+
             # Check if right side scout
             elif(self.anat_roi_names[r][0] is 'r'):
                 self.anat_roi_lrs.append('R')
                 self.anat_roi_names[r] = self.anat_roi_names[r][6:]
+
             else:
                 pass
 
@@ -721,7 +731,9 @@ class MapCompROI(MapComp):
 
 
     def conv_meg_rois(self):
-        """Convert MEG data to ROIs. 
+        """Convert MEG data to ROIs.
+
+        This 
         """
 
         # Initialize dict for current ROI data
@@ -822,6 +834,12 @@ class MapCompROI(MapComp):
         section : str
             Which part of the matrix to plot. 
                 Options: 'all', 'left', 'right', 'lr', 'rl'
+
+        Notes
+        -----
+        Instead of 'imshow' can also use 'matshow'
+        As in:
+            >> m = ax.matshow(self.anat_con)
         """
         
         # Initialize figure
@@ -833,10 +851,8 @@ class MapCompROI(MapComp):
 
         # Create the figure
         if dat is 'anat':
-            #m = ax.matshow(self.anat_con)
             m = ax.imshow(self.anat_con[ind_st_a:ind_en_a, ind_st_b:ind_en_b], interpolation='none')
         elif dat is 'meg':
-            #m = ax.matshow(self.meg_con[osc])
             m = ax.imshow(self.meg_con[osc][ind_st_a:ind_en_a, ind_st_b:ind_en_b], interpolation='none')
 
         # Add colour bar as a legend
@@ -929,7 +945,13 @@ def _init_meg_map_dict(length=0, slopes=True):
 
 
 def _init_stat_dict():
-    """   """
+    """ Initialize a dictionary to store stat data for inter-data correlations. 
+
+    Returns
+    -------
+    out : dict
+        A dictionary to store stats for terms/genes across all meg dat types. 
+    """
 
     out = dict([('TermsTheta',  np.array([])), ('TermsAlpha',    np.array([])),
                 ('TermsBeta',   np.array([])), ('TermsLowGamma', np.array([])),
