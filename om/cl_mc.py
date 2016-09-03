@@ -43,22 +43,13 @@ class MapComp():
 
         # Initialize variable to store the gene maps
         self.gene_maps = np.array([])
+        self.gene_subj = str()
 
         # Initialize a dictionary to store all the R-value results from spatial correlations
-        self.corrs = dict([('TermsTheta',  np.array([])), ('TermsAlpha',    np.array([])),
-                           ('TermsBeta',   np.array([])), ('TermsLowGamma', np.array([])),
-                           ('GenesTheta',  np.array([])), ('GenesAlpha',    np.array([])),
-                           ('GenesBeta',   np.array([])), ('GenesLowGamma', np.array([])),
-                           ('TermsSlopes', np.array([])), ('GenesSlopes',   np.array([]))
-                          ])
+        self.corrs = _init_stat_dict()
 
         # Initialize a dictionary to store all the p-value results from spatial correlations
-        self.p_vals = dict([('TermsTheta',  np.array([])),  ('TermsAlpha',    np.array([])),
-                            ('TermsBeta',   np.array([])),  ('TermsLowGamma', np.array([])),
-                            ('GenesTheta',  np.array([])),  ('GenesAlpha',    np.array([])),
-                            ('GenesBeta',   np.array([])),  ('GenesLowGamma', np.array([])),
-                            ('TermsSlopes', np.array([])),  ('GenesSlopes',   np.array([]))
-                            ])
+        self.p_vals = _init_stat_dict()
 
         # Initialize booleans that keep track of what is loaded
         self.oscs_loaded = False
@@ -88,10 +79,10 @@ class MapComp():
 
         # If asked for, print out lists of files
         if print_files:
-            print('Oscillation Files: \n', '\n'.join(osc_files), '\n')
-            print('Slope Files: \n', '\n'.join(slope_files), '\n')
-            print('Terms Files: \n', '\n'.join(term_files), '\n')
-            print('Genes Files: \n', '\n'.join(gene_files), '\n')
+            print('Oscillation Files:\n', '\n'.join(osc_files), '\n')
+            print('Slope Files:\n', '\n'.join(slope_files), '\n')
+            print('Terms Files:\n', '\n'.join(term_files), '\n')
+            print('Genes Files:\n', '\n'.join(gene_files), '\n')
 
         # If asked for, return lists of files
         if return_files:
@@ -166,6 +157,9 @@ class MapComp():
         if self.genes_loaded:
             self.unload_data('Genes')
 
+        # Set subject marker
+        self.gene_subj = subject
+
         # Make string for folder name of subject gene data directory
         subj_str = subject + '_gene_estimations'
 
@@ -186,6 +180,9 @@ class MapComp():
             # Loop through all files given
             for i in range(0, nFiles):
 
+                # Print loading status
+                print('Loading file #', str(i+1), ' of ', str(nFiles))
+
                 # If first file, initialize as first part of the gene map
                 if i == 0:
                     genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[0])
@@ -196,9 +193,6 @@ class MapComp():
                     genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[i])
                     temp_df = pd.read_csv(genes_csv, header=None)
                     self.gene_maps = pd.concat([self.gene_maps, temp_df])
-
-                # Print loading status
-                print('Loading file #', str(i+1), ' of ', str(nFiles))
 
         # Print status
         print('All files loaded!')
@@ -390,9 +384,10 @@ class MapComp():
 
             # Unload genes by resetting map variable as empty
             self.gene_maps = np.array([])
+            self.gene_subj = str()
 
             # Update boolean that genes are not loaded
-            self.genes_loaded = True
+            self.genes_loaded = False
 
         # Otherwise, data type was not understood
         else:
@@ -446,20 +441,28 @@ class MapComp():
         self : MapComp() object
             Object for storing and comparing map data. 
         dat_type : str
-            Data type to save corrs for ('Terms' or 'Genes'). 
+            Data type to save corrs for.
+                Options: {'Terms', 'Genes'}
         meg_dat : str
-            MEG data to save corrs for. 
+            MEG data to save corrs for.
+                Options: {'Theta', 'Alpha', 'Beta', 'LowGamma', 'Slopes'}
         save_as_npz : boolean, optional
             Whether to save an npz file. Default is True. 
         save_as_csv : boolean, optional
             Whether to save a csv file. Default is True. 
         """
 
-        # Check which type of data and set names accordingly
+        # Check which type of data and set names, filenames & save paths accordingly
         if dat_type is 'Terms':
             names = self.term_names
+            file_name = 'Corrs_' + dat_type + '_' + meg_dat
+            save_path = os.path.join('/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/', dat_type)
+            sub_name = ''
         elif dat_type is 'Genes':
             names = self.gene_names
+            file_name = self.gene_subj + '_Corrs_' + dat_type + meg_dat
+            save_path = os.path.join('/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/', dat_type)
+            sub_name = self.gene_subj
         else:
             print("Data type not understood. Fix it.")
 
@@ -470,17 +473,13 @@ class MapComp():
 
         # Get the correlation data of interest
         meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
-        meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])
-
-        # Set basic file name to save data as
-        file_name = 'Corrs_' + dat_type + meg_dat
-        save_path = os.path.join('/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/', dat_type)
+        meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])        
 
         # Save a numpy npz file
         if save_as_npz:
 
             # Set up specific name/path for npz file
-            npz_path = os.path.join(save_path, 'npz', '')
+            npz_path = os.path.join(save_path, 'npz', sub_name, '')
             outfile_npz = npz_path + file_name + '.npz'
 
             # Save out npz file
@@ -491,7 +490,7 @@ class MapComp():
         if save_as_csv:
 
             # Set up specific name/path for csv file
-            csv_path = os.path.join(save_path, 'csv', '')
+            csv_path = os.path.join(save_path, 'csv', sub_name, '')
             outfile_csv = csv_path + file_name + '.csv'
 
             # Open the csv file
@@ -927,6 +926,18 @@ def _init_meg_map_dict(length=0, slopes=True):
         meg_map.pop('Slopes')
 
     return meg_map
+
+
+def _init_stat_dict():
+    """   """
+
+    out = dict([('TermsTheta',  np.array([])), ('TermsAlpha',    np.array([])),
+                ('TermsBeta',   np.array([])), ('TermsLowGamma', np.array([])),
+                ('GenesTheta',  np.array([])), ('GenesAlpha',    np.array([])),
+                ('GenesBeta',   np.array([])), ('GenesLowGamma', np.array([])),
+                ('TermsSlopes', np.array([])), ('GenesSlopes',   np.array([]))])
+
+    return out
 
 
 def _mat_mult(vec):
