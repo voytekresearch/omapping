@@ -258,7 +258,7 @@ class MapComp():
             print('MEG Data not understood. Fix it.')
 
         # Print out status
-        print('Calculating corrs between', str(dat_type), ' and ', str(meg_dat))
+        print('Calculating corrs between', str(dat_type), 'and', str(meg_dat))
 
         # Initialize vectors to store correlation results
         corr_vals = np.zeros([n_comps, 1])
@@ -464,7 +464,7 @@ class MapComp():
             sub_name = ''
         elif dat_type is 'Genes':
             names = self.gene_names
-            file_name = self.gene_subj + '_Corrs_' + dat_type + meg_dat
+            file_name = self.gene_subj + '_Corrs_' + dat_type + '_' + meg_dat
             save_path = os.path.join('/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/', dat_type)
             sub_name = self.gene_subj
         else:
@@ -733,6 +733,8 @@ class MapCompROI(MapComp):
     def conv_meg_rois(self):
         """Convert MEG data to ROIs.
 
+        NOTES
+        -----
         This 
         """
 
