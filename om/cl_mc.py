@@ -67,11 +67,11 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         print_files : boolean, optional
-            Whether or not to print out available file names. 
+            Whether or not to print out available file names.
         return_files : boolean, optional
-            Whether or not to return lists of filenames. 
+            Whether or not to return lists of filenames.
         """
 
         # Get lists of files from data directories
@@ -98,11 +98,11 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         osc_file : str, optional
-            File path to the file with oscillations data. 
+            File path to the file with oscillations data.
         slope_file : str, optional
-            File path to the file with slope data. 
+            File path to the file with slope data.
         """
 
         # Initialize the var to store meg map data
@@ -151,7 +151,7 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         subject : str
             Which subject of gene data to load. Of the form 'sub#'
         """
@@ -168,10 +168,10 @@ class MapComp():
 
         # Get list of files available for requested subject
         genes_file_names = clean_file_list(os.listdir(os.path.join(self.genes_path, subj_str)), 'r10')
-        
+
         # If one file given, load this as the gene map
         if len(genes_file_names) == 1:
-            genes_csv = os.path.join(self.genes_path, subj_str, genes_files_names[0])
+            genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[0])
             self.gene_maps = pd.read_csv(genes_file_names[0], header=None)
 
         # If multiple files, load them all and concatenate
@@ -190,7 +190,7 @@ class MapComp():
                 if i == 0:
                     genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[0])
                     self.gene_maps = pd.read_csv(genes_csv, header=None)
-                    
+
                 # For all subsequent files, concatenate to end of gene map
                 else:
                     genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[i])
@@ -210,7 +210,7 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         term_file_name : str
             File name of term data file.
         """
@@ -231,7 +231,7 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         dat_type : str
             Type of data to correlate with meg data
                 'Terms' or 'Genes' only
@@ -239,8 +239,8 @@ class MapComp():
             Specific type of meg data to correlate
                 osc_band or 'Slopes' only
         method : str
-            Run method (linear or parallel) to use. 
-                Options: {'linear', 'parallel'}. Default: 'linear'. 
+            Run method (linear or parallel) to use.
+                Options: {'linear', 'parallel'}. Default: 'linear'.
         """
 
         # Check with data type and set data accordingly
@@ -277,7 +277,7 @@ class MapComp():
                 dat = np.array(dat_df.ix[:, comp])
 
                 # Get inds of data that contains numbers
-                inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) == False]
+                inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) is False]
 
                 # Calculate correlation between data and meg map
                 [corr_vals[comp], p_vals[comp]] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
@@ -285,10 +285,10 @@ class MapComp():
         # Run in parallel
         elif method is 'parallel':
 
-            """ NOTE: parallel method is not yet implemented! 
-            Relevant libraries not imported. 
+            """ NOTE: parallel method is not yet implemented!
+            Relevant libraries not imported.
             """
-            
+
             # Initialize pool of workers
             pool = multiprocessing.Pool(processes=4)
 
@@ -306,14 +306,14 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         dat_type : str
-            Data type (Terms or Genes) of corrs to check. 
+            Data type (Terms or Genes) of corrs to check.
         meg_dat : str
-            Specific MEG data of corrs to check. 
+            Specific MEG data of corrs to check.
         n_check : int, optional
-            Number of correlations to check. 
-        top : boolean, optional. 
+            Number of correlations to check.
+        top : boolean, optional.
             Get Top (True) or Bottom (False) set of correlations.
         """
 
@@ -364,9 +364,9 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         dat_type : str
-            Indicator of which set of data to unload from object. 
+            Indicator of which set of data to unload from object.
                 Options: 'Terms', 'Genes'
         """
 
@@ -408,11 +408,11 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         dat_type : str
-            Data type to plot corrs for (Terms or Genes). 
+            Data type to plot corrs for (Terms or Genes).
         meg_dat : str
-            Specific meg map to plot corrs for. 
+            Specific meg map to plot corrs for.
         """
 
         # Check that asked for correlations have been computed
@@ -423,7 +423,7 @@ class MapComp():
         # Get the specified data
         meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
         meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])
-        
+
         # Initialize subplot figure
         fig, ax = plt.subplots(1, 2, figsize=(12, 6))
 
@@ -446,7 +446,7 @@ class MapComp():
         Parameters
         ----------
         self : MapComp() object
-            Object for storing and comparing map data. 
+            Object for storing and comparing map data.
         dat_type : str
             Data type to save corrs for.
                 Options: {'Terms', 'Genes'}
@@ -454,9 +454,9 @@ class MapComp():
             MEG data to save corrs for.
                 Options: {'Theta', 'Alpha', 'Beta', 'LowGamma', 'Slopes'}
         save_as_npz : boolean, optional
-            Whether to save an npz file. Default is True. 
+            Whether to save an npz file. Default is True.
         save_as_csv : boolean, optional
-            Whether to save a csv file. Default is True. 
+            Whether to save a csv file. Default is True.
         """
 
         # Check which type of data and set names, filenames & save paths accordingly
@@ -482,7 +482,7 @@ class MapComp():
 
         # Get the correlation data of interest
         meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
-        meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])        
+        meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])
 
         # Save a numpy npz file
         if save_as_npz:
@@ -492,7 +492,7 @@ class MapComp():
             outfile_npz = npz_path + file_name + '.npz'
 
             # Save out npz file
-            np.savez(outfile_npz, dat_type=dat_type, meg_dat=meg_dat, names=names, 
+            np.savez(outfile_npz, dat_type=dat_type, meg_dat=meg_dat, names=names,
                      meg_corrs=meg_corrs, meg_p_vals=meg_p_vals)
 
         # Save a csv file
@@ -555,7 +555,7 @@ class MapCompROI(MapComp):
         self.elec_roi_lrs = list()
         self.elec_nROIs = int
         self.elec_roi_verts = list()
-        
+
         # Initialize list to store ROI labels
         self.roi_labels = list()
         self.roi_verts = list()
@@ -579,7 +579,7 @@ class MapCompROI(MapComp):
 
 
     def load_anat_maps(self, anat_file_name, anat_type):
-        """Load the spatial maps of anatomilcal data. 
+        """Load the spatial maps of anatomilcal data.
 
         Parameters
         ----------
@@ -588,7 +588,7 @@ class MapCompROI(MapComp):
         anat_file_name : str
             File name of anat data file.
         anat_type : str
-            Indicates which type of anat data is loaded. 
+            Indicates which type of anat data is loaded.
         """
 
         # Get full path for the anat mat file
@@ -616,14 +616,14 @@ class MapCompROI(MapComp):
 
 
     def load_elec_rois(self, roi_file_name):
-        """Load the ROI file for the MEG data. 
-        
+        """Load the ROI file for the MEG data.
+
         Parameters
         ----------
         self : MapCompROI() object
             Object for storing and comparing map data, in ROI format.
         roi_file_name : str
-            File name (including path) to the matlab scout definition file. 
+            File name (including path) to the matlab scout definition file.
         """
 
         # Load ROI dat from mat file
@@ -657,7 +657,7 @@ class MapCompROI(MapComp):
 
 
     def align_rois(self):
-        """Align ROIs used and names between anat and meg ROIs. 
+        """Align ROIs used and names between anat and meg ROIs.
 
         NOTES
         -----
@@ -673,11 +673,11 @@ class MapCompROI(MapComp):
         for r in range(0, self.elec_nROIs):
 
             # Check if left side scout
-            if(self.elec_roi_names[r][-1] is 'L'):
+            if self.elec_roi_names[r][-1] is 'L':
                 self.elec_roi_lrs.append('L')
 
             # Check if right side scout
-            elif(self.elec_roi_names[r][-1] is 'R'):
+            elif self.elec_roi_names[r][-1] is 'R':
                 self.elec_roi_lrs.append('R')
 
             else:
@@ -690,12 +690,12 @@ class MapCompROI(MapComp):
         for r in range(0, self.anat_nROIs):
 
             # Check if left side scout
-            if(self.anat_roi_names[r][0] is 'l'):
+            if self.anat_roi_names[r][0] is 'l':
                 self.anat_roi_lrs.append('L')
                 self.anat_roi_names[r] = self.anat_roi_names[r][5:]
 
             # Check if right side scout
-            elif(self.anat_roi_names[r][0] is 'r'):
+            elif self.anat_roi_names[r][0] is 'r':
                 self.anat_roi_lrs.append('R')
                 self.anat_roi_names[r] = self.anat_roi_names[r][6:]
 
@@ -719,7 +719,7 @@ class MapCompROI(MapComp):
                 if self.elec_roi_names[j] == cur_roi:
 
                     # Check if L/R is right
-                    if (self.elec_roi_lrs[j] == cur_lr):
+                    if self.elec_roi_lrs[j] == cur_lr:
 
                         # Same side - add to overall list
                         self.roi_labels.append(cur_roi)
@@ -740,7 +740,7 @@ class MapCompROI(MapComp):
 
         NOTES
         -----
-        This 
+        This XXXXX
         """
 
         # Initialize dict for current ROI data
@@ -753,14 +753,14 @@ class MapCompROI(MapComp):
             # Loop through all oscs
             for key in self.meg_maps.keys():
 
-                # 
+                #
                 cur_verts = np.squeeze(self.roi_verts[r] - 1)
                 nVerts = len(cur_verts)
 
                 #
                 temp_dat = self.meg_maps[key][cur_verts]
 
-                # 
+                #
                 roi_meg_dat[key][r] = (sum(temp_dat) / nVerts)
 
         # Add the current ROI data to object
@@ -771,14 +771,14 @@ class MapCompROI(MapComp):
 
 
     def comp_meg_anat(self, section='all', print_out=True):
-        """Compare anatomical connectivity to oscillation data. 
+        """Compare anatomical connectivity to oscillation data.
 
         Parameters
         ----------
         self : MapCompROI() object
             Object for storing and comparing map data, in ROI format.
         section : str
-            Which section of data to compare. 
+            Which section of data to compare.
                 Options: 'all', 'left', 'right'
         print_out : boolean, optional
             Whether to print out the stats results.
@@ -795,7 +795,7 @@ class MapCompROI(MapComp):
         for key in self.meg_con.keys():
             self.meg_con[key] = _mat_mult(self.meg_ROI_maps[key][ind_st:ind_en])
 
-        # Initialize a dictionary to store data 
+        # Initialize a dictionary to store data
         meg_stats = _init_meg_map_dict(length=2, slopes=False)
 
         # Get nROIs used in comparison
@@ -817,7 +817,7 @@ class MapCompROI(MapComp):
         if print_out:
             print('Anatomical data used is: ', self.anat_type)
             print('Correlation between MEG and anatomical connectivity: \n')
-            
+
             # Loop through each oscillation, and print out R-val and p-val
             for key in self.meg_stats.keys():
                 print(key)
@@ -826,20 +826,20 @@ class MapCompROI(MapComp):
 
 
     def plot_mat(self, dat, osc=None, section='all'):
-        """Plot the connectivity matrix. 
+        """Plot the connectivity matrix.
 
         Parameters
         ----------
         self : MapCompROI() object
             Object for storing and comparing map data, in ROI format.
         dat : str
-            Which data type to plot. 
+            Which data type to plot.
                 Options: 'anat', 'meg'
         osc : str, optional
-            If data is MEG, which oscillation to plot. 
+            If data is MEG, which oscillation to plot.
                 Options: 'Theta', 'Alpha', 'Beta', 'LowGamma'. Default is None.
         section : str
-            Which part of the matrix to plot. 
+            Which part of the matrix to plot.
                 Options: 'all', 'left', 'right', 'lr', 'rl'
 
         Notes
@@ -848,7 +848,7 @@ class MapCompROI(MapComp):
         As in:
             >> m = ax.matshow(self.anat_con)
         """
-        
+
         # Initialize figure
         f = plt.figure(figsize=[12, 12])
         ax = f.add_subplot(111)
@@ -858,9 +858,11 @@ class MapCompROI(MapComp):
 
         # Create the figure
         if dat is 'anat':
-            m = ax.imshow(self.anat_con[ind_st_a:ind_en_a, ind_st_b:ind_en_b], interpolation='none')
+            m = ax.imshow(self.anat_con[ind_st_a:ind_en_a, ind_st_b:ind_en_b],
+                          interpolation='none')
         elif dat is 'meg':
-            m = ax.imshow(self.meg_con[osc][ind_st_a:ind_en_a, ind_st_b:ind_en_b], interpolation='none')
+            m = ax.imshow(self.meg_con[osc][ind_st_a:ind_en_a, ind_st_b:ind_en_b],
+                          interpolation='none')
 
         # Add colour bar as a legend
         f.colorbar(m)
@@ -881,12 +883,12 @@ class MapCompROI(MapComp):
 
 
 def _get_map_names(names_file, path):
-    """Get the map names from a given file. 
+    """Get the map names from a given file.
 
     Parameters
     ----------
     names_file : str
-        File name to pull the map names from. 
+        File name to pull the map names from.
     path : str
         Path of where the file is. 
 
@@ -911,21 +913,21 @@ def _get_map_names(names_file, path):
 
 
 def _init_meg_map_dict(length=0, slopes=True):
-    """Initialize a dictionary to store meg data 
+    """Initialize a dictionary to store meg data.
 
     Parameters
     ----------
     length : int, optional
-        If non-zero, length of zeros array to initialize. 
-            Defaults to 0, which initializes an empty array. 
+        If non-zero, length of zeros array to initialize.
+            Defaults to 0, which initializes an empty array.
     slopes : boolean, optional
-        Whether to include the 'Slopes' key in the dictonary. 
+        Whether to include the 'Slopes' key in the dictonary.
             Defaults to True
 
     Returns
     -------
     meg_map : dictionary
-        Dictionary with fields for MEG oscillation data. 
+        Dictionary with fields for MEG oscillation data.
     """
 
     # If length 0, initialize dict with empty arrays
@@ -952,12 +954,12 @@ def _init_meg_map_dict(length=0, slopes=True):
 
 
 def _init_stat_dict():
-    """ Initialize a dictionary to store stat data for inter-data correlations. 
+    """Initialize a dictionary to store stat data for inter-data correlations.
 
     Returns
     -------
     out : dict
-        A dictionary to store stats for terms/genes across all meg dat types. 
+        A dictionary to store stats for terms/genes across all meg dat types.
     """
 
     out = dict([('TermsTheta',  np.array([])), ('TermsAlpha',    np.array([])),
@@ -970,44 +972,44 @@ def _init_stat_dict():
 
 
 def _mat_mult(vec):
-    """Multiply a vector element by element with itself. 
+    """Multiply a vector element by element with itself.
 
     Parameters
     ----------
     vec : 1d array
-        A vector to be multiplied by itself. 
+        A vector to be multiplied by itself.
 
     Returns
     -------
     out : 2d array
-        A matrix of the input vector multiplied by itself. 
+        A matrix of the input vector multiplied by itself.
     """
-    
+
     # Get length of first vector
     l = len(vec)
 
     # Initialize a matrix
     out = np.zeros([l, l])
-    
+
     # Loop through vector, multiplying each element
     for i in range(0, l):
         for j in range(0, l):
             out[i, j] = vec[i] * vec[j]
-    
+
     return out
 
 
 def _get_section(section, nROIs, roi_lr):
-    """Get indices for desired section. 
+    """Get indices for desired section.
 
     Parameters
     ----------
     section : str
-        Which section to get indices for. 
+        Which section to get indices for.
     nROIs : int
         The number of ROIs.
     roi_lr : list(str)
-        List of L/R for each ROI. 
+        List of L/R for each ROI.
     """
 
     # Set section indices
@@ -1029,7 +1031,7 @@ def _get_section(section, nROIs, roi_lr):
         ind_st_a = roi_lr.index('R')
         ind_en_a = _find_last(roi_lr, 'R')
         ind_st_b = roi_lr.index('L')
-        ind_en_b = _find_last(roi_lr, 'L') 
+        ind_en_b = _find_last(roi_lr, 'L')
     else:
         print('Section range unclear!')
         ind_st_a = ind_en_a = ind_st_b = ind_en_b = 0
@@ -1039,14 +1041,14 @@ def _get_section(section, nROIs, roi_lr):
 
 
 def _find_last(input_list, wanted):
-    """Find the index of the last instance of a wanted element. 
+    """Find the index of the last instance of a wanted element.
 
     Parameters
     ----------
     input_list : list
         A list to search through.
     wanted : str
-        The element for which the last index is wanted. 
+        The element for which the last index is wanted.
 
     From here: http://stackoverflow.com/questions/6890170/how-to-find-the-last-occurrence-of-an-item-in-a-python-list
     """
