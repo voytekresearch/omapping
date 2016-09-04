@@ -17,8 +17,14 @@ class MegData():
 
     def __init__(self):
 
-        # Set data paths
-        self.foof_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/Colin/'
+        # Set base path for OMEGA data
+        self.omega_dat_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/'
+
+        # Set paths for different data types
+        self.maps_path = os.path.join(self.omega_dat_path, '/Maps/')
+        self.meg_path = os.path.join(self.omega_dat_path, '/MEG/')
+        self.foof_path = os.path.join(self.meg_path, '/3-FOOF/Colin/')
+        self.viz_path = os.path.join(self.meg_path, '/4-Viz/')
 
         # Initialize subject number
         self.subnum = int()
@@ -162,13 +168,13 @@ class MegData():
 
             # Get oscillations in specific band for each band
             self.thetas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
-                                         osc.theta_low, osc.theta_high)
+                                        osc.theta_low, osc.theta_high)
             self.alphas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
-                                         osc.alpha_low, osc.alpha_high)
+                                        osc.alpha_low, osc.alpha_high)
             self.betas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
                                         osc.beta_low, osc.beta_high)
             self.lowgammas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
-                                            osc.lowgamma_low, osc.lowgamma_high)
+                                        osc.lowgamma_low, osc.lowgamma_high)
 
         # Update boolean to note that current subject has band specific oscs calculated. 
         self.bands_vertex = True
@@ -178,9 +184,9 @@ class MegData():
         """Saves a matfile of frequency information to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
-        save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
+        #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
         save_name = str(self.subnum) + '_Foof_Viz'
-        save_file = os.path.join(save_path, save_name)
+        save_file = os.path.join(self.viz_path, save_name)
 
         # Save desired outputs into a dictionary
         save_dict = {}
@@ -564,9 +570,9 @@ class GroupMegData(MegData):
         if save_out:
             
             # Set up 
-            npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Slopes/'
+            #npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Slopes/'
             npz_file_name = file_name + '.npz'
-            npz_save_name = os.path.join(npz_save_path, npz_file_name)
+            npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
 
             # Save out an npz file
             np.savez(npz_save_name, chis=self.chis_avg, n_subjs=self.n_subjs)
@@ -575,9 +581,9 @@ class GroupMegData(MegData):
         if set_viz:
 
             # Set up paths to save to
-            save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
+            #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
             save_name = 'Group_Slopes'
-            save_file = os.path.join(save_path, save_name)
+            save_file = os.path.join(self.viz_path, save_name)
 
             # Save desired outputs into a dictionary
             save_dict = {}
@@ -592,9 +598,9 @@ class GroupMegData(MegData):
         """Saves out a matfile (of osc-probs) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
-        save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
+        #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
         save_name = 'Group_Osc_Prob_Viz'
-        save_file = os.path.join(save_path, save_name)
+        save_file = os.path.join(self.viz_path, save_name)
 
         # Save desired outputs into a dictionary
         save_dict = {}
@@ -732,9 +738,9 @@ class GroupMegData(MegData):
         """
 
         # Create full file path and save file as an npz file
-        npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Oscs/'
+        #npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Oscs/'
         npz_file_name = file_name + '.npz'
-        npz_save_name = os.path.join(npz_save_path, npz_file_name)
+        npz_save_name = os.path.join(self.maps_path, 'Oscs', npz_file_name)
         np.savez(npz_save_name, osc_score_theta=self.theta_score, osc_score_alpha=self.alpha_score,
                  osc_score_beta=self.beta_score, osc_score_lowgamma=self.lowgamma_score)
 
@@ -743,9 +749,9 @@ class GroupMegData(MegData):
         """Saves a matfile (of osc-scores) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
-        save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
+        #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
         save_name = 'Group_Osc_Score_Viz'
-        save_file = os.path.join(save_path, save_name)
+        save_file = os.path.join(self.viz_path, save_name)
 
         # Save desired outputs into a dictionary
         save_dict = {}
@@ -959,9 +965,9 @@ def _get_demo_csv(subnum):
     """
 
     # Set up paths for demographic info csv file
-    csv_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/'
+    #csv_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/'
     csv_file_name = '00-Collin_Subjects.csv'
-    csv_file = os.path.join(csv_data_path, csv_file_name)
+    csv_file = os.path.join(self.meg_path, csv_file_name)
 
     # Open csv file, loop through looking for right row, grab age & sex information
     with open(csv_file, 'rb') as f_name:
