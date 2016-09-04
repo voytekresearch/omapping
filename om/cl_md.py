@@ -77,13 +77,13 @@ class MegData():
         Parameters
         ----------
         self : MegData() object
-            Object to store MEG FOOF data. 
+            Object to store MEG FOOF data.
         subnum : int
-            Number of the subject to import. 
+            Number of the subject to import.
         get_demo : boolean, optional
-            Whether to load demographic data from csv file. 
+            Whether to load demographic data from csv file.
         load_type : str, optional
-            What type of file to load data from. 
+            What type of file to load data from.
                 Options: 'pickle', 'csv'
         """
 
@@ -110,7 +110,7 @@ class MegData():
         elif load_type is 'csv':
             results = _load_foof_csv(cur_subj_path)
 
-        # Check how many 
+        # Check how many
         self.n_PSDs = len(results)
 
         # Initialize numpy arrays to pull out different result params
@@ -147,9 +147,9 @@ class MegData():
         Parameters
         ----------
         self : MegData object
-            MegData object. 
+            MegData object.
         osc : Osc object
-            An object containing frequency bands to use. 
+            An object containing frequency bands to use.
         """
 
         ## Re-Initialize matrices to right size to save results
@@ -167,16 +167,16 @@ class MegData():
             bws_temp = self.bws[i, :]
 
             # Get oscillations in specific band for each band
-            self.thetas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
-                                        osc.theta_low, osc.theta_high)
-            self.alphas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
-                                        osc.alpha_low, osc.alpha_high)
-            self.betas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
-                                        osc.beta_low, osc.beta_high)
-            self.lowgammas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
-                                        osc.lowgamma_low, osc.lowgamma_high)
+            self.thetas[i,:]    = _get_osc(centers_temp, powers_temp, bws_temp,
+                                           osc.theta_low, osc.theta_high)
+            self.alphas[i,:]    = _get_osc(centers_temp, powers_temp, bws_temp,
+                                           osc.alpha_low, osc.alpha_high)
+            self.betas[i,:]     = _get_osc(centers_temp, powers_temp, bws_temp,
+                                           osc.beta_low, osc.beta_high)
+            self.lowgammas[i,:] = _get_osc(centers_temp, powers_temp, bws_temp,
+                                           osc.lowgamma_low, osc.lowgamma_high)
 
-        # Update boolean to note that current subject has band specific oscs calculated. 
+        # Update boolean to note that current subject has band specific oscs calculated.
         self.bands_vertex = True
 
 
@@ -235,7 +235,7 @@ class MegData():
         osc : Osc object
             Object with oscillation frequency details
         avg : str
-            Which type of averaging to do. 
+            Which type of averaging to do.
                 Options: {'mean', 'median'}
         """
 
@@ -262,6 +262,7 @@ class MegData():
 
         # Set up subplots
         fig, ax = plt.subplots(3, 1, figsize=(15, 15))
+
         # Set plot super-title
         plt.suptitle('Distributions of Oscillatory Parameters - ' + self.title, fontsize=st_fs, fontweight='bold')
 
@@ -384,7 +385,7 @@ class MegData():
     def save_pickle(self):
         """Save current meg data object as a pickled object.
 
-        NOTE: NOT YET IMPLEMENTED. 
+        NOTE: NOT YET IMPLEMENTED.
         """
 
         pass
@@ -437,7 +438,7 @@ class GroupMegData(MegData):
         self.beta_score = np.array([])
         self.lowgamma_score = np.array([])
 
-        #
+        # Initialize vars to store slope values
         self.gr_chis = np.array([])
         self.chis_avg = np.array([])
 
@@ -452,7 +453,7 @@ class GroupMegData(MegData):
         Parameters
         ----------
         self : GroupMegData() object. 
-            Object to store map data across a group of subjects.  
+            Object to store map data across a group of subjects.
         new_subj : MegData() Object
             MEG subject (instance of MegData)
         add_all_oscs : boolean, optional
@@ -496,7 +497,7 @@ class GroupMegData(MegData):
                 self.gr_betas = np.dstack([self.gr_betas, new_subj.betas])
                 self.gr_lowgammas = np.dstack([self.gr_lowgammas, new_subj.lowgammas])
 
-        # 
+        #
         if add_vertex_oscs:
 
             if self.n_subjs == 0:
@@ -520,7 +521,7 @@ class GroupMegData(MegData):
         self.n_subjs += 1
         self.subjs = np.append(self.subjs, new_subj.subnum)
 
-        # 
+        #
         self.all_osc = add_all_oscs
         self.bands_vertex = add_vertex_bands
 
@@ -536,9 +537,9 @@ class GroupMegData(MegData):
 
 
     def osc_prob(self):
-        """Calculates the probability (per vertex / across subjects) of an oscillation in a specific band. """
+        """Calculates the probability (per vertex / across subjects) of an osc in a specific band. """
 
-        # For each frequency band, compute the probability of oscillation in that band. 
+        # For each frequency band, compute the probability of oscillation in that band.
         self.theta_prob = _osc_prob(self.gr_thetas)
         self.alpha_prob = _osc_prob(self.gr_alphas)
         self.beta_prob = _osc_prob(self.gr_betas)
@@ -549,18 +550,18 @@ class GroupMegData(MegData):
 
 
     def group_slope(self, save_out=False, file_name=None, set_viz=False):
-        """Calculates the average slope value for each vertex, across subjects. 
+        """Calculates the average slope value for each vertex, across subjects.
 
         Parameters
         ----------
-        self : GroupMegData() object. 
-            Object to store map data across a group of subjects. 
+        self : GroupMegData() object.
+            Object to store map data across a group of subjects.
         save_out : boolean, optional
-            Whether to save out npz file of average slope values. 
+            Whether to save out npz file of average slope values.
         file_name : str
-            File name to save group slope file as. 
+            File name to save group slope file as.
         set_viz : boolean, optional
-            Whether to save out mat file for visualization in matlab. 
+            Whether to save out mat file for visualization in matlab.
         """
 
         # Calculate the average slope value per vertex
@@ -568,8 +569,8 @@ class GroupMegData(MegData):
 
         # Save map out, if required
         if save_out:
-            
-            # Set up 
+
+            # Set up
             #npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Slopes/'
             npz_file_name = file_name + '.npz'
             npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
@@ -619,10 +620,10 @@ class GroupMegData(MegData):
         Returns
         -------
         corrs : dict
-            Contains the correlations between all oscillation probabilities. 
+            Contains the correlations between all oscillation probabilities.
         """
 
-        # Check if oscillation probabilities have been calculated. 
+        # Check if oscillation probabilities have been calculated.
         if not self.osc_prob_done:
             print("Osc Probability not calculated - can't proceed.")
             return
@@ -657,13 +658,13 @@ class GroupMegData(MegData):
 
 
     def osc_score(self):
-        """Calculate the oscillation score for each frequency band. 
+        """Calculate the oscillation score for each frequency band.
 
         The oscillation score is .... XXXXX
 
         """
 
-        # Check if osc-prob is calculated. Can't proceed if it isnt. 
+        # Check if osc-prob is calculated. Can't proceed if it isnt.
         if not self.osc_prob_done:
             print("Oscillation probability not computed. Can't continue.")
 
@@ -689,10 +690,10 @@ class GroupMegData(MegData):
         Returns
         -------
         corrs : dict
-            Contains the results of the correlations across oscillation scores. 
+            Contains the results of the correlations across oscillation scores.
         """
 
-        # Check if oscillation probabilities have been calculated. 
+        # Check if oscillation probabilities have been calculated.
         if not self.osc_score_done:
             print("Osc Score not calculated - can't proceed.")
             return
@@ -727,14 +728,14 @@ class GroupMegData(MegData):
 
 
     def save_osc_score(self, file_name):
-        """Save out the oscillation score as an npz file. 
+        """Save out the oscillation score as an npz file.
 
         Parameters
         ----------
-        self : GroupMegData() object. 
-            Object to store map data across a group of subjects. 
+        self : GroupMegData() object.
+            Object to store map data across a group of subjects.
         file_name : str
-            Name to save the file as. 
+            Name to save the file as.
         """
 
         # Create full file path and save file as an npz file
@@ -770,7 +771,7 @@ class GroupMegData(MegData):
         Returns
         -------
         corrs : dict
-            A dictionary containing correlations results comparing age to oscillations. 
+            A dictionary containing correlations results comparing age to oscillations.
         """
 
         # Plot settings
@@ -816,21 +817,21 @@ class GroupMegData(MegData):
     def freq_corr(self, f_win):
         """Calculates the correlation between adjacent frequency bands.
 
-        Uses oscillation probabilities. 
+        Uses oscillation probabilities.
 
         Parameters
         ----------
-        self : GroupMegData() object. 
-            Object to store map data across a group of subjects. 
+        self : GroupMegData() object.
+            Object to store map data across a group of subjects.
         f_win : float
-            Size of frequency window to use. 
+            Size of frequency window to use.
 
         Returns
         -------
         corr_vec : 1d array
-            Vector of the correlation coefficients between all adjacent frequency bands. 
+            Vector of the correlation coefficients between all adjacent frequency bands.
         p_vec : 1d array
-            Vector of the p-values for the correlations between adjacent frequency bands. 
+            Vector of the p-values for the correlations between adjacent frequency bands.
         """
 
         # Get # vertices, # of subjects to loop through
@@ -903,7 +904,7 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
     Returns
     -------
     osc_out : tuple
-        Osc data, form: [centers, powers, bws, # oscillations]. 
+        Osc data, form: [centers, powers, bws, # oscillations].
     """
 
     # Find indices of oscillations in the specified range
@@ -954,14 +955,14 @@ def _get_demo_csv(subnum):
     Parameters
     ----------
     subnum : int
-        Subject number to get demographic info for. 
+        Subject number to get demographic info for.
 
     Returns
     -------
     sex : str
-        Sex ['M'/'F'] of specified subject. 
+        Sex ['M'/'F'] of specified subject.
     age : int
-        Age (in whole years) of specified subject. 
+        Age (in whole years) of specified subject.
     """
 
     # Set up paths for demographic info csv file
@@ -1024,7 +1025,7 @@ def _osc_prob(osc_mat):
     ----------
     osc_mat : ??
         Matrix of [n_vertex, n_dim, n_subj]
-    
+
     Returns
     -------
     prob : ??
@@ -1099,11 +1100,11 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
     Parameters
     ----------
     centers : 1d vector
-        Vector of center frequencies to use. 
+        Vector of center frequencies to use.
     osc_low : float
-        Lower bound of frequency range to check. 
+        Lower bound of frequency range to check.
     osc_high : float
-        Upper bound of frequency range to check. 
+        Upper bound of frequency range to check.
     avg : str
         What kind of average to take.
             Options: {'mean', 'median'}
@@ -1111,7 +1112,7 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
     Returns
     -------
     peak : float
-        Peak frequency value - the average frequency within a given range. 
+        Peak frequency value - the average frequency within a given range.
     """
 
     #
@@ -1128,7 +1129,7 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
 
 
 def _load_foof_pickle(path):
-    """Loads FOOF data from a pickle file. 
+    """Loads FOOF data from a pickle file.
 
     Parameters
     ----------
