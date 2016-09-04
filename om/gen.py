@@ -7,11 +7,11 @@ import scipy.io as sio
 # Import FOOF (use sys to add location to path, then import)
 import sys
 sys.path.append('/Users/thomasdonoghue/Documents/GitCode/')
-from foof import syn
 from foof.fit import FOOF
+#from foof import syn
 
 # Import Parallelization Packages
-from multiprocessing import Pool, freeze_support
+from multiprocessing import Pool
 
 ###################################################################################
 ########################## OMEGAMAPPIN - GENERAL CLASSES ##########################
@@ -19,7 +19,7 @@ from multiprocessing import Pool, freeze_support
 
 class Osc:
     """Class to store oscillations parameters."""
-    
+
     def __init__(self):
 
         # Theta
@@ -39,12 +39,12 @@ class Osc:
         self.lowgamma_high = 40
 
 
-###############################################################################
-############################## OM_FOOF Functions ##############################
-###############################################################################
+###################################################################################
+################################ OM_FOOF Functions ################################
+###################################################################################
 
 def clean_file_list(files_in, string):
-    """"Takes a list of files and returns only a specified set of files. 
+    """"Takes a list of files and returns only a specified set of files.
 
     Parameters
     ----------
@@ -58,19 +58,19 @@ def clean_file_list(files_in, string):
     files_out : list (str)
         A list of the file names that contain the given string.
     """
-    
+
     # Initialize variable of files to return
     files_out = []
 
     # Loop through given files, keeping those that contain string
     for i in range(0, len(files_in)):
-        if(string.lower() in files_in[i].lower()):
+        if string.lower() in files_in[i].lower():
             files_out.append(files_in[i])
 
     # Check if list is empty
     if not files_out:
         print('No files found!')
-            
+
     return files_out
 
 
@@ -80,9 +80,9 @@ def load_meg_psds(meg_path, subj_num):
     Parameters
     ----------
     meg_path : str
-        Path where data to load is located. 
+        Path where data to load is located.
     subj_num : int
-        Subject identifier number. 
+        Subject identifier number.
 
     Returns
     -------
@@ -103,14 +103,14 @@ def load_meg_psds(meg_path, subj_num):
     freqs = data_mat['Freqs']
     psd = data_mat['TF']
 
-    # Label data is also available: Scout names if it's scout data, or Sensor/vertex numbers. 
+    # Label data is also available: Scout names if it's scout data, or Sensor/vertex numbers.
     #labels = data_mat['RowNames']
 
     return psd, freqs
 
 
 def extract_psd(psd, freqs, f_low, f_high):
-    """Extract frequency range of interest from PSD data. 
+    """Extract frequency range of interest from PSD data.
 
     Parameters
     ----------
@@ -119,9 +119,9 @@ def extract_psd(psd, freqs, f_low, f_high):
     freqs : 1d array
         xx
     f_low : float
-        Lower bound of frequencies to extract. 
+        Lower bound of frequencies to extract.
     f_high : float
-        Upper bound of frequencies to extract. 
+        Upper bound of frequencies to extract.
 
     Returns
     -------
@@ -144,27 +144,27 @@ def extract_psd(psd, freqs, f_low, f_high):
     return psd_ext, freqs_ext
 
 def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
-    """Run FOOF on MEG-PSD data. 
+    """Run FOOF on MEG-PSD data.
 
     Parameters
     ----------
     psd_ext : 2d array
         Matrix of PSDs in the form of [nVerts, nFreqs].
     freqs_ext : 1d array
-        Vector of the frequency values for each power value in psd_ext. 
+        Vector of the frequency values for each power value in psd_ext.
     min_p : float
-        Minimum probability for splitting peaks. Parameter for FOOF. 
+        Minimum probability for splitting peaks. Parameter for FOOF.
     freqs_res : float
-        Frequency resolution. 
+        Frequency resolution.
     method : str
-        Which method to use to run FOOF. 
+        Which method to use to run FOOF.
         Options:
             'linear', 'parallel'
 
     Returns
     -------
     results : list
-        List of tuples of FOOF results. Length of list is number of vertices. 
+        List of tuples of FOOF results. Length of list is number of vertices.
             Each tuple is (slope value, centers (list), amps (list), bws (list)).
     """
 
@@ -197,28 +197,28 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
 
 
 def save_foof_pickle(results, save_path, sub_num):
-    """Save out the FOOF results as a pickle file. 
+    """Save out the FOOF results as a pickle file.
 
     Parameters
     ----------
     results : list
         xx
     save_path: str
-        Filepath of where to save out the file. 
+        Filepath of where to save out the file.
     sub_num : int
-        Subject identifier number. 
+        Subject identifier number.
     """
 
     # Set save name and path
     save_name = str(sub_num) + '_Foof_Vertex.p'
     foof_save_path = os.path.join(save_path, save_name)
-    
+
     # Save out data to pickle file
     pickle.dump(results, open(foof_save_path, 'wb'))
 
 
 def save_foof_csv(results, save_path, sub_num):
-    """Save out the FOOF results as a csv file. 
+    """Save out the FOOF results as a csv file.
 
     Parameters
     ----------
@@ -227,7 +227,7 @@ def save_foof_csv(results, save_path, sub_num):
     save_path : str
         xx
     sub_num : int
-        Subject identifier number. 
+        Subject identifier number.
     """
 
     #
@@ -255,30 +255,30 @@ def save_foof_csv(results, save_path, sub_num):
         #
         nOscs = len(results[vert][1])
 
-        # 
+        #
         for osc in range(0, nOscs):
 
-            cur_osc_dat = list([vert + 1, results[vert][i_cen][osc], 
-                results[vert][i_amp][osc], results[vert][i_bw][osc]])
-            osc_csv.write( (", ".join( repr(el) for el in cur_osc_dat )) + '\n')
+            cur_osc_dat = list([vert + 1, results[vert][i_cen][osc],
+                                results[vert][i_amp][osc], results[vert][i_bw][osc]])
+            osc_csv.write((", ".join(repr(el) for el in cur_osc_dat)) + '\n')
 
 
 def load_foof_pickle(dat_path, sub_num):
-    """Load FOOF data from pickle file. 
+    """Load FOOF data from pickle file.
 
     Parameters
     ----------
     dat_path : str
-        File name for where data is stored to load from. 
+        File name for where data is stored to load from.
     sub_num : int
-        Subject identifier number. 
+        Subject identifier number.
 
     Returns
     -------
     results : ?
         xx
     """
-    
+
     # Get list of available files to load
     files = os.listdir(os.path.join(dat_path, 'pickle'))
     files = clean_file_list(files, 'Foof_Vertex')
@@ -289,13 +289,13 @@ def load_foof_pickle(dat_path, sub_num):
 
     # Load file
     results = pickle.load(open(subj_path, 'rb'))
-    
+
     return results
 
 
 def load_foof_csv():
-    """   
-    NOTE: Not yet implemented. 
+    """
+    NOTE: Not yet implemented.
     """
 
     pass
@@ -309,13 +309,13 @@ def get_sub_nums(files_in, f_l):
     files_in : list (str)
         List of filenames.
     f_l : str
-        Whether subject numbers are first or last in file name. 
+        Whether subject numbers are first or last in file name.
         Options: 'first', 'last'
-    
+
     Returns
     -------
     subnums : list (int)
-        List of subject numbers. 
+        List of subject numbers.
     """
 
     # Intialize variable to store subject numbers
@@ -340,12 +340,12 @@ def get_cur_subj(cur_subj, files):
     cur_subj : int
         Subject number to search for in given file list.
     files : list (str)
-        List of files to search through. 
+        List of files to search through.
 
     Returns
     -------
     subj_file
-        File name of specific subject's file. 
+        File name of specific subject's file.
     """
 
     # Make sure given number is a string
@@ -362,29 +362,29 @@ def get_cur_subj(cur_subj, files):
 ########################################################################
 
 def _run_foof_l(foof, freqs_ext, psd_ext):
-    """Local helper function to run FOOF linearly. 
+    """Local helper function to run FOOF linearly.
 
-    Used by meg_foof(). 
+    Used by meg_foof().
 
     Parameters
     ----------
     foof : FOOF() object
-        FOOF object to model 1/f & oscillations. 
+        FOOF object to model 1/f & oscillations.
     freqs_ext : 1d vector
-        Vector of frequency values for the psd. 
+        Vector of frequency values for the psd.
     psd_ext : 1d vector
-        Vector of power values for the psd. 
+        Vector of power values for the psd.
 
     Returns
     -------
     out : tuple
-        Tuple of FOOF results. 
+        Tuple of FOOF results.
             Tuple is (slope value, centers (list), amps (list), bws (list)).
     """
 
     # Fit FOOF
     foof.model(freqs_ext, psd_ext)
-    
+
     # Store vals in tuple and return
     return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
 
@@ -395,6 +395,6 @@ def _run_foof_p(psd_ext):
 
     # Fit FOOF
     foof.model(freqs_ext, psd_ext)
-    
+
     # Store vals in tuple and return
     return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
