@@ -143,6 +143,7 @@ def extract_psd(psd, freqs, f_low, f_high):
 
     return psd_ext, freqs_ext
 
+
 def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
     """Run FOOF on MEG-PSD data.
 
@@ -306,7 +307,7 @@ def get_sub_nums(files_in, f_l):
 
     Parameters
     ----------
-    files_in : list (str)
+    files_in : list[str]
         List of filenames.
     f_l : str
         Whether subject numbers are first or last in file name.
@@ -314,9 +315,12 @@ def get_sub_nums(files_in, f_l):
 
     Returns
     -------
-    subnums : list (int)
+    subnums : list[int]
         List of subject numbers.
     """
+
+    # Check and remove file extensions
+    files_in = rm_files_ext(files_in)
 
     # Intialize variable to store subject numbers
     subnums = []
@@ -339,12 +343,12 @@ def get_cur_subj(cur_subj, files):
     ----------
     cur_subj : int
         Subject number to search for in given file list.
-    files : list (str)
+    files : list[str]
         List of files to search through.
 
     Returns
     -------
-    subj_file
+    subj_file : str
         File name of specific subject's file.
     """
 
@@ -357,9 +361,40 @@ def get_cur_subj(cur_subj, files):
             return files[i]
 
 
-########################################################################
-###################### OM GEN - Private Functions ######################
-########################################################################
+def rm_files_ext(files_in):
+    """Removes file extensions for list of files given.
+
+    Parameters
+    ----------
+    files_in : list[str]
+        A list of file and/or directory names.
+
+    Returns
+    -------
+    files_out : list[str]
+        A list of file and/or directory names with file extensions removed.
+    """
+    
+    # Initialize list to store output
+    files_out = []
+
+    # Loop through all files
+    for f_name in files_in:
+
+        # If there is an extension, remove it
+        if '.' in f_name:
+            cur_file = f_name.split('.')[0]
+        else:
+            cur_file = f_name
+
+        # Gather all file names to return
+        files_out.append(cur_file)
+
+    return files_out
+
+################################################################################
+########################## OM GEN - Private Functions ##########################
+################################################################################
 
 def _run_foof_l(foof, freqs_ext, psd_ext):
     """Local helper function to run FOOF linearly.
@@ -370,9 +405,9 @@ def _run_foof_l(foof, freqs_ext, psd_ext):
     ----------
     foof : FOOF() object
         FOOF object to model 1/f & oscillations.
-    freqs_ext : 1d vector
+    freqs_ext : 1d array
         Vector of frequency values for the psd.
-    psd_ext : 1d vector
+    psd_ext : 1d array
         Vector of power values for the psd.
 
     Returns
