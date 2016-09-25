@@ -12,19 +12,21 @@ from om.gen import *
 ###############################  OMEGAMAPPIN - MD CLASSES  ###############################
 ##########################################################################################
 
+
 class MegData():
     """Class for a single subject of FOOF results for MEG Source PSDs."""
 
-    def __init__(self):
+    def __init__(self, db):
 
-        # Set base path for OMEGA data
-        self.omega_dat_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/'
+        # Store which db is set
+        self.dat_source = db.dat_source
 
-        # Set paths for different data types
-        self.maps_path = os.path.join(self.omega_dat_path, '/Maps/')
-        self.meg_path = os.path.join(self.omega_dat_path, '/MEG/')
-        self.foof_path = os.path.join(self.meg_path, '/3-FOOF/Colin/')
-        self.viz_path = os.path.join(self.meg_path, '/4-Viz/')
+        # Pull out needed paths from MegDB object
+        self.project_path = db.project_path
+        self.maps_path = db.maps_path
+        self.meg_path = db.meg_path
+        self.foof_path = db.foof_path
+        self.viz_path = db.viz_path
 
         # Initialize subject number
         self.subnum = int()
@@ -134,7 +136,7 @@ class MegData():
 
         # Get demographic data
         if get_demo:
-            self.sex, self.age = _get_demo_csv(self.subnum)
+            self.sex, self.age = _get_demo_csv(self.subnum, self.meg_path, self.dat_source)
 
         # Update boolean to say current subject has data attached
         self.has_data = True
@@ -219,6 +221,21 @@ class MegData():
         self.centers_all = self.centers_all[non_zeros]
         self.powers_all = self.powers_all[non_zeros]
         self.bws_all = self.bws_all[non_zeros]
+
+        # Check for nans in BW estimation
+        # NOTE: Updated FOOF sometimes returns NaN for bw. Check and discard those. 
+        nans = np.isnan(self.bws_all)
+        n_nans = sum(nans)
+
+        # If there are nans, print how many and remove them
+        if n_nans > 0:
+            print('Subj:', str(self.subnum), 'Found', str(n_nans), ' NaNs. Removing.')
+
+            # Remove osc's with nan values
+            non_nans = np.logical_not(nans)
+            self.centers_all = self.centers_all[non_nans]
+            self.powers_all = self.powers_all[non_nans]
+            self.bws_all = self.bws_all[non_nans]
 
         # Get the number of oscillations
         self.n_oscs = len(self.centers_all)
@@ -398,10 +415,10 @@ class GroupMegData(MegData):
     Note: Class derived from MegData
     """
 
-    def __init__(self):
+    def __init__(self, db):
 
         #
-        MegData.__init__(self)
+        MegData.__init__(self, db)
 
         # Initialize groups subject variables
         self.n_subjs = int()
@@ -571,7 +588,6 @@ class GroupMegData(MegData):
         if save_out:
 
             # Set up
-            #npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Slopes/'
             npz_file_name = file_name + '.npz'
             npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
 
@@ -582,7 +598,6 @@ class GroupMegData(MegData):
         if set_viz:
 
             # Set up paths to save to
-            #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
             save_name = 'Group_Slopes'
             save_file = os.path.join(self.viz_path, save_name)
 
@@ -599,7 +614,6 @@ class GroupMegData(MegData):
         """Saves out a matfile (of osc-probs) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
-        #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
         save_name = 'Group_Osc_Prob_Viz'
         save_file = os.path.join(self.viz_path, save_name)
 
@@ -739,7 +753,6 @@ class GroupMegData(MegData):
         """
 
         # Create full file path and save file as an npz file
-        #npz_save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/Oscs/'
         npz_file_name = file_name + '.npz'
         npz_save_name = os.path.join(self.maps_path, 'Oscs', npz_file_name)
         np.savez(npz_save_name, osc_score_theta=self.theta_score, osc_score_alpha=self.alpha_score,
@@ -750,7 +763,6 @@ class GroupMegData(MegData):
         """Saves a matfile (of osc-scores) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
-        #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
         save_name = 'Group_Osc_Score_Viz'
         save_file = os.path.join(self.viz_path, save_name)
 
@@ -949,7 +961,7 @@ def _get_all_osc(centers, osc_low, osc_high):
     return osc_cens
 
 
-def _get_demo_csv(subnum):
+def _get_demo_csv(subnum, meg_path, dat_source):
     """Get demographic information from csv file for specified subject.
 
     Parameters
@@ -966,9 +978,11 @@ def _get_demo_csv(subnum):
     """
 
     # Set up paths for demographic info csv file
-    #csv_data_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/'
-    csv_file_name = '00-Collin_Subjects.csv'
-    csv_file = os.path.join(self.meg_path, csv_file_name)
+    if dat_source is 'OMEGA':
+        csv_file_name = '00-Collin_Subjects.csv'
+    elif dat_source is 'HCP':
+        csv_file_name = ''
+    csv_file = os.path.join(meg_path, csv_file_name)
 
     # Open csv file, loop through looking for right row, grab age & sex information
     with open(csv_file, 'rb') as f_name:
