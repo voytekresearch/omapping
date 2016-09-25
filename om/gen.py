@@ -17,6 +17,92 @@ from multiprocessing import Pool
 ########################## OMEGAMAPPIN - GENERAL CLASSES ##########################
 ###################################################################################
 
+class OMDB():
+    """Class to hold database information for MEG project. """
+
+    def __init__(self, dat_source='both'):
+
+        # Check dat_source is acceptable
+        pos_sources = ['both', 'OMEGA', 'HCP']
+        if dat_source not in pos_sources:
+            raise DataSourceNotUnderstood
+
+        # Save to object which data source is being used
+        self.dat_source = dat_source
+
+        # Set base path for OMEGA data
+        self.project_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/'
+
+        # Set paths for different data types
+        self.maps_path = os.path.join(self.project_path, 'Maps')
+        self.meg_path = os.path.join(self.project_path, 'MEG')
+        self.corrs_path = os.path.join(self.project_path, 'Corrs')
+
+        # Set paths for MEG data types
+        self.psd_base_path = os.path.join(self.meg_path, '2-PSDs')
+        self.foof_base_path = os.path.join(self.meg_path, '3-FOOF')
+        self.viz_path = os.path.join(self.meg_path, '4-Viz')        
+
+        # Set path for database specific stuff
+        if dat_source is 'both':
+            self.psd_path = ''
+            self.foof_path = ''
+        else: 
+            self.psd_path = os.path.join(self.psd_base_path, dat_source)
+            self.foof_path = os.path.join(self.foof_base_path, dat_source)
+
+
+    def check_files(self, dat_type, save_type='pickle', verbose=True):
+        """Check which FOOF files are available. 
+
+        Parameters
+        ----------
+        dat_type : str
+            Which data type to check files for. 
+                Options: {'PSD', 'foof'}
+        save_type : str, optional
+            Which file type to check files for. Only used for foof files. 
+                Options: {'pickle', 'csv'}
+
+        Returns
+        -------
+        sub_nums : list(int)
+            A list of subject numbers of all the available files.
+        """
+
+        # Set up which files to look for
+        if dat_type is 'PSD':
+            dat_path = self.psd_base_path
+            word = 'subject_'
+            save_type = ''
+            f_l = 'last'
+        elif dat_type is 'foof':
+            dat_path = self.foof_base_path
+            word = 'foof'
+            f_l = 'first'
+
+        if self.dat_source is not 'both':
+            sub_nums = _check_files(os.path.join(dat_path, self.dat_source, save_type), word, f_l)
+            source = [self.dat_source] * len(sub_nums)
+ 
+        else:
+            sub_nums_omega = _check_files(os.path.join(dat_path, 'OMEGA', save_type), word, f_l)
+            n_omega = len(sub_nums_omega)
+
+            sub_nums_hcp = _check_files(os.path.join(dat_path, 'HCP', save_type), word, f_l)
+            n_hcp = len(sub_nums_hcp)
+
+            sub_nums = sub_nums_omega + sub_nums_hcp
+            source = (['OMEGA'] * n_omega) + (['HCP'] * n_hcp)
+
+        # If requested, print out the list of subject numbers
+        if verbose:
+            print('\nNumber of Subjects available: ' + str(len(sub_nums)) + '\n')
+            print('Subject numbers with FOOF data available: \n' + str(sub_nums) + '\n')
+
+        return sub_nums, source
+
+
 class Osc:
     """Class to store oscillations parameters."""
 
@@ -146,6 +232,8 @@ def extract_psd(psd, freqs, f_low, f_high):
 
 def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
     """Run FOOF on MEG-PSD data.
+    NOTE: OLD - NOT CURRENTLY USED.
+        REPLACED BY STANDALONE SCRIPT.
 
     Parameters
     ----------
@@ -392,6 +480,16 @@ def rm_files_ext(files_in):
 
     return files_out
 
+
+#################################################################################
+################################## OM GEN - ERRORS ##############################
+#################################################################################
+
+class DataSourceNotUnderstood(Exception):
+    """An Error indicating data source specification is not understood. """
+    pass
+
+
 ################################################################################
 ########################## OM GEN - Private Functions ##########################
 ################################################################################
@@ -433,3 +531,14 @@ def _run_foof_p(psd_ext):
 
     # Store vals in tuple and return
     return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
+
+
+def _check_files(path, word, f_l):
+    """   """
+
+    files = os.listdir(path)
+    files = clean_file_list(files, word)
+
+    sub_nums = get_sub_nums(files, f_l)
+
+    return sub_nums
