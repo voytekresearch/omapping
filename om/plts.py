@@ -4,9 +4,9 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-#############################################################
-#################### OM - PLTS - CLASSES ####################
-#############################################################
+#############################################################################
+############################ OM - PLTS - CLASSES ############################
+#############################################################################
 
 class FigInfo():
     """Object to hold settings to save figures. """
@@ -23,16 +23,16 @@ class FigInfo():
         self.vis_opac = 0.005
 
         # Save Information
-        self.save_path = '/Users/thomasdonoghue/Desktop/'
+        self.save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/4-Figures/MegAnalysis/'
         self.format = 'pdf'
         self.bbox = 'tight'
         self.dpi = 600
 
-###############################################################
-################## OM - PLTS - MEGDATA PLOTS ##################
-###############################################################
+###############################################################################
+########################## OM - PLTS - MEGDATA PLOTS ##########################
+###############################################################################
 
-def plot_slopes(slopes, title):
+def plot_slopes(slopes, title, save_out=False):
     """Plots a histogram of the chi values for all vertices. 
 
     Parameters
@@ -41,6 +41,8 @@ def plot_slopes(slopes, title):
         A vector of slope values to plot.
     title : str
         A string to append to the title.
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
     """
 
     # Get FigInfo()
@@ -57,13 +59,23 @@ def plot_slopes(slopes, title):
     plt.xlabel('Chi Parameter', {'fontsize': ax_fs, 'fontweight': 'bold'})
     plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
 
+    # Save out (if requested)
+    if save_out:
 
-def plot_hist_count(osc_count):
+        # Set up save name & save out
+        save_name = fi.save_path + title + '_Slopes.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+
+
+def plot_hist_count(osc_count, save_out=False):
     """Plots a histogram of the osc_count vector.
+
     Parameters
     ----------
     osc_count : 1d Vector
-        An array of the number of oscillations found in each vertex. 
+        An array of the number of oscillations found in each vertex.
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
     """
 
     # Get FigInto
@@ -80,9 +92,30 @@ def plot_hist_count(osc_count):
     plt.xlabel('# Oscillations', {'fontsize': ax_fs, 'fontweight': 'bold'})
     plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
 
+    # Save out (if requested)
+    if save_out:
 
-def plot_all_oscs(centers_all, powers_all, bws_all, title):
-    """Plots histogram distributions of oscillation centers, powers and bws. """
+        # Set up save name & save out
+        save_name = fi.save_path + 'OscCount.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+
+
+def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
+    """Plots histogram distributions of oscillation centers, powers and bws.
+
+    Parameters
+    ----------
+    centers_all : 1d array
+        Vector of the center frequencies for all oscillations.
+    powers_all : 1d array
+        Vector of the powers for all oscillations.
+    bws_all : 1d array
+        Vector of the bandwidths for all oscillations.
+    title : str
+        A string to append to the title.
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
+    """
 
     # Get FigInto
     fi = FigInfo()
@@ -121,11 +154,31 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title):
     # Adjust subplot spacing
     plt.subplots_adjust(hspace=0.4)
 
+    # Save out (if requested)
+    if save_out:
 
-def plot_comparison(centers_all, powers_all, bws_all, title):
+        # Set up save name & save out
+        save_name = fi.save_path + 'AllOscs.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+
+
+def plot_comparison(centers_all, powers_all, bws_all, title, save_out=False):
     """Plots comparisons between oscillatory parameters.
 
     Checks Centers vs. Bandwidth, Centers vs. Power and Bandwidth vs. Power.
+
+    Parameters
+    ----------
+    centers_all : 1d array
+        Vector of the center frequencies for all oscillations.
+    powers_all : 1d array
+        Vector of the powers for all oscillations.
+    bws_all : 1d array
+        Vector of the bandwidths for all oscillations.
+    title : str
+        A string to append to the title.
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
     """
 
     # Get FigInto
@@ -165,13 +218,20 @@ def plot_comparison(centers_all, powers_all, bws_all, title):
     # Adjust subplot spacing
     plt.subplots_adjust(hspace=0.4)
 
+    # Save out (if requested)
+    if save_out:
 
-####################################################################
-################## OM - PLTS - GROUPMEGDATA PLOTS ##################
-####################################################################
+        # Set up save name & save out
+        save_name = fi.save_path + 'OscComparison.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
-def plot_freq_corr(fs, corr_vec, p_vec):
+################################################################################
+######################## OM - PLTS - GROUPMEGDATA PLOTS ########################
+################################################################################
+
+
+def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
     """Creats a scatter plot for the rolling frequency correlation.
 
     Parameters
@@ -180,6 +240,10 @@ def plot_freq_corr(fs, corr_vec, p_vec):
         Vector of frequencies used for rolling correlation (x-data).
     corr_vec : 1d array
         Vector of correlations between frequency bins (y-data).
+    p_vec : 1d array
+        Vector of p-values for each correlation. 
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
     """
 
     # Get FigInfo
@@ -226,9 +290,32 @@ def plot_freq_corr(fs, corr_vec, p_vec):
     ax.spines['left'].set_linewidth(2)
     ax.spines['bottom'].set_linewidth(2)
 
+    # Save out (if requested)
+    if save_out:
 
-def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, peak_lowgamma):
-    """   """
+        # Set up save name & save out
+        save_name = fi.save_path + 'FreqCorr.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+
+
+def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, peak_lowgamma, save_out=False):
+    """Createa a plot comparing age to peak frequencies for each oscillation band.
+
+    Parameters
+    ----------
+    age : 1d array
+        Vector of ages for each subject.
+    peak_theta : 1d array
+        Vector of peak theta frequency for each subject.
+    peak_alpha : 1d array
+        Vector of peak alpha frequency for each subject.
+    peak_beta : 1d array
+        Vector of peak beta frequency for each subject.
+    peak_lowgamma : 1d array
+        Vector of peak low gamma frequency for each subject.
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
+    """
 
     # Get FigInfo
     fi = FigInfo()
@@ -259,9 +346,26 @@ def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, peak_lowgamma):
     ax[1, 1].plot(age, peak_lowgamma, '.')
     ax[1, 1].set_title('Low Gamma', {'fontsize': sp_fs, 'fontweight': 'bold'})
 
+    # Save out (if requested)
+    if save_out:
 
-def plot_age_n_oscs(ages, nOscs):
-    """Create a scatter plot comparing age and number of oscillations."""
+        # Set up save name & save out
+        save_name = fi.save_path + 'AgePeak.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+
+
+def plot_age_n_oscs(ages, n_oscs, save_out=False):
+    """Create a scatter plot comparing age and number of oscillations.
+
+    Parameters
+    ----------
+    ages : 1d array
+        Vector of ages for each subject.
+    n_oscs : 1d array
+        Vector of the number of oscillations for each subject.
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
+    """
 
     # Get FigInfo
     fi = FigInfo()
@@ -271,6 +375,13 @@ def plot_age_n_oscs(ages, nOscs):
     ax_fs = fi.ax_fs
 
     # Make the plot
-    plt.plot(ages, nOscs, '.')
+    plt.plot(ages, n_oscs, '.')
     plt.title('# Oscillations / Age', fontsize=20, fontweight='bold')
+
+    # Save out (if requested)
+    if save_out:
+
+        # Set up save name & save out
+        save_name = fi.save_path + 'AgeNumberOscillations.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
