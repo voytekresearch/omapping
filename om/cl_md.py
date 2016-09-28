@@ -21,7 +21,7 @@ class MegData():
         # Store which db is set
         self.dat_source = db.dat_source
 
-        # Pull out needed paths from MegDB object
+        # Pull out needed paths from OMDB object
         self.project_path = db.project_path
         self.maps_path = db.maps_path
         self.meg_path = db.meg_path
@@ -32,19 +32,19 @@ class MegData():
         self.subnum = int()
         self.n_PSDs = int()
 
-        # Initialize data vectors
-        self.chis = np.array([])
+        # Initialize data arrays
+        self.slopes = np.array([])
         self.centers = np.array([])
         self.powers = np.array([])
         self.bws = np.array([])
 
-        # Initialize vectors for all-osc data
+        # Initialize arrays for all-osc data
         self.centers_all = np.array([])
         self.powers_all = np.array([])
         self.bws_all = np.array([])
         self.n_oscs = np.array([])
 
-        # Initialize
+        # Initialize arrays for oscillation bands
         self.thetas = np.array([])
         self.alphas = np.array([])
         self.betas = np.array([])
@@ -52,7 +52,6 @@ class MegData():
 
         # Set plot title
         self.title = ''
-        self.vis_opac = 0.1
 
         # Set boolean for what has been run
         self.has_data = False
@@ -116,15 +115,14 @@ class MegData():
         self.n_PSDs = len(results)
 
         # Initialize numpy arrays to pull out different result params
-        self.chis = np.zeros([self.n_PSDs, 1])
+        self.slopes = np.zeros([self.n_PSDs, 1])
         self.centers = np.zeros([self.n_PSDs, 8])
         self.powers = np.zeros([self.n_PSDs, 8])
         self.bws = np.zeros([self.n_PSDs, 8])
 
         # Loop through FOOF results, pulling out individual findings
         for i in range(0, self.n_PSDs):
-            self.chis[i] = results[i][0]
-            #self.chis[i, 0] = results[i][0]
+            self.slopes[i] = results[i][0]
             self.centers[i, 0:len(results[i][1])] = results[i][1]
             self.powers[i, 0:len(results[i][2])] = results[i][2]
             self.bws[i, 0:len(results[i][3])] = results[i][3]
@@ -169,13 +167,13 @@ class MegData():
             bws_temp = self.bws[i, :]
 
             # Get oscillations in specific band for each band
-            self.thetas[i,:]    = _get_osc(centers_temp, powers_temp, bws_temp,
+            self.thetas[i, :]    = _get_osc(centers_temp, powers_temp, bws_temp,
                                            osc.theta_low, osc.theta_high)
-            self.alphas[i,:]    = _get_osc(centers_temp, powers_temp, bws_temp,
+            self.alphas[i, :]    = _get_osc(centers_temp, powers_temp, bws_temp,
                                            osc.alpha_low, osc.alpha_high)
-            self.betas[i,:]     = _get_osc(centers_temp, powers_temp, bws_temp,
+            self.betas[i, :]     = _get_osc(centers_temp, powers_temp, bws_temp,
                                            osc.beta_low, osc.beta_high)
-            self.lowgammas[i,:] = _get_osc(centers_temp, powers_temp, bws_temp,
+            self.lowgammas[i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
                                            osc.lowgamma_low, osc.lowgamma_high)
 
         # Update boolean to note that current subject has band specific oscs calculated.
@@ -183,7 +181,7 @@ class MegData():
 
 
     def save_viz(self):
-        """Saves a matfile of frequency information to be loaded with Brainstorm for visualization. """
+        """Saves a matfile of freq info to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
         #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
@@ -192,7 +190,7 @@ class MegData():
 
         # Save desired outputs into a dictionary
         save_dict = {}
-        save_dict['slopes'] = self.chis
+        save_dict['slopes'] = self.slopes
         save_dict['thetas'] = self.thetas
         save_dict['alphas'] = self.alphas
         save_dict['betas'] = self.betas
@@ -223,7 +221,7 @@ class MegData():
         self.bws_all = self.bws_all[non_zeros]
 
         # Check for nans in BW estimation
-        # NOTE: Updated FOOF sometimes returns NaN for bw. Check and discard those. 
+        # NOTE: Updated FOOF sometimes returns NaN for bw. Check and discard those.
         nans = np.isnan(self.bws_all)
         n_nans = sum(nans)
 
@@ -263,133 +261,19 @@ class MegData():
         self.peak_lowgamma = _osc_peak(self.centers_all, osc.lowgamma_low, osc.lowgamma_high, avg)
 
 
-    def plot_all_oscs(self):
-        """Plots histogram distributions of oscillation centers, powers and bws. """
+    def calc_osc_param_corrs(self):
+        """Calculates correlations between oscillatory parameters."""
 
-        # Check if all_oscs computed
-        if not self.all_osc:
-            print("All oscillations not computed. Can't plot.")
-            return
+        ## Calculate correlations
 
-        # Plot Settings
-        n_bins = 160         # Number of bins for histograms
-        st_fs = 20           # Super Title Font Size
-        sp_fs = 18           # Subplot Title Font Size
-        ax_fs = 16           # Axis Label Font Size
-
-        # Set up subplots
-        fig, ax = plt.subplots(3, 1, figsize=(15, 15))
-
-        # Set plot super-title
-        plt.suptitle('Distributions of Oscillatory Parameters - ' + self.title, fontsize=st_fs, fontweight='bold')
-
-        # Subplot 1 - Center Frequency
-        ax[0].hist(self.centers_all, n_bins)
-        ax[0].set_title('Center Frequency', {'fontsize': sp_fs, 'fontweight': 'bold'})
-        ax[0].set_xlabel('Frequency', {'fontsize': ax_fs})
-        ax[0].set_ylabel('Count', {'fontsize': ax_fs})
-
-        # Subplot 2 - Power
-        ax[1].hist(np.log10(self.powers_all), n_bins)
-        ax[1].set_title('Oscillatory Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
-        ax[1].set_xlabel('Log Power', {'fontsize': ax_fs})
-        ax[1].set_ylabel('Count', {'fontsize': ax_fs})
-
-        # Subplot 3 - Bandwidth
-        ax[2].hist(self.bws_all, n_bins)
-        ax[2].set_title('Band Width', {'fontsize': sp_fs, 'fontweight': 'bold'})
-        ax[2].set_xlabel('Bandwidth (Hz)', {'fontsize': ax_fs})
-        ax[2].set_ylabel('Count', {'fontsize': ax_fs})
-
-        # Adjust subplot spacing
-        plt.subplots_adjust(hspace=0.4)
-
-
-    def plot_hist_count(self):
-        """Plots a histogram of the osc_count vector. """
-
-        # Plot Settings
-        n_bins = 25          # Number of bins for histograms
-        t_fs = 18            # Title font size
-        ax_fs = 16           # Axis label font size
-
-        # Create histogram
-        plt.hist(self.osc_count, n_bins, range=[0, 8])
-        plt.title('# Oscillations per Vertex', {'fontsize': t_fs, 'fontweight': 'bold'})
-        plt.xlabel('# Oscillations', {'fontsize': ax_fs, 'fontweight': 'bold'})
-        plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
-
-
-    def plot_slopes(self):
-        """Plots a histogram of the chi values for all vertices. """
-
-        # Plot Settings
-        n_bins = 100         # Number of bins for histograms
-        t_fs = 20            # Title font size
-        ax_fs = 16           # Axis label font size
-
-        # Create histogram
-        plt.hist(self.chis, n_bins)
-        plt.title('Slopes - ' + self.title, {'fontsize': t_fs, 'fontweight': 'bold'})
-        plt.xlabel('Chi Parameter', {'fontsize': ax_fs, 'fontweight': 'bold'})
-        plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
-
-
-    def plot_comparison(self):
-        """Computes correlations and plots comparisons between oscillatory parameters.
-
-        Checks Centers vs. Bandwidth, Centers vs. Power and Bandwidth vs. Power.
-        """
-
-        # Check if all-osc computed
-        if not self.all_osc:
-            print("All oscillations not computed. Can't run comparisons.")
-            return
-
-        # Plot Settings
-        st_fs = 20          # Super Title Font Size
-        sp_fs = 18          # Subplit Title Font Size
-        ax_fs = 16          # Axis Label Font Size
-
-        # Set up subplots
-        fig, ax = plt.subplots(3, 1, figsize=(15, 15))
-
-        # Set plot super-title
-        plt.suptitle('Oscillation Parameter Comparisons - ' + self.title,
-                     fontsize=st_fs, fontweight='bold')
-
-        ## Centers vs. Bandwidth
-        # Check Correlation
+        # Centers vs. Bandwidth
         corr_cen_bw, pcorr_cen_bw = pearsonr(self.centers_all, np.log10(self.bws_all))
 
-        # Plot
-        ax[0].plot(self.centers_all, np.log10(self.bws_all), '.', alpha=self.vis_opac)
-        ax[0].set_title('Center vs. Bandwidth', {'fontsize': sp_fs, 'fontweight': 'bold'})
-        ax[0].set_xlabel('Centers', {'fontsize': ax_fs})
-        ax[0].set_ylabel('BW', {'fontsize': ax_fs})
-
-        ## Centers vs. Power
-        # Check Correlation
+        # Centers vs. Power
         corr_cen_pow, pcorr_cen_pow = pearsonr(self.centers_all, np.log10(self.powers_all))
 
-        # Plot
-        ax[1].plot(self.centers_all, np.log10(self.powers_all), '.', alpha=self.vis_opac)
-        ax[1].set_title('Center vs. Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
-        ax[1].set_xlabel('Centers', {'fontsize': ax_fs})
-        ax[1].set_ylabel('Log Power', {'fontsize': ax_fs})
-
-        ## Bandwidth vs. Power
-        # Check Correlation
+        # Bandwidth vs. Power
         corr_bw_pow, pcorr_bw_pow = pearsonr(np.log10(self.bws_all), np.log10(self.powers_all))
-
-        # Plot
-        ax[2].plot(np.log10(self.bws_all), np.log10(self.powers_all), '.', alpha=self.vis_opac)
-        ax[2].set_title('BW vs. Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
-        ax[2].set_xlabel('Bandwidth (Hz)', {'fontsize': ax_fs})
-        ax[2].set_ylabel('Log Power', {'fontsize': ax_fs})
-
-        # Adjust subplot spacing
-        plt.subplots_adjust(hspace=0.4)
 
         # Save correlation results to list to return
         corrs = [['Center - B.W.'   , corr_cen_bw , pcorr_cen_bw ],
@@ -429,7 +313,6 @@ class GroupMegData(MegData):
 
         # Set title for plots
         self.title = 'Group'
-        self.vis_opac = 0.005
 
         # Initialize matrices for osc-band data
         self.gr_thetas = np.array([])
@@ -457,14 +340,15 @@ class GroupMegData(MegData):
 
         # Initialize vars to store slope values
         self.gr_chis = np.array([])
-        self.chis_avg = np.array([])
+        self.slopes_avg = np.array([])
 
         # Set booleans for what has been run
         self.osc_prob_done = False
         self.osc_score_done = False
 
 
-    def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, add_vertex_oscs=False, add_vertex_slopes=False):
+    def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, 
+                    add_vertex_oscs=False, add_vertex_slopes=False):
         """Adds a new subject to the GroupMegData object.
 
         Parameters
@@ -494,7 +378,7 @@ class GroupMegData(MegData):
             self.centers_all = np.append(self.centers_all, new_subj.centers_all)
             self.bws_all = np.append(self.bws_all, new_subj.bws_all)
             self.powers_all = np.append(self.powers_all, new_subj.powers_all)
-            self.chis = np.append(self.chis, new_subj.chis)
+            self.slopes = np.append(self.slopes, new_subj.slopes)
 
             # Update count of total number of oscillations
             self.n_oscs = np.append(self.n_oscs, new_subj.n_oscs)
@@ -530,9 +414,9 @@ class GroupMegData(MegData):
         if add_vertex_slopes:
 
             if self.n_subjs == 0:
-                self.gr_chis = new_subj.chis
+                self.gr_chis = new_subj.slopes
             else:
-                self.gr_chis = np.hstack([self.gr_chis, new_subj.chis])
+                self.gr_chis = np.hstack([self.gr_chis, new_subj.slopes])
 
         # Update subj count and subject number list
         self.n_subjs += 1
@@ -582,7 +466,7 @@ class GroupMegData(MegData):
         """
 
         # Calculate the average slope value per vertex
-        self.chis_avg = np.median(self.gr_chis, axis=1)
+        self.slopes_avg = np.median(self.gr_chis, axis=1)
 
         # Save map out, if required
         if save_out:
@@ -592,7 +476,7 @@ class GroupMegData(MegData):
             npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
 
             # Save out an npz file
-            np.savez(npz_save_name, chis=self.chis_avg, n_subjs=self.n_subjs)
+            np.savez(npz_save_name, chis=self.slopes_avg, n_subjs=self.n_subjs)
 
         # Save out as matfile for visualization with matlab, if required
         if set_viz:
@@ -603,7 +487,7 @@ class GroupMegData(MegData):
 
             # Save desired outputs into a dictionary
             save_dict = {}
-            save_dict['chis'] = self.chis_avg
+            save_dict['chis'] = self.slopes_avg
             save_dict['n_subjs'] = self.n_subjs
 
             # Save the dicionary out to a .mat file
@@ -777,39 +661,15 @@ class GroupMegData(MegData):
         sio.savemat(save_file, save_dict)
 
 
-    def osc_age_comparison_plot(self):
-        """Creates a plot comparing peak frequency to age for each frequency band.
-
+    def calc_osc_peak_age(self):
+        """Compares age and peak frequency within frequency bands.
+        
         Returns
         -------
         corrs : dict
             A dictionary containing correlations results comparing age to oscillations.
+
         """
-
-        # Plot settings
-        st_fs = 20          # Font size for the super title
-        sp_fs = 18          # Font size for the subplot titles
-
-        # Set up subplots
-        fig, ax = plt.subplots(2, 2, figsize=(10, 10))
-        # Set plot super-title
-        plt.suptitle('Peak Frequency / Age Comparisons', fontsize=st_fs, fontweight='bold')
-
-        # Theta
-        ax[0, 0].plot(self.age, self.peak_theta, '.')
-        ax[0, 0].set_title('Theta', {'fontsize': sp_fs, 'fontweight': 'bold'})
-
-        # Alpha
-        ax[0, 1].plot(self.age, self.peak_alpha, '.')
-        ax[0, 1].set_title('Alpha', {'fontsize': sp_fs, 'fontweight': 'bold'})
-
-        # Beta
-        ax[1, 0].plot(self.age, self.peak_beta, '.')
-        ax[1, 0].set_title('Beta', {'fontsize': sp_fs, 'fontweight': 'bold'})
-
-        # Gamma
-        ax[1, 1].plot(self.age, self.peak_lowgamma, '.')
-        ax[1, 1].set_title('Low Gamma', {'fontsize': sp_fs, 'fontweight': 'bold'})
 
         # Check correlations
         [r_age_th_peak, p_age_th_peak] = pearsonr(self.age, self.peak_theta)
@@ -968,6 +828,11 @@ def _get_demo_csv(subnum, meg_path, dat_source):
     ----------
     subnum : int
         Subject number to get demographic info for.
+    meg_path : str
+        String for path to csv file.
+    dat_source: str
+        Which database subject is from.
+            Options: {'OMEGA', 'HCP'}
 
     Returns
     -------
@@ -979,18 +844,28 @@ def _get_demo_csv(subnum, meg_path, dat_source):
 
     # Set up paths for demographic info csv file
     if dat_source is 'OMEGA':
-        csv_file_name = '00-Collin_Subjects.csv'
+        csv_file_name = '00-OMEGA_Subjects.csv'
+        num_ind = 1
+        sex_ind = 4
+        age_ind = 7
     elif dat_source is 'HCP':
-        csv_file_name = ''
+        csv_file_name = '00-HCP_Subjects.csv'
+        num_ind = 0
+        sex_ind = 3
+        age_ind = 4
     csv_file = os.path.join(meg_path, csv_file_name)
 
     # Open csv file, loop through looking for right row, grab age & sex information
     with open(csv_file, 'rb') as f_name:
         reader = csv.reader(f_name, delimiter=',')
         for row in reader:
-            if row[1] == str(subnum):
-                sex = row[4]
-                age = int(row[7])
+            if row[num_ind] == str(subnum):
+                sex = row[sex_ind]
+                if dat_source is 'OMEGA':
+                    age = int(row[age_ind])
+                else:
+                    age_temp = (row[age_ind]).split('-')
+                    age = (int(age_temp[0]) + int(age_temp[1]))/2
                 break
 
     return sex, age
@@ -1156,8 +1031,8 @@ def _load_foof_pickle(path):
 
 
 def _load_foof_csv(path):
-    """   
+    """
     NOTE: not yet implemented
     """
-    
+
     pass
