@@ -15,13 +15,12 @@ from om.gen import *
 class MapComp():
     """Class for storing and comparing spatial topographies."""
 
-    def __init__(self):
+    def __init__(self, db):
 
-        # Set root path for where all map data is stored
-        self.maps_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Maps/'
-
-        # Save paths to save out correlation data
-        self.corrs_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/'
+        # Pull out needed paths from OMDB object
+        self.project_path = db.project_path
+        self.maps_path = db.maps_path
+        self.corrs_path = db.corrs_path
 
         # Set specific paths for different data types
         self.oscs_path = os.path.join(self.maps_path, 'Oscs')
@@ -463,13 +462,11 @@ class MapComp():
         if dat_type is 'Terms':
             names = self.term_names
             file_name = 'Corrs_' + dat_type + '_' + meg_dat
-            #save_path = os.path.join('/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/', dat_type)
             save_path = os.path.join(self.corrs_path, dat_type)
             sub_name = ''
         elif dat_type is 'Genes':
             names = self.gene_names
             file_name = self.gene_subj + '_Corrs_' + dat_type + '_' + meg_dat
-            #save_path = os.path.join('/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/Corrs/', dat_type)
             save_path = os.path.join(self.corrs_path, dat_type)
             sub_name = self.gene_subj
         else:
