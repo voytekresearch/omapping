@@ -1,17 +1,16 @@
 from __future__ import print_function, division
 import os
+import sys
 import pickle
 import numpy as np
 import scipy.io as sio
 
 # Import FOOF (use sys to add location to path, then import)
-import sys
 sys.path.append('/Users/thomasdonoghue/Documents/GitCode/')
 from foof.fit import FOOF
-#from foof import syn
 
 # Import Parallelization Packages
-from multiprocessing import Pool
+#from multiprocessing import Pool
 
 ###################################################################################
 ########################## OMEGAMAPPIN - GENERAL CLASSES ##########################
@@ -41,27 +40,27 @@ class OMDB():
         # Set paths for MEG data types
         self.psd_base_path = os.path.join(self.meg_path, '2-PSDs')
         self.foof_base_path = os.path.join(self.meg_path, '3-FOOF')
-        self.viz_path = os.path.join(self.meg_path, '4-Viz')        
+        self.viz_path = os.path.join(self.meg_path, '4-Viz')
 
         # Set path for database specific stuff
         if dat_source is 'both':
             self.psd_path = ''
             self.foof_path = ''
-        else: 
+        else:
             self.psd_path = os.path.join(self.psd_base_path, dat_source)
             self.foof_path = os.path.join(self.foof_base_path, dat_source)
 
 
     def check_files(self, dat_type, save_type='pickle', verbose=True):
-        """Check which FOOF files are available. 
+        """Check which FOOF files are available.
 
         Parameters
         ----------
         dat_type : str
-            Which data type to check files for. 
+            Which data type to check files for.
                 Options: {'PSD', 'foof'}
         save_type : str, optional
-            Which file type to check files for. Only used for foof files. 
+            Which file type to check files for. Only used for foof files.
                 Options: {'pickle', 'csv'}
 
         Returns
@@ -84,7 +83,7 @@ class OMDB():
         if self.dat_source is not 'both':
             sub_nums = _check_files(os.path.join(dat_path, self.dat_source, save_type), word, f_l)
             source = [self.dat_source] * len(sub_nums)
- 
+
         else:
             sub_nums_omega = _check_files(os.path.join(dat_path, 'OMEGA', save_type), word, f_l)
             n_omega = len(sub_nums_omega)
@@ -462,7 +461,7 @@ def rm_files_ext(files_in):
     files_out : list[str]
         A list of file and/or directory names with file extensions removed.
     """
-    
+
     # Initialize list to store output
     files_out = []
 
