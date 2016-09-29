@@ -44,6 +44,9 @@ class MegData():
         self.bws_all = np.array([])
         self.n_oscs = np.array([])
 
+        # Initialize list to store all centers histogram
+        self.centers_hist = []
+
         # Initialize arrays for oscillation bands
         self.thetas = np.array([])
         self.alphas = np.array([])
@@ -235,6 +238,9 @@ class MegData():
             self.powers_all = self.powers_all[non_nans]
             self.bws_all = self.bws_all[non_nans]
 
+        # Create the all-centers histogram
+        self.centers_hist, _ = np.histogram(self.centers_all, bins=np.arange(3, 40.25, 0.25))
+
         # Get the number of oscillations
         self.n_oscs = len(self.centers_all)
 
@@ -264,15 +270,13 @@ class MegData():
     def calc_osc_param_corrs(self):
         """Calculates correlations between oscillatory parameters."""
 
-        ## Calculate correlations
-
-        # Centers vs. Bandwidth
+        # Calculate correlations: Centers vs. Bandwidth
         corr_cen_bw, pcorr_cen_bw = pearsonr(self.centers_all, np.log10(self.bws_all))
 
-        # Centers vs. Power
+        # Calculate correlations: Centers vs. Power
         corr_cen_pow, pcorr_cen_pow = pearsonr(self.centers_all, np.log10(self.powers_all))
 
-        # Bandwidth vs. Power
+        # Calculate correlations: Bandwidth vs. Power
         corr_bw_pow, pcorr_bw_pow = pearsonr(np.log10(self.bws_all), np.log10(self.powers_all))
 
         # Save correlation results to list to return
@@ -379,6 +383,9 @@ class GroupMegData(MegData):
             self.bws_all = np.append(self.bws_all, new_subj.bws_all)
             self.powers_all = np.append(self.powers_all, new_subj.powers_all)
             self.slopes = np.append(self.slopes, new_subj.slopes)
+
+            # Add centers hist
+            self.centers_hist.append(new_subj.centers_hist)
 
             # Update count of total number of oscillations
             self.n_oscs = np.append(self.n_oscs, new_subj.n_oscs)
@@ -519,6 +526,8 @@ class GroupMegData(MegData):
         -------
         corrs : dict
             Contains the correlations between all oscillation probabilities.
+        corrs_mat : array
+            xx
         """
 
         # Check if oscillation probabilities have been calculated.
@@ -552,14 +561,17 @@ class GroupMegData(MegData):
                  ['Alpha-LG'   , r_al_lg, p_al_lg],
                  ['Beta-LG'    , r_be_lg, p_be_lg]]
 
-        return corrs
+        # Save corrs out in a matrix
+        corrs_mat = np.array([[0, r_th_al, r_th_be, r_th_lg], [r_th_al, 0, r_al_be, r_al_lg], 
+                              [r_th_be, r_al_be, 0, r_be_lg], [r_th_lg, r_al_lg, r_be_lg, 0]])
+
+        return corrs, corrs_mat
 
 
     def osc_score(self):
         """Calculate the oscillation score for each frequency band.
 
         The oscillation score is .... XXXXX
-
         """
 
         # Check if osc-prob is calculated. Can't proceed if it isnt.
@@ -589,6 +601,8 @@ class GroupMegData(MegData):
         -------
         corrs : dict
             Contains the results of the correlations across oscillation scores.
+        corrs_mat : array
+            xx
         """
 
         # Check if oscillation probabilities have been calculated.
@@ -622,7 +636,11 @@ class GroupMegData(MegData):
                  ['Alpha-LG'   , r_al_lg, p_al_lg],
                  ['Beta-LG'    , r_be_lg, p_be_lg]]
 
-        return corrs
+        # Save corrs out in a matrix
+        corrs_mat = np.array([[0, r_th_al, r_th_be, r_th_lg], [r_th_al, 0, r_al_be, r_al_lg], 
+                              [r_th_be, r_al_be, 0, r_be_lg], [r_th_lg, r_al_lg, r_be_lg, 0]])
+
+        return corrs, corrs_mat
 
 
     def save_osc_score(self, file_name):
@@ -668,7 +686,6 @@ class GroupMegData(MegData):
         -------
         corrs : dict
             A dictionary containing correlations results comparing age to oscillations.
-
         """
 
         # Check correlations
