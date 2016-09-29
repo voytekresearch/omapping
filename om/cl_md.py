@@ -2,9 +2,9 @@ from __future__ import print_function, division
 import os
 import csv
 import pickle
+import datetime
 import numpy as np
 import scipy.io as sio
-import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
 from om.gen import *
 
@@ -187,7 +187,6 @@ class MegData():
         """Saves a matfile of freq info to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
-        #save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/'
         save_name = str(self.subnum) + '_Foof_Viz'
         save_file = os.path.join(self.viz_path, save_name)
 
@@ -203,7 +202,7 @@ class MegData():
         sio.savemat(save_file, save_dict)
 
 
-    def all_oscs(self):
+    def all_oscs(self, verbose=True):
         """Flatten osc data to vectors.
 
         When imported, oscillation data is in matrix form [n_vertex, osc_slots].
@@ -230,7 +229,8 @@ class MegData():
 
         # If there are nans, print how many and remove them
         if n_nans > 0:
-            print('Subj:', str(self.subnum), 'Found', str(n_nans), ' NaNs. Removing.')
+            if verbose:
+                print('Subj:', str(self.subnum), 'Found', str(n_nans), ' NaNs. Removing.')
 
             # Remove osc's with nan values
             non_nans = np.logical_not(nans)
@@ -495,13 +495,15 @@ class GroupMegData(MegData):
             # Save desired outputs into a dictionary
             save_dict = {}
             save_dict['chis'] = self.slopes_avg
+            save_dict['dat_source'] = self.dat_source
             save_dict['n_subjs'] = self.n_subjs
+            save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
             # Save the dicionary out to a .mat file
             sio.savemat(save_file, save_dict)
 
 
-    def set_prob_vis(self):
+    def set_prob_viz(self):
         """Saves out a matfile (of osc-probs) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
@@ -514,6 +516,9 @@ class GroupMegData(MegData):
         save_dict['alpha_prob'] = self.alpha_prob
         save_dict['beta_prob'] = self.beta_prob
         save_dict['lowgamma_prob'] = self.lowgamma_prob
+        save_dict['dat_source'] = self.dat_source
+        save_dict['n_subjs'] = self.n_subjs
+        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         # Save the dicionary out to a .mat file
         sio.savemat(save_file, save_dict)
@@ -661,7 +666,7 @@ class GroupMegData(MegData):
                  osc_score_beta=self.beta_score, osc_score_lowgamma=self.lowgamma_score)
 
 
-    def set_score_vis(self):
+    def set_score_viz(self):
         """Saves a matfile (of osc-scores) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
@@ -674,6 +679,9 @@ class GroupMegData(MegData):
         save_dict['alpha_score'] = self.alpha_score
         save_dict['beta_score'] = self.beta_score
         save_dict['lowgamma_score'] = self.lowgamma_score
+        save_dict['dat_source'] = self.dat_source
+        save_dict['n_subjs'] = self.n_subjs
+        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         # Save the dicionary out to a .mat file
         sio.savemat(save_file, save_dict)
