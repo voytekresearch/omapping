@@ -1,6 +1,7 @@
-__all__ = ["gen", "cl_mc", "cl_md", "plts"]
+__all__ = ["gen", "cl_mc", "cl_md", "md_plts", "mc_plts"]
 
 import gen
 import cl_mc
 import cl_md
-import plts
+import md_plts
+import mc_plts
