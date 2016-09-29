@@ -180,7 +180,7 @@ def plot_all_osc_single(data, dat_type, title, n_bins=160, size=(15, 5), save_ou
         dat_title = 'Bandwidth'
         xlab = 'Bandwidth (Hz)'
     else:
-        print('Data type not understood.')
+        raise UnkownDataType
 
     # Set up plot
     fig, ax = plt.subplots(figsize=size)
