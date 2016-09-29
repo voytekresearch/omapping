@@ -5,9 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from om.gen import FigInfo
 
-###############################################################################
-########################## OM - PLTS - MEGDATA PLOTS ##########################
-###############################################################################
+#######################################################################################
+############################## OM - PLTS - MEGDATA PLOTS ##############################
+#######################################################################################
 
 def plot_slopes(slopes, title, save_out=False):
     """Plots a histogram of the chi values for all vertices.
@@ -141,23 +141,24 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
-def plot_all_osc_single(data, dat_type, title, n_bins=160, size=(5, 15), save_out=False):
+def plot_all_osc_single(data, dat_type, title, n_bins=160, size=(15, 5), save_out=False):
     """Create a plot for a single oscillation parameter.
 
     Parameters
     ----------
     data : 1d array
         Vector of oscillation parameter data.
-    dat_type : str
-        Which osc parameter is being plotted.
+    dat_type : int
+        Int refers to which osc parameter is being plotted.
+            Options: {0:'Center Frequency', 1:'Power', 2:'Bandwidth'
     title : str
         A string to append to the title.
     n_bins : int, optional
         Number of bins to use for the plot. Default: 160.
     size : tuple, optional
-        Size of the figure to make. Default: (5, 15).
+        Size of the figure to make. Default: (15, 5).
     save_out : boolean, optional
-        Whether to save out a copy of the figure.
+        Whether to save out a copy of the figure. Default: False.
     """
 
     # Get FigInto
@@ -167,14 +168,28 @@ def plot_all_osc_single(data, dat_type, title, n_bins=160, size=(5, 15), save_ou
     t_fs = fi.t_fs           # Super Title Font Size
     ax_fs = fi.ax_fs         # Axis Label Font Size
 
+    # Set up for which data type
+    if dat_type is 0:
+        dat_title = 'Center Frequency'
+        xlab = 'Frequency'
+    elif dat_type is 1:
+        dat_title = 'Power'
+        xlab = 'Log Power'
+        data = np.log10(data)
+    elif dat_type is 2:
+        dat_title = 'Bandwidth'
+        xlab = 'Bandwidth (Hz)'
+    else:
+        print('Data type not understood.')
+
     # Set up plot
     fig, ax = plt.subplots(figsize=size)
 
     # Subplot 1 - Center Frequency
-    ax.hist(centers_all, n_bins)
+    ax.hist(data, n_bins)
 
-    plt.title('Center Frequency', {'fontsize': sp_fs, 'fontweight': 'bold'})
-    plt.xlabel('Frequency', {'fontsize': ax_fs})
+    plt.title(dat_title + ' ' + title, {'fontsize': t_fs, 'fontweight': 'bold'})
+    plt.xlabel(xlab, {'fontsize': ax_fs})
     plt.ylabel('Count', {'fontsize': ax_fs})
 
     # Save out (if requested)
