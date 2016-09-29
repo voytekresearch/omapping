@@ -33,7 +33,7 @@ class FigInfo():
 ###############################################################################
 
 def plot_slopes(slopes, title, save_out=False):
-    """Plots a histogram of the chi values for all vertices. 
+    """Plots a histogram of the chi values for all vertices.
 
     Parameters
     ----------
@@ -88,6 +88,8 @@ def plot_hist_count(osc_count, save_out=False):
 
     # Create histogram
     plt.hist(osc_count, n_bins, range=[0, 8])
+
+    # Add title and axis labels
     plt.title('# Oscillations per Vertex', {'fontsize': t_fs, 'fontweight': 'bold'})
     plt.xlabel('# Oscillations', {'fontsize': ax_fs, 'fontweight': 'bold'})
     plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
@@ -130,7 +132,7 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
     fig, ax = plt.subplots(3, 1, figsize=(15, 15))
 
     # Set plot super-title
-    plt.suptitle('Distributions of Oscillatory Parameters - ' + title, 
+    plt.suptitle('Distributions of Oscillatory Parameters - ' + title,
                  fontsize=st_fs, fontweight='bold')
 
     # Subplot 1 - Center Frequency
@@ -188,7 +190,7 @@ def plot_comparison(centers_all, powers_all, bws_all, title, save_out=False):
     st_fs = fi.t_fs              # Super Title Font Size
     sp_fs = fi.sp_fs             # Subplit Title Font Size
     ax_fs = fi.ax_fs             # Axis Label Font Size
-    vis_opac = 0.1              # Alpha value for plotted data
+    vis_opac = 0.1               # Alpha value for plotted data
 
     # Set up subplots
     fig, ax = plt.subplots(3, 1, figsize=(15, 15))
@@ -226,9 +228,52 @@ def plot_comparison(centers_all, powers_all, bws_all, title, save_out=False):
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
-################################################################################
-######################## OM - PLTS - GROUPMEGDATA PLOTS ########################
-################################################################################
+########################################################################################
+############################ OM - PLTS - GROUPMEGDATA PLOTS ############################
+########################################################################################
+
+
+def plot_peak_boxplot(peaks, osc_band, save_out=False):
+    """Plot a boxplot of peak frequencies within an oscillation band.
+
+    Parameters
+    ----------
+    peaks : 1d array
+        Vector of peak frequencies for given oscillation band.
+    osc_band : str
+        Label of which osc band is being plotted.
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
+    """
+
+    # Initialize the figure
+    f, ax = plt.subplots(figsize=(2, 5))
+
+    # Make the boxplot
+    ax.boxplot(peaks, widths=0.45)
+
+    # Set the top and right side frame & ticks off
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+
+    # Set linewidth of remaining spines
+    ax.spines['left'].set_linewidth(2)
+    ax.spines['bottom'].set_linewidth(2)
+
+    # Add a title
+    plt.title(osc_band, fontsize=20, fontweight='bold')
+
+    # Remove x ticks
+    plt.xticks([])
+
+    # Save out (if requested)
+    if save_out:
+
+        # Set up save name & save out
+        save_name = fi.save_path + osc_band + '_boxplot.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
 def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
@@ -241,7 +286,7 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
     corr_vec : 1d array
         Vector of correlations between frequency bins (y-data).
     p_vec : 1d array
-        Vector of p-values for each correlation. 
+        Vector of p-values for each correlation.
     save_out : boolean, optional
         Whether to save out a copy of the figure.
     """
@@ -258,7 +303,7 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
     p_size = 5
 
     # Make the plot
-    fig, ax = plt.subplots(figsize=(8,5))
+    fig, ax = plt.subplots(figsize=(8, 5))
 
     # Create the plot
     ax.plot(fs, corr_vec, 'x', alpha=r_alpha, markersize=r_size)
@@ -384,4 +429,60 @@ def plot_age_n_oscs(ages, n_oscs, save_out=False):
         # Set up save name & save out
         save_name = fi.save_path + 'AgeNumberOscillations.pdf'
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+
+
+def plot_osc_profiles(centers_hist, save_out=False):
+    """Creates a plot showing all subjects oscillation profiles.
+
+    Parameters
+    ----------
+    centers_hist : list[list]
+        Contains the oscillation profile for each subject.
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
+    """
+
+    # Get FigInfo
+    fi = FigInfo()
+
+    # Plot settings
+    t_fs = fi.t_fs
+    ax_fs = fi.ax_fs
+    ind_lw = 0.5
+    avg_lw = 2
+    alpha = 0.4
+
+    # Initialize plot
+    fig, ax = plt.subplots(figsize=(18, 5))
+
+    # Initialize a frequency vector for the x-axis
+    freqs = np.arange(3.125, 40.125, 0.25)
+    
+    # Loop through all subjects, adding profile to plot
+    for h in centers_hist:
+        ax.plot(freqs, h, linewidth=ind_lw, alpha=alpha)
+    
+    # Add the average profile
+    ax.plot(freqs, np.median(centers_hist, 0), 'k', linewidth=avg_lw)
+
+    # Add title and axis labels
+    plt.title('Individual Oscillation Profiles', {'fontsize': t_fs, 'fontweight': 'bold'})
+    plt.xlabel('Frequency', {'fontsize': ax_fs, 'fontweight': 'bold'})
+    plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
+
+    # Set the x axis limits
+    plt.xlim([3, 40])
+
+    # Save out (if requested)
+    if save_out:
+
+        # Set up save name & save out
+        save_name = fi.save_path + 'OscillationProfiles.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+
+
+#######################################################################################
+############################ OM - PLTS - MAP COMPARE PLOTS ############################
+#######################################################################################
+
 
