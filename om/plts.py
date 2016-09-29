@@ -103,7 +103,7 @@ def plot_hist_count(osc_count, save_out=False):
 
 
 def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
-    """Plots histogram distributions of oscillation centers, powers and bws.
+    """Plots combined plot with distributions of oscillation centers, powers and bws.
 
     Parameters
     ----------
@@ -164,8 +164,52 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
-def plot_comparison(centers_all, powers_all, bws_all, title, save_out=False):
-    """Plots comparisons between oscillatory parameters.
+def plot_all_osc_single(data, dat_type, title, n_bins=160, size=(5, 15), save_out=False):
+    """Create a plot for a single oscillation parameter.
+
+    Parameters
+    ----------
+    data : 1d array
+        Vector of oscillation parameter data.
+    dat_type : str
+        Which osc parameter is being plotted.
+    title : str
+        A string to append to the title.
+    n_bins : int, optional
+        Number of bins to use for the plot. Default: 160.
+    size : tuple, optional
+        Size of the figure to make. Default: (5, 15).
+    save_out : boolean, optional
+        Whether to save out a copy of the figure.
+    """
+
+    # Get FigInto
+    fi = FigInfo()
+
+    # Plot Settings
+    t_fs = fi.t_fs           # Super Title Font Size
+    ax_fs = fi.ax_fs         # Axis Label Font Size
+
+    # Set up plot
+    fig, ax = plt.subplots(figsize=size)
+
+    # Subplot 1 - Center Frequency
+    ax.hist(centers_all, n_bins)
+
+    plt.title('Center Frequency', {'fontsize': sp_fs, 'fontweight': 'bold'})
+    plt.xlabel('Frequency', {'fontsize': ax_fs})
+    plt.ylabel('Count', {'fontsize': ax_fs})
+
+    # Save out (if requested)
+    if save_out:
+
+        # Set up save name & save out
+        save_name = fi.save_path + dat_type + '_AllOscs.pdf'
+        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+
+
+def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=False):
+    """Plots comparisons between all oscillatory parameters.
 
     Checks Centers vs. Bandwidth, Centers vs. Power and Bandwidth vs. Power.
 
@@ -310,6 +354,7 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
 
     # Add marker for significance
     for i, p in enumerate(p_vec):
+        
         # Add a marker if passes Bonferroni corrected p-value
         if p < 0.05/len(p_vec):
             ax.plot(fs[i], corr_vec[i], 'ro', alpha=p_alpha, markersize=p_size)
