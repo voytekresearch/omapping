@@ -403,6 +403,7 @@ class MapComp():
 
     def plot_corrs(self, dat_type, meg_dat):
         """Plot the R and p values of specified correlation results.
+        TODO: NEEDS TO BE MOVED TO MC_PLTS!
 
         Parameters
         ----------
@@ -824,6 +825,7 @@ class MapCompROI(MapComp):
 
     def plot_mat(self, dat, osc=None, section='all'):
         """Plot the connectivity matrix.
+        TODO: NEEDS TO BE MOVED TO MC_PLTS!
 
         Parameters
         ----------
