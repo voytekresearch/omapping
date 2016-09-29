@@ -126,6 +126,27 @@ class Osc:
         self.lowgamma_high = 40
 
 
+class FigInfo():
+    """Object to hold settings to save figures. """
+
+    def __init__(self):
+
+        # Default Settings
+        self.t_fs = 20           # Title font size
+        self.sp_fs = 18          # Subplot title font size
+        self.ax_fs = 16          # Axis font size
+
+        # Plot Information
+        self.title = 'Group'
+        self.vis_opac = 0.005
+
+        # Save Information
+        self.save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/4-Figures/MegAnalysis/'
+        self.format = 'pdf'
+        self.bbox = 'tight'
+        self.dpi = 600
+
+
 ###################################################################################
 ################################ OM_FOOF Functions ################################
 ###################################################################################
