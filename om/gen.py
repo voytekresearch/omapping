@@ -24,7 +24,7 @@ class OMDB():
         # Check dat_source is acceptable
         pos_sources = ['both', 'OMEGA', 'HCP']
         if dat_source not in pos_sources:
-            raise DataSourceNotUnderstood
+            raise UnknownDataSource
 
         # Save to object which data source is being used
         self.dat_source = dat_source
@@ -104,7 +104,7 @@ class OMDB():
         return sub_nums, source
 
 
-class Osc:
+class Osc():
     """Class to store oscillations parameters."""
 
     def __init__(self):
@@ -125,6 +125,27 @@ class Osc:
         self.lowgamma_low = 30
         self.lowgamma_high = 40
 
+"""
+TODO: Update Osc and everything that calls it to use a more flexible dictionary mapping. 
+This is so it's much easier to change / add / remove oscillation bands. 
+
+Something like: 
+
+class Osc():
+
+    def __init__(self, input_bands=None):
+
+        # If supplied, use the given dictionary of oscillation bands. 
+        if input_bands:
+            self.bands = input_bands
+
+        # Otherwise, use the default oscillation bands.
+        else:
+            self.bands = dict({'Theta': (3, 8), 
+                               'Alpha': (8, 13), 
+                               'Beta': (13, 30), 
+                               'LowGamma': (30, 40)})
+"""
 
 class FigInfo():
     """Object to hold settings to save figures. """
@@ -503,23 +524,27 @@ def rm_files_ext(files_in):
     return files_out
 
 
-#################################################################################
-################################## OM GEN - ERRORS ##############################
-#################################################################################
+#########################################################################################
+###################################### OM GEN - ERRORS ##################################
+#########################################################################################
 
-class DataSourceNotUnderstood(Exception):
-    """An Error indicating data source specification is not understood. """
+class UnknownDataSource(Exception):
+    """An Error indicating data source specification is not understood."""
     pass
 
+class UnknownDataType(Exception):
+    """An Error indicating data type specification is not understood."""
+    pass
 
-################################################################################
-########################## OM GEN - Private Functions ##########################
-################################################################################
+########################################################################################
+############################## OM GEN - Private Functions ##############################
+########################################################################################
 
 def _run_foof_l(foof, freqs_ext, psd_ext):
     """Local helper function to run FOOF linearly.
 
     Used by meg_foof().
+    NOTE: CURRENTLY UNUSED.
 
     Parameters
     ----------
@@ -546,6 +571,7 @@ def _run_foof_l(foof, freqs_ext, psd_ext):
 
 def _run_foof_p(psd_ext):
     """ ???
+    NOTE: CURRENTLY UNUSED.
     """
 
     # Fit FOOF
@@ -556,7 +582,22 @@ def _run_foof_p(psd_ext):
 
 
 def _check_files(path, word, f_l):
-    """   """
+    """???
+
+    Parameters
+    ----------
+    path : ?
+        xx
+    word : ?
+        xx
+    f_l : ?
+        xx
+
+    Returns
+    -------
+    sub_nums : ?
+        xx
+    """
 
     files = os.listdir(path)
     files = clean_file_list(files, word)
