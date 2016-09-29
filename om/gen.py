@@ -80,10 +80,12 @@ class OMDB():
             word = 'foof'
             f_l = 'first'
 
+        # ?
         if self.dat_source is not 'both':
             sub_nums = _check_files(os.path.join(dat_path, self.dat_source, save_type), word, f_l)
             source = [self.dat_source] * len(sub_nums)
 
+        # ?
         else:
             sub_nums_omega = _check_files(os.path.join(dat_path, 'OMEGA', save_type), word, f_l)
             n_omega = len(sub_nums_omega)
