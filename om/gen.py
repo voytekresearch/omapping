@@ -50,9 +50,14 @@ class OMDB():
             self.psd_path = os.path.join(self.psd_base_path, dat_source)
             self.foof_path = os.path.join(self.foof_base_path, dat_source)
 
+        # Set paths to save data out to
+        self.processed_path = os.path.join(self.meg_path, '5-Processed')
+        self.md_save_path = os.path.join(self.processed_path, 'md_pickle')
+        self.mc_save_path = os.path.join(self.processed_path, 'mc_pickle')
 
-    def check_files(self, dat_type, save_type='pickle', verbose=True):
-        """Check which FOOF files are available.
+
+    def check_dat_files(self, dat_type, save_type='pickle', verbose=True):
+        """Checks what data files are available.
 
         Parameters
         ----------
@@ -103,6 +108,42 @@ class OMDB():
 
         return sub_nums, source
 
+    def check_res_files(self, res_type, verbose=True):
+        """Checks what result files are available.
+
+        Parameters
+        ----------
+        res_type : str
+            Which data type to check files for.
+                Options: {'md', 'mc'}
+
+        Returns
+        -------
+        files : list(str)
+            A list of all the available files.
+        """
+
+        # Settings
+        word = 'Res'
+        
+        # Set up which files to look for
+        if res_type is 'md':
+            dat_path = self.md_save_path
+        elif res_type is 'mc':
+            dat_path = self.mc_save_path
+
+        # Get files
+        files = os.listdir(dat_path)
+        files = clean_file_list(files, word)
+
+        # If requested, print out the list of subject numbers
+        if verbose:
+            print('\nNumber of files available: ' + str(len(files)) + '\n')
+            print('Files available: \n' + ('\n'.join(files)) + '\n')
+
+        # Return file list
+        return files
+
 
 class Osc():
     """Class to store oscillations parameters."""
@@ -152,10 +193,17 @@ class FigInfo():
 
     def __init__(self):
 
-        # Default Settings
-        self.t_fs = 20           # Title font size
-        self.sp_fs = 18          # Subplot title font size
-        self.ax_fs = 16          # Axis font size
+        # Default Settings - font sizes
+        self.t_fs = 28           # Title font size
+        self.sp_fs = 22          # Subplot title font size
+        self.ax_fs = 20          # Axis font size
+        self.ti_fs = 14          # Ticks font size
+
+        # Default Settings - other settings
+        self.ax_lw = 2.5
+
+        # Default Settings - what to add to plot
+        self.add_title = False
 
         # Plot Information
         self.title = 'Group'
@@ -163,7 +211,7 @@ class FigInfo():
 
         # Save Information
         self.save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/4-Figures/MegAnalysis/'
-        self.format = 'pdf'
+        self.format = 'svg'
         self.bbox = 'tight'
         self.dpi = 600
 
@@ -203,7 +251,7 @@ def clean_file_list(files_in, string):
     return files_out
 
 
-def load_meg_psds(meg_path, subj_num):
+def load_meg_psds(dat_source, meg_path, subj_num):
     """Loads a requested subject's PSD-MEG data.
 
     Parameters
@@ -222,8 +270,11 @@ def load_meg_psds(meg_path, subj_num):
     """
 
     # Set file name and get full path
-    mat_file = 'psd_source_median_' + str(subj_num)
-    file_name = os.path.join((meg_path + 'Subject_' + str(subj_num)), mat_file)
+    if dat_source is 'OMEGA':
+        mat_file = 'psd_source_median_' + str(subj_num)
+    elif dat_source is 'HCP':
+        mat_file = 'PSD_Source_Median_' + str(subj_num)
+    file_name = os.path.join(meg_path, ('Subject_' + str(subj_num)), mat_file)
 
     # Load MEG PSD data from matfile
     data_mat = sio.loadmat(file_name, appendmat=True, struct_as_record=False, squeeze_me=True)
