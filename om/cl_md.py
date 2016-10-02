@@ -27,6 +27,7 @@ class MegData():
         self.meg_path = db.meg_path
         self.foof_path = db.foof_path
         self.viz_path = db.viz_path
+        self.md_save_path = db.md_save_path
 
         # Initialize subject number
         self.subnum = int()
@@ -285,15 +286,6 @@ class MegData():
                  ['B.W. - Power '   , corr_bw_pow , pcorr_bw_pow ]]
 
         return corrs
-
-
-    def save_pickle(self):
-        """Save current meg data object as a pickled object.
-
-        NOTE: NOT YET IMPLEMENTED.
-        """
-
-        pass
 
 
 class GroupMegData(MegData):
@@ -774,6 +766,52 @@ class GroupMegData(MegData):
         return corr_vec, p_vec
 
 
+############################################################################################
+########################## OMEGAMAPPIN - OM_MD - PUBLIC FUNCTIONS ##########################
+############################################################################################
+
+def save_md_pickle(obj, save_name):
+    """Save current meg data object as a pickled object.
+
+    Parameters
+    ----------
+    obj : MegData() or GroupMegData()
+        Object to save to pickle
+    save_name : str
+        String to be included in the name of the file.
+    """
+
+    # Get database object
+    db = OMDB()
+
+    # Set save name and path
+    save_name = 'Res_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
+    foof_save_path = os.path.join(db.md_save_path, save_name)
+
+    # Save out data to pickle file
+    pickle.dump(obj, open(foof_save_path, 'wb'))
+
+
+def load_md_pickle(file_name):
+    """Load a pickled file.
+
+    Parameters
+    ----------
+    file_name : str
+        File name of the pickle file to be loaded.
+    """
+
+    # Get database object
+    db = OMDB()
+
+    # Set up path to load file
+    dat_path = os.path.join(db.md_save_path, file_name)
+
+    # Load file & return pickled object
+    results = pickle.load(open(dat_path, 'rb'))
+    return results
+
+
 #################################################################################################
 ############################ OMEGAMAPPIN - OM_MD - PRIVATE FUNCTIONS ############################
 #################################################################################################
@@ -962,12 +1000,13 @@ def _osc_prob(osc_mat):
 def _osc_pow_ratio(osc_mat):
     """Calculate the power ratio of an oscillation.
 
-    Power ratio is a score between [0, 1] power relative to
-        max power in that frequency band.
+    Power ratio is a score, bounded between [0, 1], reflecting power 
+    in a given freqeuncy band, relative to the max power in that 
+    frequency band. Max power is 
 
     Parameters
     ----------
-    osc_mat : ??
+    osc_mat : 3-d array
         XX
 
     Returns
