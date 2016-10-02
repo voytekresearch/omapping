@@ -194,8 +194,8 @@ class FigInfo():
     def __init__(self):
 
         # Default Settings - font sizes
-        self.t_fs = 28           # Title font size
-        self.sp_fs = 22          # Subplot title font size
+        self.t_fs = 22           # Title font size
+        self.sp_fs = 20          # Subplot title font size
         self.ax_fs = 20          # Axis font size
         self.ti_fs = 14          # Ticks font size
 
