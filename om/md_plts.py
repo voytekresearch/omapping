@@ -49,7 +49,7 @@ def plot_slopes(slopes, title, save_out=False):
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + title + '_Slopes' + '.' + fi.format
+        save_name = fi.save_path + '101-' + title + '_Slopes' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -91,7 +91,7 @@ def plot_hist_count(osc_count, save_out=False):
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + 'OscCount' + '.' + fi.format
+        save_name = fi.save_path + '102-OscCount' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -158,7 +158,7 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + 'AllOscs' + '.' + fi.format
+        save_name = fi.save_path + '103-AllOscs' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -236,7 +236,7 @@ def plot_all_oscs_single(data, dat_type, title, n_bins=160, size=(15, 5), save_o
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + dat_title + '_AllOscs'+ '.' + fi.format
+        save_name = fi.save_path + '104-' + dat_title + '_AllOscs'+ '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -305,7 +305,7 @@ def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + 'OscComparison' + '.' + fi.format
+        save_name = fi.save_path + '105-OscComparison' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -353,13 +353,13 @@ def plot_band_corr_matrix(corr_dat, save_out=False):
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
     # Add a colorbar - add padding to offset further from plot
-    plt.colorbar(pad=0.12)
+    plt.colorbar(pad=0.15)
 
     # Save out (if requested)
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + 'CorrMat' + '.' + fi.format
+        save_name = fi.save_path + '106-CorrMat' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -380,7 +380,7 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
     fi = FigInfo()
 
     # Plot Settings
-    t_fs = fi.t_fs              # Title Font Size
+    t_fs = fi.sp_fs              # Title Font Size
     ti_fs = fi.ti_fs            # Axis ticks font size
     ax_lw = fi.ax_lw
 
@@ -402,7 +402,7 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
 
     # Add a title
     #if fi.add_title:
-    plt.title(osc_band, fontsize=t_fs, fontweight='bold')
+    plt.title(osc_band, fontsize=t_fs, fontweight='bold', y=1.12)
 
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
@@ -414,7 +414,7 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + osc_band + '_boxplot' + '.' + fi.format
+        save_name = fi.save_path + '107-' + osc_band + '_boxplot' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -490,7 +490,7 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + 'FreqCorr' + '.' + fi.format
+        save_name = fi.save_path + '108-FreqCorr' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -551,7 +551,7 @@ def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, peak_lowgamma, save_ou
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + 'AgePeak' + '.' + fi.format
+        save_name = fi.save_path + '109-AgePeak' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -590,7 +590,7 @@ def plot_age_n_oscs(ages, n_oscs, save_out=False):
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + 'AgeNumberOscillations' + '.' + fi.format
+        save_name = fi.save_path + '110-AgeNumberOscillations' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
 
 
@@ -616,7 +616,7 @@ def plot_osc_profiles(centers_hist, save_out=False):
 
     # 
     ind_lw = 0.5
-    avg_lw = 2
+    avg_lw = 2.5
     alpha = 0.45
 
     # Initialize plot
@@ -660,12 +660,6 @@ def plot_osc_profiles(centers_hist, save_out=False):
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + 'OscillationProfiles' + '.' + fi.format
+        save_name = fi.save_path + '111-OscillationProfiles' + '.' + fi.format
         plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
-
-
-#######################################################################################
-############################ OM - PLTS - MAP COMPARE PLOTS ############################
-#######################################################################################
-
 
