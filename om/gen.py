@@ -9,9 +9,6 @@ import scipy.io as sio
 sys.path.append('/Users/thomasdonoghue/Documents/GitCode/')
 from foof.fit import FOOF
 
-# Import Parallelization Packages
-#from multiprocessing import Pool
-
 ###################################################################################
 ########################## OMEGAMAPPIN - GENERAL CLASSES ##########################
 ###################################################################################
@@ -24,7 +21,7 @@ class OMDB():
         # Check dat_source is acceptable
         pos_sources = ['both', 'OMEGA', 'HCP']
         if dat_source not in pos_sources:
-            raise UnknownDataSource
+            raise UnknownDataSourceError('Source to load data not understood.')
 
         # Save to object which data source is being used
         self.dat_source = dat_source
@@ -213,7 +210,7 @@ class FigInfo():
         self.save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/4-Figures/MegAnalysis/'
         self.format = 'svg'
         self.bbox = 'tight'
-        self.dpi = 600
+        self.dpi = 150
 
 
 ###################################################################################
@@ -579,11 +576,11 @@ def rm_files_ext(files_in):
 ###################################### OM GEN - ERRORS ##################################
 #########################################################################################
 
-class UnknownDataSource(Exception):
+class UnknownDataSourceError(Exception):
     """An Error indicating data source specification is not understood."""
     pass
 
-class UnknownDataType(Exception):
+class UnknownDataTypeError(Exception):
     """An Error indicating data type specification is not understood."""
     pass
 
