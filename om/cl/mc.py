@@ -5,8 +5,13 @@ import numpy as np
 import pandas as pd
 import scipy.io as sio
 import matplotlib.pyplot as plt
-from scipy.stats.stats import pearsonr
+import scipy.stats.stats as sps
+#from scipy.stats.stats import pearsonr
 from om.gen import *
+
+# Import required things from ipyparallel
+from ipyparallel import Client
+from ipyparallel.util import interactive
 
 ###########################################################################################
 ############################ OMEGAMAPPIN - MAP COMPARE CLASSES ############################
@@ -250,24 +255,23 @@ class MapComp():
             n_comps = self.n_genes
             dat_df = self.gene_maps
         else:
-            print("Improper Data Type. Fix it.")
-            return
+            raise UnknownDataTypeError('Data Type not understood.')
 
         # Get the specified meg map
         try:
             meg_map = self.meg_maps[meg_dat]
         except KeyError:
-            print('MEG Data not understood. Fix it.')
+            raise UnknownDataTypeError('MEG Data not understood.')
 
         # Print out status
         print('Calculating corrs between', str(dat_type), 'and', str(meg_dat))
 
-        # Initialize vectors to store correlation results
-        corr_vals = np.zeros([n_comps, 1])
-        p_vals = np.zeros([n_comps, 1])
-
         # Run linearly
         if method is 'linear':
+
+            # Initialize vectors to store correlation results
+            corr_vals = np.zeros([n_comps, 1])
+            p_vals = np.zeros([n_comps, 1])
 
             # Loop through all comparisons to run
             for comp in range(0, n_comps):
@@ -276,23 +280,35 @@ class MapComp():
                 dat = np.array(dat_df.ix[:, comp])
 
                 # Get inds of data that contains numbers
-                inds_non_nan = [i for i in range(len(dat)) if np.isnan(dat[i]) is False]
+                inds_non_nan = [i for i in range(len(dat)) if not np.isnan(dat[i])]
 
                 # Calculate correlation between data and meg map
-                [corr_vals[comp], p_vals[comp]] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
+                [corr_vals[comp], p_vals[comp]] = sps.pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
 
         # Run in parallel
         elif method is 'parallel':
 
-            """ NOTE: parallel method is not yet implemented!
-            Relevant libraries not imported.
-            """
+            # Initialize client & gather workers
+            c = Client()
+            view = c[:]
 
-            # Initialize pool of workers
-            pool = multiprocessing.Pool(processes=4)
+            # Import required libraries for each worker
+            with view.sync_imports():
+                import numpy
+                from scipy.stats.stats import pearsonr
 
-            #
-            out = pool.Map(_corr_par(), dat_in) # _corr_par not yet implemented!
+            # Send data to workers
+            view['meg_map'] = meg_map
+
+            # Turn data into a list
+            dat_list = _make_list(dat_df)
+
+            # Map and get results
+            corr_map = view.map(_run_corr, dat_list)
+            results = corr_map.get()
+
+            # Pull out results
+            [corr_vals, p_vals] = _pull_out_results(results)
 
         # Save correlations results to MapComp object
         self.corrs[dat_type + meg_dat] = corr_vals
@@ -324,7 +340,7 @@ class MapComp():
             names = self.gene_names
             la_str = ' <55'
         else:
-            print("Data type not understood. Fix it.")
+            raise UnknownDataTypeError('Data type not understood.')
 
         # Check that asked for correlations have been computed
         #if not self.corrs[dat_type + meg_dat]:
@@ -398,7 +414,7 @@ class MapComp():
 
         # Otherwise, data type was not understood
         else:
-            print('Data type not understood. Try again.')
+            raise UnknownDataTypeError('Data type not understood.')
 
 
     def plot_corrs(self, dat_type, meg_dat):
@@ -471,7 +487,7 @@ class MapComp():
             save_path = os.path.join(self.corrs_path, dat_type)
             sub_name = self.gene_subj
         else:
-            print("Data type not understood. Fix it.")
+            raise UnknownDataTypeError('Data type not understood.')
 
         # Check that asked for correlations have been computed
         #if not self.corrs[dat_type + meg_dat]:
@@ -1058,3 +1074,51 @@ def _find_last(input_list, wanted):
         # If element is the wanted one, return index
         if el == wanted:
             return len(input_list) - 1 - ind
+
+
+def _make_list(dat_df):
+    """   """
+
+    # Get size of the data to
+    [n_vert, n_dat] = dat_df.shape
+
+    # Initialize list to return
+    out_list = list()
+
+    # Pull each data column into a list entry
+    for i in range(n_dat):
+        out_list.append(np.array(dat_df.ix[:, i]))
+
+    return out_list
+
+
+def _pull_out_results(dat_in):
+    """   """
+
+    # Check length of data
+    n = len(dat_in)
+
+    # Initializ vectors
+    out_1 = np.zeros([n, 1])
+    out_2 = np.zeros([n, 1])
+
+    # Loop through and pull out data
+    for i in range(n):
+        out_1[i] = dat_in[i][0]
+        out_2[i] = dat_in[i][1]
+
+    return out_1, out_2
+
+
+@interactive
+def _run_corr(dat):
+    """   """
+    
+    # Get inds of data that contains numbers
+    inds_non_nan = [i for i in range(len(dat)) if not numpy.isnan(dat[i])]
+
+    # Calculate corr between data and MEG map
+    [corr_vals, p_vals] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
+
+    # Return results
+    return (corr_vals, p_vals)
