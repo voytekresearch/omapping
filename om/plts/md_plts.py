@@ -203,7 +203,7 @@ def plot_all_oscs_single(data, dat_type, title, n_bins=160, size=(15, 5), save_o
         dat_title = 'Bandwidth'
         xlab = 'Bandwidth (Hz)'
     else:
-        raise UnkownDataType
+        raise UnkownDataTypeError('Data type not understood.')
 
     # Set up plot
     fig, ax = plt.subplots(figsize=size)
@@ -402,7 +402,7 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
 
     # Add a title
     #if fi.add_title:
-    plt.title(osc_band, fontsize=t_fs, fontweight='bold', y=1.12)
+    plt.title(osc_band, fontsize=t_fs, fontweight='bold', y=1.08)
 
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
