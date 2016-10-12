@@ -572,6 +572,47 @@ def rm_files_ext(files_in):
     return files_out
 
 
+def get_section(section, nROIs, roi_lr):
+    """Get indices for desired section of ...
+
+    Parameters
+    ----------
+    section : str
+        Which section to get indices for.
+    nROIs : int
+        The number of ROIs.
+    roi_lr : list(str)
+        List of L/R for each ROI.
+    """
+
+    # Set section indices
+    if section is 'all':
+        ind_st_a = ind_st_b = 0
+        ind_en_a = ind_en_b = nROIs
+    elif section is 'left':
+        ind_st_a = ind_st_b = roi_lr.index('L')
+        ind_en_a = ind_en_b = _find_last(roi_lr, 'L')
+    elif section is 'right':
+        ind_st_a = ind_st_b = roi_lr.index('R')
+        ind_en_a = ind_en_b =  _find_last(roi_lr, 'R')
+    elif section is 'lr':
+        ind_st_a = roi_lr.index('L')
+        ind_en_a = _find_last(roi_lr, 'L')
+        ind_st_b = roi_lr.index('R')
+        ind_en_b = _find_last(roi_lr, 'R')
+    elif section is 'rl':
+        ind_st_a = roi_lr.index('R')
+        ind_en_a = _find_last(roi_lr, 'R')
+        ind_st_b = roi_lr.index('L')
+        ind_en_b = _find_last(roi_lr, 'L')
+    else:
+        print('Section range unclear!')
+        ind_st_a = ind_en_a = ind_st_b = ind_en_b = 0
+
+    # Return indices
+    return ind_st_a, ind_en_a, ind_st_b, ind_en_b
+
+
 #########################################################################################
 ###################################### OM GEN - ERRORS ##################################
 #########################################################################################
@@ -653,3 +694,24 @@ def _check_files(path, word, f_l):
     sub_nums = get_sub_nums(files, f_l)
 
     return sub_nums
+
+
+def _find_last(input_list, wanted):
+    """Find the index of the last instance of a wanted element.
+
+    Parameters
+    ----------
+    input_list : list
+        A list to search through.
+    wanted : str
+        The element for which the last index is wanted.
+
+    From here: http://stackoverflow.com/questions/6890170/how-to-find-the-last-occurrence-of-an-item-in-a-python-list
+    """
+
+    # Run through the list, backwards
+    for ind, el in enumerate(reversed(input_list)):
+
+        # If element is the wanted one, return index
+        if el == wanted:
+            return len(input_list) - 1 - ind
