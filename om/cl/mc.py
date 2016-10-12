@@ -417,45 +417,6 @@ class MapComp():
             raise UnknownDataTypeError('Data type not understood.')
 
 
-    def plot_corrs(self, dat_type, meg_dat):
-        """Plot the R and p values of specified correlation results.
-        TODO: NEEDS TO BE MOVED TO MC_PLTS!
-
-        Parameters
-        ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
-        dat_type : str
-            Data type to plot corrs for (Terms or Genes).
-        meg_dat : str
-            Specific meg map to plot corrs for.
-        """
-
-        # Check that asked for correlations have been computed
-        #if not self.corrs[dat_type + meg_dat]:
-        #    print("Those correlations not calculated. Quitting.")
-        #    return
-
-        # Get the specified data
-        meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
-        meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])
-
-        # Initialize subplot figure
-        fig, ax = plt.subplots(1, 2, figsize=(12, 6))
-
-        # Set supertitle for the plot
-        plt.suptitle('Corr Stats for ' + dat_type + ' ' + meg_dat, fontsize=20, fontweight='bold')
-
-        # Plot R values
-        ax[0].plot(meg_corrs, '.')
-        ax[0].set_title('R Values', {'fontsize': 16, 'fontweight': 'bold'})
-        ax[0].set_ylim([-0.5, 0.5])
-
-        # Plot the p values
-        ax[1].plot(meg_p_vals, '.')
-        ax[1].set_title('P Values', {'fontsize': 16, 'fontweight': 'bold'})
-
-
     def save_corrs(self, dat_type, meg_dat, save_as_npz=True, save_as_csv=True):
         """Save out the correlation results.
 
@@ -546,10 +507,10 @@ class MapComp():
 class MapCompROI(MapComp):
     """Class for storing and comparing spatial topographies in ROIs."""
 
-    def __init__(self):
+    def __init__(self, db):
 
         # Inherit from MapComp() class
-        MapComp.__init__(self)
+        MapComp.__init__(self, db)
 
         # Initialize var to store number of ROIs
         self.nROIs = int()
@@ -803,7 +764,7 @@ class MapCompROI(MapComp):
         self.meg_con = _init_meg_map_dict(slopes=False)
 
         # Get section indices to run comparisons
-        ind_st, ind_en, x, x = _get_section(section, self.nROIs, self.roi_lr)
+        ind_st, ind_en, x, x = get_section(section, self.nROIs, self.roi_lr)
 
         # Calculate the meg connectivity data for each oscillation band
         for key in self.meg_con.keys():
@@ -820,7 +781,7 @@ class MapCompROI(MapComp):
 
         # Calculate the correlations between each oscillation and anat data
         for key in meg_stats.keys():
-            meg_stats[key][0], meg_stats[key][1] = pearsonr(
+            meg_stats[key][0], meg_stats[key][1] = sps.pearsonr(
                 self.meg_con[key][np.triu_indices(nROIs_used, 1)],
                 anat_comp[np.triu_indices(nROIs_used, 1)])
 
@@ -837,59 +798,6 @@ class MapCompROI(MapComp):
                 print(key)
                 print('    R value: ', format(self.meg_stats[key][0], '1.4'))
                 print('    P value: ', format(self.meg_stats[key][1], '1.4'))
-
-
-    def plot_mat(self, dat, osc=None, section='all'):
-        """Plot the connectivity matrix.
-        TODO: NEEDS TO BE MOVED TO MC_PLTS!
-
-        Parameters
-        ----------
-        self : MapCompROI() object
-            Object for storing and comparing map data, in ROI format.
-        dat : str
-            Which data type to plot.
-                Options: 'anat', 'meg'
-        osc : str, optional
-            If data is MEG, which oscillation to plot.
-                Options: 'Theta', 'Alpha', 'Beta', 'LowGamma'. Default is None.
-        section : str
-            Which part of the matrix to plot.
-                Options: 'all', 'left', 'right', 'lr', 'rl'
-
-        Notes
-        -----
-        Instead of 'imshow' can also use 'matshow'
-        As in:
-            >> m = ax.matshow(self.anat_con)
-        """
-
-        # Initialize figure
-        f = plt.figure(figsize=[12, 12])
-        ax = f.add_subplot(111)
-
-        # Get indices for section to plot
-        ind_st_a, ind_en_a, ind_st_b, ind_en_b = _get_section(section, self.nROIs, self.roi_lr)
-
-        # Create the figure
-        if dat is 'anat':
-            m = ax.imshow(self.anat_con[ind_st_a:ind_en_a, ind_st_b:ind_en_b],
-                          interpolation='none')
-        elif dat is 'meg':
-            m = ax.imshow(self.meg_con[osc][ind_st_a:ind_en_a, ind_st_b:ind_en_b],
-                          interpolation='none')
-
-        # Add colour bar as a legend
-        f.colorbar(m)
-
-        # Add a title to the plot
-        if dat is 'anat':
-            plt.title('Anatomy Connectivity', fontsize=22, fontweight='bold')
-        elif dat is 'meg':
-            plt.title('MEG Connectivity', fontsize=22, fontweight='bold')
-
-        # Display the figure
-        plt.show()
 
 
 #################################################################################################
@@ -1012,68 +920,6 @@ def _mat_mult(vec):
             out[i, j] = vec[i] * vec[j]
 
     return out
-
-
-def _get_section(section, nROIs, roi_lr):
-    """Get indices for desired section.
-
-    Parameters
-    ----------
-    section : str
-        Which section to get indices for.
-    nROIs : int
-        The number of ROIs.
-    roi_lr : list(str)
-        List of L/R for each ROI.
-    """
-
-    # Set section indices
-    if section is 'all':
-        ind_st_a = ind_st_b = 0
-        ind_en_a = ind_en_b = nROIs
-    elif section is 'left':
-        ind_st_a = ind_st_b = roi_lr.index('L')
-        ind_en_a = ind_en_b = _find_last(roi_lr, 'L')
-    elif section is 'right':
-        ind_st_a = ind_st_b = roi_lr.index('R')
-        ind_en_a = ind_en_b =  _find_last(roi_lr, 'R')
-    elif section is 'lr':
-        ind_st_a = roi_lr.index('L')
-        ind_en_a = _find_last(roi_lr, 'L')
-        ind_st_b = roi_lr.index('R')
-        ind_en_b = _find_last(roi_lr, 'R')
-    elif section is 'rl':
-        ind_st_a = roi_lr.index('R')
-        ind_en_a = _find_last(roi_lr, 'R')
-        ind_st_b = roi_lr.index('L')
-        ind_en_b = _find_last(roi_lr, 'L')
-    else:
-        print('Section range unclear!')
-        ind_st_a = ind_en_a = ind_st_b = ind_en_b = 0
-
-    # Return indices
-    return ind_st_a, ind_en_a, ind_st_b, ind_en_b
-
-
-def _find_last(input_list, wanted):
-    """Find the index of the last instance of a wanted element.
-
-    Parameters
-    ----------
-    input_list : list
-        A list to search through.
-    wanted : str
-        The element for which the last index is wanted.
-
-    From here: http://stackoverflow.com/questions/6890170/how-to-find-the-last-occurrence-of-an-item-in-a-python-list
-    """
-
-    # Run through the list, backwards
-    for ind, el in enumerate(reversed(input_list)):
-
-        # If element is the wanted one, return index
-        if el == wanted:
-            return len(input_list) - 1 - ind
 
 
 def _make_list(dat_df):
