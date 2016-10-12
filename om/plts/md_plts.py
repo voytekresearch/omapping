@@ -264,7 +264,7 @@ def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=
 
     # Plot Settings
     st_fs = fi.t_fs              # Super Title Font Size
-    sp_fs = fi.sp_fs             # Subplit Title Font Size
+    sp_fs = fi.sp_fs             # Subplot Title Font Size
     ax_fs = fi.ax_fs             # Axis Label Font Size
     ti_fs = fi.ti_fs             # Axis ticks font size
     vis_opac = 0.1               # Alpha value for plotted data
