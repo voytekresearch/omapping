@@ -218,7 +218,7 @@ class MegData():
             for band in osc.bands:
 
                 # Get oscillations in specific band
-                self.oscs[band][i, :] = _get_osc(centers_temp, powers_temp, bws_temp, 
+                self.oscs[band][i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
                                                  osc.bands[band][0], osc.bands[band][1])
 
         # Update boolean to note that current subject has band specific oscs calculated.
@@ -226,7 +226,7 @@ class MegData():
 
 
     def save_viz(self):
-        """Saves a matfile of freq info to be loaded with Brainstorm for visualization. 
+        """Saves a matfile of freq info to be loaded with Brainstorm for visualization.
         NOTE: Needs updating for Osc_Dict
         """
 
@@ -317,7 +317,7 @@ class MegData():
         # Loop through each band, calculating peak frequency
         for band in osc.bands:
             self.peaks[band] = _osc_peak(self.centers_all, osc.bands[band][0], osc.bands[band][1], avg)
-        
+
 
     def calc_osc_param_corrs(self):
         """Calculates correlations between oscillatory parameters."""
@@ -352,7 +352,7 @@ class MegData():
         #
         corrs_mat[0, 1], ps_mat[0, 1] = pearsonr(self.centers_all, np.log10(self.powers_all))
         corrs_mat[0, 2], ps_mat[0, 2] = pearsonr(self.centers_all, np.log10(self.bws_all))
-        corrs_mat[1, 2], ps_mat[1, 2] = pearsonr(np.log10(self.powers_all), 
+        corrs_mat[1, 2], ps_mat[1, 2] = pearsonr(np.log10(self.powers_all),
                                                  np.log10(self.bws_all))
 
         corrs_mat = corrs_mat + corrs_mat.T
@@ -431,13 +431,13 @@ class GroupMegData(MegData):
         self.osc_score_done = False
 
 
-    def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, 
+    def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False,
                     add_vertex_oscs=False, add_peak_freqs=False, add_vertex_slopes=False):
         """Adds a new subject to the GroupMegData object.
 
         Parameters
         ----------
-        self : GroupMegData() object. 
+        self : GroupMegData() object.
             Object to store map data across a group of subjects.
         new_subj : MegData() Object
             MEG subject (instance of MegData)
@@ -689,7 +689,7 @@ class GroupMegData(MegData):
         for i in range(n_bands):
             for j in range(n_bands):
                 corrs_mat[i, j], ps_mat[i, j] = pearsonr(
-                    dat[sorted_bands[sort_inds[i]]], 
+                    dat[sorted_bands[sort_inds[i]]],
                     dat[sorted_bands[sort_inds[j]]])
 
         # xx
@@ -726,7 +726,7 @@ class GroupMegData(MegData):
                  ['Beta-LG'    , r_be_lg, p_be_lg]]
 
         # Save corrs out in a matrix
-        corrs_mat = np.array([[0, r_th_al, r_th_be, r_th_lg], [r_th_al, 0, r_al_be, r_al_lg], 
+        corrs_mat = np.array([[0, r_th_al, r_th_be, r_th_lg], [r_th_al, 0, r_al_be, r_al_lg],
                               [r_th_be, r_al_be, 0, r_be_lg], [r_th_lg, r_al_lg, r_be_lg, 0]])
 
         return corrs, corrs_mat
@@ -801,7 +801,7 @@ class GroupMegData(MegData):
         for i in range(n_bands):
             for j in range(n_bands):
                 corrs_mat[i, j], ps_mat[i, j] = pearsonr(
-                    self.osc_scores[sorted_bands[sort_inds[i]]], 
+                    self.osc_scores[sorted_bands[sort_inds[i]]],
                     self.osc_scores[sorted_bands[sort_inds[j]]])
 
         #
@@ -837,12 +837,12 @@ class GroupMegData(MegData):
                  ['Beta-LG'    , r_be_lg, p_be_lg]]
 
         # Save corrs out in a matrix
-        corrs_mat = np.array([[0, r_th_al, r_th_be, r_th_lg], [r_th_al, 0, r_al_be, r_al_lg], 
+        corrs_mat = np.array([[0, r_th_al, r_th_be, r_th_lg], [r_th_al, 0, r_al_be, r_al_lg],
                               [r_th_be, r_al_be, 0, r_be_lg], [r_th_lg, r_al_lg, r_be_lg, 0]])
-        
 
         return corrs, corrs_mat
         """
+
 
     def save_osc_score(self, file_name):
         """Save out the oscillation score as an npz file.
@@ -863,7 +863,7 @@ class GroupMegData(MegData):
 
 
     def set_score_viz(self):
-        """Saves a matfile (of oscillation scores) to be loaded with Brainstorm for visualization. """
+        """Saves a matfile (of oscillation scores) to be loaded for visualization. """
 
         # Set up paths to save to
         save_name = 'Group_Osc_Score_Viz'
@@ -1020,8 +1020,8 @@ def print_corrs_mat(rs_mat, ps_mat, labels):
                 continue
 
             print('Corr of ', '{:16}'.format(labels[x]+'-'+labels[y]),
-                  ' is ', '{:+1.4f}'.format(rs_mat[x,y]), '    with p-val of ', 
-                  '{:1.5f}'.format(ps_mat[x,y]))
+                  ' is ', '{:+1.4f}'.format(rs_mat[x, y]), '    with p-val of ',
+                  '{:1.5f}'.format(ps_mat[x, y]))
 
 
 def print_corrs_vec(rs_vec, ps_vec, labels, desc):
@@ -1032,9 +1032,9 @@ def print_corrs_vec(rs_vec, ps_vec, labels, desc):
 
     #
     for x in range(n):
-        print('Corr of ', '{:20}'.format(labels[x]+'-'+desc),
-                  ' is ', '{:+1.4f}'.format(rs_vec[x]), '    with p-val of ', 
-                  '{:1.5f}'.format(ps_vec[x]))
+        print('Corr of ', '{:20}'.format(labels[x]+'-'+desc),' is ',
+              '{:+1.4f}'.format(rs_vec[x]), '    with p-val of ',
+              '{:1.5f}'.format(ps_vec[x]))
 
 
 def save_md_pickle(obj, save_name):
@@ -1268,9 +1268,9 @@ def _osc_prob(osc_mat):
 def _osc_pow_ratio(osc_mat):
     """Calculate the power ratio of an oscillation.
 
-    Power ratio is a score, bounded between [0, 1], reflecting power 
-    in a given freqeuncy band, relative to the max power in that 
-    frequency band. Max power is 
+    Power ratio is a score, bounded between [0, 1], reflecting power
+    in a given freqeuncy band, relative to the max power in that
+    frequency band. Max power is ...
 
     Parameters
     ----------
@@ -1354,36 +1354,36 @@ def _band_sort(osc_bands):
 
     Parameters
     ----------
-    osc_bands : ?
-        xx
+    osc_bands : dict
+        A dictionary containing the oscillation band definitions.
 
     Returns
     -------
-    ordered_bands : ?
-        xx
-    sort_inds : ?
-        xx
+    ordered_bands : list(str)
+        A list of the oscillation band names, in order.
+    sort_inds : list(int)
+        A list of indices that ...
     """
-    
+
     # Check how many oscillation bands there are
     n_bands = len(osc_bands)
-    
+
     # Get low end for each band
     band_names = []
     lower_bounds = np.array([])
-    
-    # 
+
+    # xx
     for band in osc_bands:
         band_names.append(band)
         lower_bounds = np.append(lower_bounds, osc_bands[band][0])
-        
+
     #
     sort_inds = np.argsort(lower_bounds)
-    
+
     #
     ordered_bands = []
     ordered_bands[:] = [band_names[i] for i in sort_inds]
-    
+
     return ordered_bands, sort_inds
 
 

@@ -123,7 +123,7 @@ class OMDB():
 
         # Settings
         word = 'Res'
-        
+
         # Set up which files to look for
         if res_type is 'md':
             dat_path = self.md_save_path
@@ -171,15 +171,15 @@ class Osc_Dict():
 
     def __init__(self, input_bands=None):
 
-        # If supplied, use the given dictionary of oscillation bands. 
+        # If supplied, use the given dictionary of oscillation bands.
         if input_bands:
             self.bands = input_bands
 
         # Otherwise, use the default oscillation bands.
         else:
-            self.bands = dict({'Theta': (3, 8), 
-                               'Alpha': (8, 13), 
-                               'Beta': (13, 30), 
+            self.bands = dict({'Theta': (3, 8),
+                               'Alpha': (8, 13),
+                               'Beta': (13, 30),
                                'LowGamma': (30, 40)})
 
 
@@ -194,8 +194,9 @@ class Osc_Dict():
             The lower and upper frequency limit of the band.
         """
 
-        self.bands[band_name] = band_lims 
-        
+        self.bands[band_name] = band_lims
+
+
     def rm_band(self, old_band):
         """Remove a previously defined oscillation band.
 
@@ -352,7 +353,7 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
     Parameters
     ----------
     psd_ext : 2d array
-        Matrix of PSDs in the form of [nVerts, nFreqs].
+        Matrix of PSDs in the form of [n_verts, n_freqs].
     freqs_ext : 1d array
         Vector of the frequency values for each power value in psd_ext.
     min_p : float
@@ -372,7 +373,7 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
     """
 
     # Check how many PSDs there are
-    [nPSDs, nFreqs] = np.shape(psd_ext)
+    [nPSDs, n_freqs] = np.shape(psd_ext)
 
     # Initialize foof
     foof = FOOF(min_p=min_p, res=freq_res, fmin=freqs_ext.min(), fmax=freqs_ext.max())
@@ -439,7 +440,7 @@ def save_foof_csv(results, save_path, sub_num):
     i_bw = 3
 
     #
-    nVert = len(results)
+    n_verts = len(results)
 
     #
     csv_sl_fname = save_path + '/csv/' + str(sub_num) + '_Slopes.csv'
@@ -450,16 +451,16 @@ def save_foof_csv(results, save_path, sub_num):
     osc_csv = open(csv_osc_fname, 'w')
 
     #
-    for vert in range(0, nVert):
+    for vert in range(0, n_verts):
 
         #
         sl_csv.write(str(results[vert][0]) + '\n')
 
         #
-        nOscs = len(results[vert][1])
+        n_oscs = len(results[vert][1])
 
         #
-        for osc in range(0, nOscs):
+        for osc in range(0, n_oscs):
 
             cur_osc_dat = list([vert + 1, results[vert][i_cen][osc],
                                 results[vert][i_amp][osc], results[vert][i_bw][osc]])
@@ -595,14 +596,14 @@ def rm_files_ext(files_in):
     return files_out
 
 
-def get_section(section, nROIs, roi_lr):
+def get_section(section, n_ROIs, roi_lr):
     """Get indices for desired section of ...
 
     Parameters
     ----------
     section : str
         Which section to get indices for.
-    nROIs : int
+    n_ROIs : int
         The number of ROIs.
     roi_lr : list(str)
         List of L/R for each ROI.
@@ -611,13 +612,13 @@ def get_section(section, nROIs, roi_lr):
     # Set section indices
     if section is 'all':
         ind_st_a = ind_st_b = 0
-        ind_en_a = ind_en_b = nROIs
+        ind_en_a = ind_en_b = n_ROIs
     elif section is 'left':
         ind_st_a = ind_st_b = roi_lr.index('L')
         ind_en_a = ind_en_b = _find_last(roi_lr, 'L')
     elif section is 'right':
         ind_st_a = ind_st_b = roi_lr.index('R')
-        ind_en_a = ind_en_b =  _find_last(roi_lr, 'R')
+        ind_en_a = ind_en_b = _find_last(roi_lr, 'R')
     elif section is 'lr':
         ind_st_a = roi_lr.index('L')
         ind_en_a = _find_last(roi_lr, 'L')

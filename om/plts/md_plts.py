@@ -37,11 +37,11 @@ def plot_slopes(slopes, title, save_out=False):
     # Add title
     if fi.add_title:
         plt.title('Slopes - ' + title, {'fontsize': t_fs, 'fontweight': 'bold'})
-    
+
     # Add axis labels
     plt.xlabel('Chi Parameter', {'fontsize': ax_fs, 'fontweight': 'bold'})
     plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
-    
+
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
@@ -79,7 +79,7 @@ def plot_hist_count(osc_count, save_out=False):
     # Add title
     if fi.add_title:
         plt.title('# Oscillations per Vertex', {'fontsize': t_fs, 'fontweight': 'bold'})
-    
+
     # Add axis labels
     plt.xlabel('# Oscillations', {'fontsize': ax_fs, 'fontweight': 'bold'})
     plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
@@ -128,7 +128,7 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
     # Set plot super-title
     if fi.add_title:
         plt.suptitle('Distributions of Oscillatory Parameters - ' + title,
-                      fontsize=st_fs, fontweight='bold')
+                     fontsize=st_fs, fontweight='bold')
 
     # Subplot 1 - Center Frequency
     ax[0].hist(centers_all, n_bins)
@@ -315,7 +315,7 @@ def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=
 
 
 def plot_band_corr_matrix(corr_dat, save_out=False):
-    """Plot the correlation 
+    """Plot the correlation ...
 
     Parameters
     ----------
@@ -456,7 +456,7 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
 
     # Add marker for significance
     for i, p in enumerate(p_vec):
-        
+
         # Add a marker if passes Bonferroni corrected p-value
         if p < 0.05/len(p_vec):
             ax.plot(fs[i], corr_vec[i], 'ro', alpha=p_alpha, markersize=p_size)
@@ -573,7 +573,6 @@ def plot_age_n_oscs(ages, n_oscs, save_out=False):
 
     # Plot settings
     t_fs = fi.t_fs
-    ax_fs = fi.ax_fs
     ti_fs = fi.ti_fs         # Axis ticks font size
 
     # Make the plot
@@ -581,7 +580,7 @@ def plot_age_n_oscs(ages, n_oscs, save_out=False):
 
     # Add title
     if fi.add_title:
-        plt.title('# Oscillations / Age', fontsize=20, fontweight='bold')
+        plt.title('# Oscillations / Age', fontsize=t_fs, fontweight='bold')
 
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
@@ -608,13 +607,13 @@ def plot_osc_profiles(centers_hist, save_out=False):
     # Get FigInfo
     fi = FigInfo()
 
-    # Plot settings 
+    # Plot settings
     t_fs = fi.t_fs
     ax_fs = fi.ax_fs
     ti_fs = fi.ti_fs         # Axis ticks font size
     ax_lw = fi.ax_lw
 
-    # 
+    # xx
     ind_lw = 0.5
     avg_lw = 2.5
     alpha = 0.45
@@ -624,11 +623,11 @@ def plot_osc_profiles(centers_hist, save_out=False):
 
     # Initialize a frequency vector for the x-axis
     freqs = np.arange(3.125, 40.125, 0.25)
-    
+
     # Loop through all subjects, adding profile to plot
     for h in centers_hist:
         ax.plot(freqs, h, linewidth=ind_lw, alpha=alpha)
-    
+
     # Add the average profile
     ax.plot(freqs, np.median(centers_hist, 0), 'k', linewidth=avg_lw)
 

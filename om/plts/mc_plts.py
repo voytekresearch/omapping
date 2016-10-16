@@ -88,7 +88,7 @@ def plot_con_mat(dat, section, roi_lr, save_out=False):
     ax = f.add_subplot(111)
 
     # Create the figure
-    m = ax.imshow(dat[ind_st_a:ind_en_a, ind_st_b:ind_en_b], 
+    m = ax.imshow(dat[ind_st_a:ind_en_a, ind_st_b:ind_en_b],
                   interpolation='none')
 
     # Add title

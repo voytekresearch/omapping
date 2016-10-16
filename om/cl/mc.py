@@ -4,14 +4,13 @@ import csv
 import numpy as np
 import pandas as pd
 import scipy.io as sio
-import matplotlib.pyplot as plt
 import scipy.stats.stats as sps
-#from scipy.stats.stats import pearsonr
-from om.gen import *
-
-# Import required things from ipyparallel
+import matplotlib.pyplot as plt
 from ipyparallel import Client
 from ipyparallel.util import interactive
+
+# Import custom om code
+from om.gen import *
 
 ###########################################################################################
 ############################ OMEGAMAPPIN - MAP COMPARE CLASSES ############################
@@ -813,7 +812,7 @@ def _get_map_names(names_file, path):
     names_file : str
         File name to pull the map names from.
     path : str
-        Path of where the file is. 
+        Path of where the file is.
 
     Returns
     -------
@@ -959,7 +958,7 @@ def _pull_out_results(dat_in):
 @interactive
 def _run_corr(dat):
     """   """
-    
+
     # Get inds of data that contains numbers
     inds_non_nan = [i for i in range(len(dat)) if not numpy.isnan(dat[i])]
 
