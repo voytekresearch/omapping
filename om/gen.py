@@ -105,6 +105,7 @@ class OMDB():
 
         return sub_nums, source
 
+
     def check_res_files(self, res_type, verbose=True):
         """Checks what result files are available.
 
@@ -143,7 +144,9 @@ class OMDB():
 
 
 class Osc():
-    """Class to store oscillations parameters."""
+    """Class to store oscillations parameters.
+    NOTE: Old format. Currently being updated.
+    """
 
     def __init__(self):
 
@@ -163,13 +166,8 @@ class Osc():
         self.lowgamma_low = 30
         self.lowgamma_high = 40
 
-"""
-TODO: Update Osc and everything that calls it to use a more flexible dictionary mapping. 
-This is so it's much easier to change / add / remove oscillation bands. 
 
-Something like: 
-
-class Osc():
+class Osc_Dict():
 
     def __init__(self, input_bands=None):
 
@@ -183,7 +181,32 @@ class Osc():
                                'Alpha': (8, 13), 
                                'Beta': (13, 30), 
                                'LowGamma': (30, 40)})
-"""
+
+
+    def add_band(self, band_name, band_lims):
+        """Add a new oscillation band definition.
+
+        Parameters
+        ----------
+        band_name : str
+            The name of the new oscillation band.
+        band_lims : tuple(float, float)
+            The lower and upper frequency limit of the band.
+        """
+
+        self.bands[band_name] = band_lims 
+        
+    def rm_band(self, old_band):
+        """Remove a previously defined oscillation band.
+
+        Parameters
+        ----------
+        old_band : str
+            Band name to remove from oscillation band definitions.
+        """
+
+        self.bands.pop(old_band)
+
 
 class FigInfo():
     """Object to hold settings to save figures. """
@@ -623,6 +646,14 @@ class UnknownDataSourceError(Exception):
 
 class UnknownDataTypeError(Exception):
     """An Error indicating data type specification is not understood."""
+    pass
+
+class InconsistentDataError(Exception):
+    """An Error indicating there is a fatal inconsistency in data."""
+    pass
+
+class DataNotComputedError(Exception):
+    """An Error indicating some required data has not been computed."""
     pass
 
 ########################################################################################
