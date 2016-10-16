@@ -1,4 +1,8 @@
 % Load PSD data and set to visualize
+% TODO: 
+%   1) Currently assumes default oscillation bands. 
+%       Should update to use whatever bands are found in load file.
+%   2) Figure out channel data plotting.
 
 %% Set Up
 
@@ -11,7 +15,7 @@ bst_path = '/Users/thomasdonoghue/Documents/brainstorm_db/om_viz/data/om_viz_sub
 
 %% Load FOOF Data - Oscillation Frequencies
 
-subj = 390845;
+subj = 559176;
 filename = [num2str(subj), '_Foof_Viz.mat'];
 
 % Load FOOF Data
@@ -19,7 +23,7 @@ load([datapath, filename]);
 %clear filename datapath
 
 %
-foof_dat = {slopes, thetas, alphas, betas, lowgammas};
+foof_dat = {slopes, theta, alpha, beta, lowgamma};
 foof_labels = {['Slopes_', num2str(subj)], ['Thetas_', num2str(subj)], ...
     ['Alphas_', num2str(subj)], ['Betas_', num2str(subj)], ['LowGammas_', num2str(subj)]};
 
@@ -32,7 +36,7 @@ filename = 'Group_Osc_Prob_Viz.mat';
 
 % Load Group osc-prob data
 load([datapath, filename])
-foof_dat = {[], theta_prob, alpha_prob, beta_prob, lowgamma_prob};
+foof_dat = {[], theta_prob', alpha_prob', beta_prob', lowgamma_prob'};
 foof_labels = {'xx', 'Theta_Prob', 'Alpha_Prob', 'Beta_Prob', 'LowGamma_Prob'};
 
 disp('Data Loaded')
@@ -44,7 +48,7 @@ filename = 'Group_Osc_Score_viz.mat';
 
 % Load Grop osc-score data
 load([datapath, filename])
-foof_dat = {[], theta_score, alpha_score, beta_score, lowgamma_score};
+foof_dat = {[], theta_score', alpha_score', beta_score', lowgamma_score'};
 foof_labels = {'xx', 'Theta_Score', 'Alpha_Score', 'Beta_Score', 'LowGamma_Score'};
 
 disp('Data Loaded')
@@ -56,7 +60,7 @@ filename = 'Group_Slopes.mat';
 
 % Load Slope data
 load([datapath, filename]);
-foof_dat = {chis};
+foof_dat = {slopes};
 foof_labels = {'Slopes'};
 
 disp('Data Loaded');
@@ -71,7 +75,7 @@ for i = 1:length(foof_dat)
     
     % Set data
     Time = 0;
-    ImageGridAmp = foof_dat{i}';
+    ImageGridAmp = foof_dat{i};
     Comment = foof_labels{i};
 
     % Save bst 
