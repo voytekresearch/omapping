@@ -342,22 +342,30 @@ class MegData():
         return corrs_mat, ps_mat, labels
 
 
-    def save_viz(self):
-        """Saves a matfile of freq info to be loaded with Brainstorm for visualization.
-        NOTE: Needs updating for Osc_Dict().
-        """
+    def set_foof_viz(self):
+        """Saves a matfile of freq info to be loaded with Brainstorm for visualization."""
 
         # Set up paths to save to
         save_name = str(self.subnum) + '_Foof_Viz'
         save_file = os.path.join(self.viz_path, save_name)
 
-        # Save desired outputs into a dictionary
+        # Initialzie dictionary, save basic information and slope data
         save_dict = {}
+        save_dict['subnum'] = self.subnum
+        save_dict['dat_source'] = self.dat_source
+        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         save_dict['slopes'] = self.slopes
+
+        # Save out oscillation data
+        for band in self.bands:
+            save_dict[band.lower()] = self.oscs[band]
+
+        """OLD:
         save_dict['thetas'] = self.thetas
         save_dict['alphas'] = self.alphas
         save_dict['betas'] = self.betas
         save_dict['lowgammas'] = self.lowgammas
+        """
 
         # Save the dicionary out to a .mat file
         sio.savemat(save_file, save_dict)
@@ -906,54 +914,66 @@ class GroupMegData(MegData):
         return corr_vec, p_vec
 
 
-    def save_gr_slope(self, save_out=False, file_name=None, set_viz=False):
+    def save_gr_slope(self, file_name):
         """Saves out the average group slope results.
-
-        NOTE: UPDATE CHIS SAVE NAME, NEED TO CHECK WHAT LOADS THESE FILES.
 
         Parameters
         ----------
         self : GroupMegData() object.
             Object to store map data across a group of subjects.
-        save_out : boolean, optional
-            Whether to save out npz file of average slope values.
         file_name : str
             File name to save group slope file as.
-        set_viz : boolean, optional
-            Whether to save out mat file for visualization in matlab.
         """
 
-        # Save map out, if required
-        if save_out:
+        # Set up
+        npz_file_name = file_name + '.npz'
+        npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
 
-            # Set up
-            npz_file_name = file_name + '.npz'
-            npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
+        # Check current time for when file is saved
+        cur_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-            # Save out an npz file
-            np.savez(npz_save_name, chis=self.slopes_gr_avg, n_subjs=self.n_subjs)
+        # Save out an npz file
+        np.savez(npz_save_name, dat_source=self.dat_source, slopes=self.slopes_gr_avg, 
+                 n_subjs=self.n_subjs, save_time=cur_time)
 
-        # Save out as matfile for visualization with matlab, if required
-        if set_viz:
 
-            # Set up paths to save to
-            save_name = 'Group_Slopes'
-            save_file = os.path.join(self.viz_path, save_name)
+    def save_map(self, dat_type, file_name):
+        """Save oscillation map data out to disc.
 
-            # Save desired outputs into a dictionary
-            save_dict = {}
-            save_dict['chis'] = self.slopes_gr_avg
-            save_dict['dat_source'] = self.dat_source
-            save_dict['n_subjs'] = self.n_subjs
-            save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        Parameters
+        ----------
+        self : GroupMegData() object.
+            Object to store map data across a group of subjects.
+        dat_type : str
+            Which map data type to save out.
+                Options: {'prob', 'score'}
+        file_name : str
+            String to add to the file name.
+        """
 
-            # Save the dicionary out to a .mat file
-            sio.savemat(save_file, save_dict)
+        # Set data type
+        if dat_type is 'prob':
+            dat = self.osc_probs
+        elif dat_type is 'score':
+            dat = self.osc_scores
+        else:
+            raise UnknownDataTypeError('Map type not understood.')
+
+        # Check current time for when file is saved
+        cur_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        # Set file name, and create full file path
+        npz_file_name = file_name + '_' + dat_type + '.npz'
+        npz_save_name = os.path.join(self.maps_path, 'Oscs', npz_file_name)
+
+        # Save out data
+        np.savez(npz_save_name, dat_source=self.dat_source, dat_type=dat_type, 
+                 osc_dat=dat, n_subjs = self.n_subjs, save_time=cur_time)
 
 
     def save_osc_score(self, file_name):
         """Save out the oscillation score as an npz file.
-        NOTE: Needs updating for Osc_Dict().
+        NOTE: OLD - replaced by save_map
 
         Parameters
         ----------
@@ -970,9 +990,65 @@ class GroupMegData(MegData):
                  osc_score_beta=self.beta_score, osc_score_lowgamma=self.lowgamma_score)
 
 
+    def set_slope_viz(self):
+        """Saves out a matfile, of the group average slope, for visualization."""
+
+        # Set up paths to save to
+        save_name = 'Group_Slopes'
+        save_file = os.path.join(self.viz_path, save_name)
+
+        # Save desired outputs into a dictionary
+        save_dict = {}
+        save_dict['slopes'] = self.slopes_gr_avg
+        save_dict['dat_source'] = self.dat_source
+        save_dict['n_subjs'] = self.n_subjs
+        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        # Save the dicionary out to a .mat file
+        sio.savemat(save_file, save_dict)
+
+
+    def set_map_viz(self, dat_type):
+        """Set an oscillation map for visualization with Brainstorm.
+
+        Parameters
+        ----------
+        dat_type : str
+            Which map data type to set as viz.
+                Options: {'prob', 'score'}
+        """
+
+        # Set data type
+        if dat_type is 'prob':
+            save_name = 'Group_Osc_Prob_Viz'
+            dat = self.osc_probs
+        elif dat_type is 'score':
+            dat = self.osc_scores
+            save_name = 'Group_Osc_Score_Viz'
+        else:
+            raise UnknownDataTypeError('Map type not understood.')
+
+        # Set up paths to save to
+        save_file = os.path.join(self.viz_path, save_name)
+
+        # Initialize dictionary to save out, and save basic info
+        save_dict = {}
+        save_dict['dat_source'] = self.dat_source
+        save_dict['dat_type'] = dat_type
+        save_dict['n_subjs'] = self.n_subjs
+        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        # Add maps to save dictionary
+        for band in self.bands:
+            save_dict[band.lower() + '_' + dat_type] = dat[band]
+
+        # Save out the dictionary to a mat file
+        sio.savemat(save_file, save_dict)
+
+
     def set_score_viz(self):
         """Saves a matfile (of oscillation scores) to be loaded for visualization.
-        NOTE: Needs updating for Osc_Dict().
+        NOTE: OLD - REPLACED BY set_map_viz
         """
 
         # Set up paths to save to
@@ -995,7 +1071,7 @@ class GroupMegData(MegData):
 
     def set_prob_viz(self):
         """Saves out a matfile (of osc probs) to be loaded with Brainstorm for visualization.
-        NOTE: Needs updating for Osc_Dict().
+        NOTE: OLD - REPLACED BY set_map_viz
         """
 
         # Set up paths to save to
