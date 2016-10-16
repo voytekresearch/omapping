@@ -48,11 +48,14 @@ class MegData():
         # Initialize list to store all centers histogram
         self.centers_hist = []
 
-        # Initialize arrays for oscillation bands
-        self.thetas = np.array([])
-        self.alphas = np.array([])
-        self.betas = np.array([])
-        self.lowgammas = np.array([])
+        # Initialize dictionary to store osc bands - NEW
+        self.bands = dict()
+
+        # Initialize dictionary for oscillation bands - NEW
+        self.oscs = dict()
+
+        # Initialize dictionary for peak frequencies - NEW
+        self.peaks = dict()
 
         # Set plot title
         self.title = ''
@@ -69,7 +72,14 @@ class MegData():
         # Initialize oscillation count
         self.osc_count = int()
 
-        # Initialize peak frequency variables
+
+        # Initialize arrays for oscillation bands - OLD
+        self.thetas = np.array([])
+        self.alphas = np.array([])
+        self.betas = np.array([])
+        self.lowgammas = np.array([])
+
+        # Initialize peak frequency variables - OLD
         self.peak_theta = np.array([])
         self.peak_alpha = np.array([])
         self.peak_beta = np.array([])
@@ -144,7 +154,7 @@ class MegData():
         self.has_data = True
 
 
-    def osc_bands_vertex(self, osc):
+    def osc_bands_vertex(self, osc, avg='mean'):
         """Groups oscillations at each vertex in distinct frequency bands.
         Stores band specific oscillations in (self.){thetas, alphas, betas, lowgammas}.
 
@@ -154,8 +164,11 @@ class MegData():
             MegData object.
         osc : Osc object
             An object containing frequency bands to use.
+        avg : str, optional
+            How to average to calculate peak frequencies.
+                Options: {'mean', 'median'}
         """
-
+        """
         ## Re-Initialize matrices to right size to save results
         self.thetas = np.zeros([self.n_PSDs, 4])
         self.alphas = np.zeros([self.n_PSDs, 4])
@@ -182,10 +195,40 @@ class MegData():
 
         # Update boolean to note that current subject has band specific oscs calculated.
         self.bands_vertex = True
+        """
+
+        ## NEW VERSION
+
+        # Save bands used
+        self.bands = osc.bands
+
+        # Initialize matrices to store oscillations in each band
+        for band in osc.bands:
+            self.oscs[band] = np.zeros([self.n_PSDs, 4])
+
+        # Loop through each vertex
+        for i in range(self.n_PSDs):
+
+            # Get centers, powers and bws from individual vertex
+            centers_temp = self.centers[i, :]
+            powers_temp = self.powers[i, :]
+            bws_temp = self.bws[i, :]
+
+            # Loop through each oscillation band
+            for band in osc.bands:
+
+                # Get oscillations in specific band
+                self.oscs[band][i, :] = _get_osc(centers_temp, powers_temp, bws_temp, 
+                                                 osc.bands[band][0], osc.bands[band][1])
+
+        # Update boolean to note that current subject has band specific oscs calculated.
+        self.bands_vertex = True
 
 
     def save_viz(self):
-        """Saves a matfile of freq info to be loaded with Brainstorm for visualization. """
+        """Saves a matfile of freq info to be loaded with Brainstorm for visualization. 
+        NOTE: Needs updating for Osc_Dict
+        """
 
         # Set up paths to save to
         save_name = str(self.subnum) + '_Foof_Viz'
@@ -261,16 +304,25 @@ class MegData():
                 Options: {'mean', 'median'}
         """
 
+        """
         # Get peak frequency within each frequency band
         self.peak_theta = _osc_peak(self.centers_all, osc.theta_low, osc.theta_high, avg)
         self.peak_alpha = _osc_peak(self.centers_all, osc.alpha_low, osc.alpha_high, avg)
         self.peak_beta = _osc_peak(self.centers_all, osc.beta_low, osc.beta_high, avg)
         self.peak_lowgamma = _osc_peak(self.centers_all, osc.lowgamma_low, osc.lowgamma_high, avg)
+        """
 
+        ## NEW VERSION
+
+        # Loop through each band, calculating peak frequency
+        for band in osc.bands:
+            self.peaks[band] = _osc_peak(self.centers_all, osc.bands[band][0], osc.bands[band][1], avg)
+        
 
     def calc_osc_param_corrs(self):
         """Calculates correlations between oscillatory parameters."""
 
+        """
         # Calculate correlations: Centers vs. Bandwidth
         corr_cen_bw, pcorr_cen_bw = pearsonr(self.centers_all, np.log10(self.bws_all))
 
@@ -286,6 +338,27 @@ class MegData():
                  ['B.W. - Power '   , corr_bw_pow , pcorr_bw_pow ]]
 
         return corrs
+        """
+
+        #### NEW
+
+        labels = ['Centers', 'Powers', 'Bandwidths']
+
+        n = len(labels)
+
+        corrs_mat = np.zeros([n, n])
+        ps_mat = np.zeros([n, n])
+
+        #
+        corrs_mat[0, 1], ps_mat[0, 1] = pearsonr(self.centers_all, np.log10(self.powers_all))
+        corrs_mat[0, 2], ps_mat[0, 2] = pearsonr(self.centers_all, np.log10(self.bws_all))
+        corrs_mat[1, 2], ps_mat[1, 2] = pearsonr(np.log10(self.powers_all), 
+                                                 np.log10(self.bws_all))
+
+        corrs_mat = corrs_mat + corrs_mat.T
+        ps_mat = ps_mat + ps_mat.T
+
+        return corrs_mat, ps_mat, labels
 
 
 class GroupMegData(MegData):
@@ -295,47 +368,62 @@ class GroupMegData(MegData):
     Note: Class derived from MegData
     """
 
-    def __init__(self, db):
+    def __init__(self, db, osc):
 
-        #
+        # Initialize from MegData() object
         MegData.__init__(self, db)
 
         # Initialize groups subject variables
         self.n_subjs = int()
         self.subjs = []
 
-        #
+        # Set definition of oscillation bands used for the group
+        self.bands = osc.bands
+
+        # Initialize count of total oscillations, across all subjects
         self.n_oscs_tot = int()
 
         # Set title for plots
         self.title = 'Group'
 
-        # Initialize matrices for osc-band data
+        # Initialize matrices for oscillation band data - OLD
         self.gr_thetas = np.array([])
         self.gr_alphas = np.array([])
         self.gr_betas = np.array([])
         self.gr_lowgammas = np.array([])
 
-        # Initialize to store oscillation probabilities
+        # Initialize dictionary for oscillation band data - NEW
+        self.gr_oscs = dict()
+
+        # Initialize to store oscillation probabilities - OLD
         self.theta_prob = np.array([])
         self.alpha_prob = np.array([])
         self.beta_prob = np.array([])
         self.lowgamma_prob = np.array([])
 
-        # Initialize to store oscillation power ratios
+        # Initilaize dictionary to store oscillation probabilities - NEW
+        self.osc_probs = dict()
+
+        # Initialize to store oscillation power ratios - OLD
         self.theta_pow_ratio = np.array([])
         self.alpha_pow_ratio = np.array([])
         self.beta_pow_ratio = np.array([])
         self.lowgamma_pow_ratio = np.array([])
 
-        # Initialize to store oscillation scores
+        # Initialize dict to store oscillation power ratios
+        self.osc_pow_ratios = dict()
+
+        # Initialize to store oscillation scores - OLD
         self.theta_score = np.array([])
         self.alpha_score = np.array([])
         self.beta_score = np.array([])
         self.lowgamma_score = np.array([])
 
+        # Initialize to store oscillation scores - NEW
+        self.osc_scores = dict()
+
         # Initialize vars to store slope values
-        self.gr_chis = np.array([])
+        self.vert_slopes = np.array([])
         self.slopes_avg = np.array([])
 
         # Set booleans for what has been run
@@ -344,7 +432,7 @@ class GroupMegData(MegData):
 
 
     def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False, 
-                    add_vertex_oscs=False, add_vertex_slopes=False):
+                    add_vertex_oscs=False, add_peak_freqs=False, add_vertex_slopes=False):
         """Adds a new subject to the GroupMegData object.
 
         Parameters
@@ -354,13 +442,15 @@ class GroupMegData(MegData):
         new_subj : MegData() Object
             MEG subject (instance of MegData)
         add_all_oscs : boolean, optional
-            XX
+            Whether to add the vectors of all oscillations, collapsed across vertices.
         add_vertex_bands : boolean, optional
-            XX
+            Whether to add the oscillation band data, across vertices.
         add_vertex_oscs : boolean, optional
-            XX
+            Whether to add all oscillations, across vertices.
+        add_peak_freqs : boolean, optional
+            Whether to add peak frequencies.
         add_vertex_slopes : boolean, optional
-            xx
+            Whether to add the slopes.
         """
 
         # Check if subject has data
@@ -383,7 +473,8 @@ class GroupMegData(MegData):
             self.n_oscs = np.append(self.n_oscs, new_subj.n_oscs)
             self.n_oscs_tot = len(self.centers_all)
 
-        # Add band-specific data
+        """
+        # Add band-specific data - OLD
         if add_vertex_bands:
 
             if self.n_subjs == 0:
@@ -396,6 +487,21 @@ class GroupMegData(MegData):
                 self.gr_alphas = np.dstack([self.gr_alphas, new_subj.alphas])
                 self.gr_betas = np.dstack([self.gr_betas, new_subj.betas])
                 self.gr_lowgammas = np.dstack([self.gr_lowgammas, new_subj.lowgammas])
+        """
+
+        # Add band-specific data - NEW
+        if add_vertex_bands:
+
+            # Check that new subject has same bands defined
+            if not set(self.bands) == set(new_subj.bands):
+                raise InconsistentDataError('Oscillation bands are inconsistent.')
+
+            # Add new subject to group oscillations
+            if self.n_subjs == 0:
+                self.gr_oscs = new_subj.oscs
+            else:
+                for band in self.bands:
+                    self.gr_oscs[band] = np.dstack([self.gr_oscs[band], new_subj.oscs[band]])
 
         #
         if add_vertex_oscs:
@@ -409,13 +515,27 @@ class GroupMegData(MegData):
                 self.powers = np.dstack([self.powers, new_subj.powers])
                 self.bws = np.dstack([self.bws, new_subj.bws])
 
+        # Add oscillation peak data - NEW
+        if add_peak_freqs:
+
+            # Check that new subject has same bands defined
+            if not set(self.bands) == set(new_subj.bands):
+                raise InconsistentDataError('Oscillation bands are inconsistent.')
+
+            #
+            if self.n_subjs == 0:
+                self.peaks = new_subj.peaks
+            else:
+                for band in self.bands:
+                    self.peaks[band] = np.append(self.peaks[band], new_subj.peaks[band])
+
         #
         if add_vertex_slopes:
 
             if self.n_subjs == 0:
-                self.gr_chis = new_subj.slopes
+                self.vert_slopes = new_subj.slopes
             else:
-                self.gr_chis = np.hstack([self.gr_chis, new_subj.slopes])
+                self.vert_slopes = np.hstack([self.vert_slopes, new_subj.slopes])
 
         # Update subj count and subject number list
         self.n_subjs += 1
@@ -429,21 +549,33 @@ class GroupMegData(MegData):
         self.sex.append(new_subj.sex)
         self.age = np.append(self.age, new_subj.age)
 
-        # Add osc-peak data
+        """
+        # Add oscillation peak data - OLD
         self.peak_theta = np.append(self.peak_theta, new_subj.peak_theta)
         self.peak_alpha = np.append(self.peak_alpha, new_subj.peak_alpha)
         self.peak_beta = np.append(self.peak_beta, new_subj.peak_beta)
         self.peak_lowgamma = np.append(self.peak_lowgamma, new_subj.peak_lowgamma)
+        """
 
 
     def osc_prob(self):
-        """Calculates the probability (per vertex / across subjects) of an osc in a specific band. """
+        """Calculates the probability (per vertex / across subjects) of an osc in a specific band."""
 
-        # For each frequency band, compute the probability of oscillation in that band.
+        """"
+        # For each frequency band, compute the probability of oscillation in that band. - OLD
         self.theta_prob = _osc_prob(self.gr_thetas)
         self.alpha_prob = _osc_prob(self.gr_alphas)
         self.beta_prob = _osc_prob(self.gr_betas)
         self.lowgamma_prob = _osc_prob(self.gr_lowgammas)
+        """
+
+        # Check if vertex data is set
+        if not self.bands_vertex:
+            raise DataNotComputedError('Vertex oscillation bands data not available.')
+
+        # For each oscillation band, compute the probability of an oscillation in that band - NEW
+        for band in self.bands:
+            self.osc_probs[band] = _osc_prob(self.gr_oscs[band])
 
         # Update boolean that oscillation probability has been computed
         self.osc_prob_done = True
@@ -451,6 +583,8 @@ class GroupMegData(MegData):
 
     def group_slope(self, save_out=False, file_name=None, set_viz=False):
         """Calculates the average slope value for each vertex, across subjects.
+
+        NOTE: UPDATE CHIS SAVE NAME, NEED TO CHECK WHAT LOADS THESE FILES.
 
         Parameters
         ----------
@@ -465,7 +599,7 @@ class GroupMegData(MegData):
         """
 
         # Calculate the average slope value per vertex
-        self.slopes_avg = np.median(self.gr_chis, axis=1)
+        self.slopes_avg = np.median(self.vert_slopes, axis=1)
 
         # Save map out, if required
         if save_out:
@@ -496,7 +630,7 @@ class GroupMegData(MegData):
 
 
     def set_prob_viz(self):
-        """Saves out a matfile (of osc-probs) to be loaded with Brainstorm for visualization. """
+        """Saves out a matfile (of osc probs) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
         save_name = 'Group_Osc_Prob_Viz'
@@ -516,8 +650,8 @@ class GroupMegData(MegData):
         sio.savemat(save_file, save_dict)
 
 
-    def osc_prob_corrs(self):
-        """Calculates the correlations between oscillation probabilities.
+    def osc_map_corrs(self, map_type):
+        """Calculates the correlations between oscillation probabilities or scores.
 
         Returns
         -------
@@ -527,11 +661,44 @@ class GroupMegData(MegData):
             xx
         """
 
+        ## NEW
+
         # Check if oscillation probabilities have been calculated.
         if not self.osc_prob_done:
-            print("Osc Probability not calculated - can't proceed.")
-            return
+            raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
 
+        # Check how many oscillation bands are defined
+        n_bands = len(self.bands)
+
+        # Initialize matrices to store correlation results
+        corrs_mat = np.zeros([n_bands, n_bands])
+        ps_mat = np.zeros([n_bands, n_bands])
+
+        # xx
+        sorted_bands, sort_inds = _band_sort(self.bands)
+
+        # xx
+        if map_type is 'prob':
+            dat = self.osc_probs
+        elif map_type is 'score':
+            dat = self.osc_scores
+        else:
+            raise UnknownDataTypeError('Map type not understood.')
+
+        # xx
+        for i in range(n_bands):
+            for j in range(n_bands):
+                corrs_mat[i, j], ps_mat[i, j] = pearsonr(
+                    dat[sorted_bands[sort_inds[i]]], 
+                    dat[sorted_bands[sort_inds[j]]])
+
+        # xx
+        np.fill_diagonal(corrs_mat, 0)
+        np.fill_diagonal(ps_mat, 0)
+
+        return corrs_mat, ps_mat, sorted_bands
+
+        """
         # Theta-Alpha Corr
         [r_th_al, p_th_al] = pearsonr(self.theta_prob, self.alpha_prob)
 
@@ -563,6 +730,7 @@ class GroupMegData(MegData):
                               [r_th_be, r_al_be, 0, r_be_lg], [r_th_lg, r_al_lg, r_be_lg, 0]])
 
         return corrs, corrs_mat
+        """
 
 
     def osc_score(self):
@@ -571,28 +739,39 @@ class GroupMegData(MegData):
         The oscillation score is .... XXXXX
         """
 
-        # Check if osc-prob is calculated. Can't proceed if it isnt.
+        # Check if oscillation probability is calculated. Can't proceed if it isnt.
         if not self.osc_prob_done:
-            print("Oscillation probability not computed. Can't continue.")
+            raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
 
-        # Compute power ratio for each oscillatory band
+        # Compute power ratio for each oscillation band - NEW
+        for band in self.bands:
+            self.osc_pow_ratios[band] = _osc_pow_ratio(self.gr_oscs[band])
+
+        # Compute oscillation score for each oscillation band - NEW
+        for band in self.bands:
+            self.osc_scores[band] = self.osc_pow_ratios[band] * self.osc_probs[band]
+
+        """
+        # Compute power ratio for each oscillatory band - OLD
         self.theta_pow_ratio = _osc_pow_ratio(self.gr_thetas)
         self.alpha_pow_ratio = _osc_pow_ratio(self.gr_alphas)
         self.beta_pow_ratio = _osc_pow_ratio(self.gr_betas)
         self.lowgamma_pow_ratio = _osc_pow_ratio(self.gr_lowgammas)
 
-        # Compute oscillation score for each oscillatory band
+        # Compute oscillation score for each oscillatory band - OLD
         self.theta_score = self.theta_pow_ratio * self.theta_prob
         self.alpha_score = self.alpha_pow_ratio * self.alpha_prob
         self.beta_score = self.beta_pow_ratio * self.beta_prob
         self.lowgamma_score = self.lowgamma_pow_ratio * self.lowgamma_prob
+        """
 
-        # Set boolean that osc-score has been computed
+        # Set boolean that oscillation score has been computed.
         self.osc_score_done = True
 
 
     def osc_score_corrs(self):
         """Calculates the correlations between oscillations scores.
+        NOTE: NO LONGER NEEDED. NOW INCLUDED IN OSC_MAP_CORRS()
 
         Returns
         -------
@@ -602,11 +781,35 @@ class GroupMegData(MegData):
             xx
         """
 
+        ## NEW
+
         # Check if oscillation probabilities have been calculated.
         if not self.osc_score_done:
-            print("Osc Score not calculated - can't proceed.")
-            return
+            raise DataNotComputedError('Oscillation score not computed - can not proceed.')
 
+        # Check how many bands there are
+        n_bands = len(self.bands)
+
+        # Initialize matrices to store correlation results
+        corrs_mat = np.zeros([n_bands, n_bands])
+        ps_mat = np.zeros([n_bands, n_bands])
+
+        # xx
+        sorted_bands, sort_inds = _band_sort(self.bands)
+
+        # xx
+        for i in range(n_bands):
+            for j in range(n_bands):
+                corrs_mat[i, j], ps_mat[i, j] = pearsonr(
+                    self.osc_scores[sorted_bands[sort_inds[i]]], 
+                    self.osc_scores[sorted_bands[sort_inds[j]]])
+
+        #
+        np.fill_diagonal(corrs_mat, 0)
+        np.fill_diagonal(ps_mat, 0)
+
+
+        """ - OLD
         # Theta-Alpha Corr
         [r_th_al, p_th_al] = pearsonr(self.theta_score, self.alpha_score)
 
@@ -636,9 +839,10 @@ class GroupMegData(MegData):
         # Save corrs out in a matrix
         corrs_mat = np.array([[0, r_th_al, r_th_be, r_th_lg], [r_th_al, 0, r_al_be, r_al_lg], 
                               [r_th_be, r_al_be, 0, r_be_lg], [r_th_lg, r_al_lg, r_be_lg, 0]])
+        
 
         return corrs, corrs_mat
-
+        """
 
     def save_osc_score(self, file_name):
         """Save out the oscillation score as an npz file.
@@ -659,7 +863,7 @@ class GroupMegData(MegData):
 
 
     def set_score_viz(self):
-        """Saves a matfile (of osc-scores) to be loaded with Brainstorm for visualization. """
+        """Saves a matfile (of oscillation scores) to be loaded with Brainstorm for visualization. """
 
         # Set up paths to save to
         save_name = 'Group_Osc_Score_Viz'
@@ -688,6 +892,26 @@ class GroupMegData(MegData):
             A dictionary containing correlations results comparing age to oscillations.
         """
 
+        ## NEW
+
+        # Check how many bands there are
+        n_bands = len(self.bands)
+
+        # Initialize matrices to store correlation results
+        corrs_mat = np.zeros([n_bands])
+        ps_mat = np.zeros([n_bands])
+
+        # xx
+        sorted_bands, sort_inds = _band_sort(self.bands)
+
+        # xx
+        for i in range(n_bands):
+            corrs_mat[i], ps_mat[i] = pearsonr(
+                self.age, self.peaks[sorted_bands[sort_inds[i]]])
+
+        return corrs_mat, ps_mat, sorted_bands
+
+        """
         # Check correlations
         [r_age_th_peak, p_age_th_peak] = pearsonr(self.age, self.peak_theta)
         [r_age_al_peak, p_age_al_peak] = pearsonr(self.age, self.peak_alpha)
@@ -701,6 +925,7 @@ class GroupMegData(MegData):
                  ['LG Peak - Age'    , r_age_lg_peak, p_age_lg_peak]]
 
         return corrs
+        """
 
 
     def freq_corr(self, f_win):
@@ -770,6 +995,48 @@ class GroupMegData(MegData):
 ########################## OMEGAMAPPIN - OM_MD - PUBLIC FUNCTIONS ##########################
 ############################################################################################
 
+def print_corrs_mat(rs_mat, ps_mat, labels):
+    """Prints out correlations.
+
+    Parameters
+    ----------
+    rs_mat : 2d array
+        xx
+    ps_mat : 2d array
+        xx
+    labels : list(str)
+        xx
+    """
+
+    # Check how size of the matrix there are
+    n = len(labels)
+
+    # ??
+    for x in range(n):
+        for y in range(n):
+
+            # xx
+            if x == y or y < x:
+                continue
+
+            print('Corr of ', '{:16}'.format(labels[x]+'-'+labels[y]),
+                  ' is ', '{:+1.4f}'.format(rs_mat[x,y]), '    with p-val of ', 
+                  '{:1.5f}'.format(ps_mat[x,y]))
+
+
+def print_corrs_vec(rs_vec, ps_vec, labels, desc):
+    """   """
+
+    # Check the length of the vector
+    n = len(labels)
+
+    #
+    for x in range(n):
+        print('Corr of ', '{:20}'.format(labels[x]+'-'+desc),
+                  ' is ', '{:+1.4f}'.format(rs_vec[x]), '    with p-val of ', 
+                  '{:1.5f}'.format(ps_vec[x]))
+
+
 def save_md_pickle(obj, save_name):
     """Save current meg data object as a pickled object.
 
@@ -809,6 +1076,7 @@ def load_md_pickle(file_name):
 
     # Load file & return pickled object
     results = pickle.load(open(dat_path, 'rb'))
+
     return results
 
 
@@ -1079,6 +1347,44 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
         peak = np.median(osc_cens)
 
     return peak
+
+
+def _band_sort(osc_bands):
+    """
+
+    Parameters
+    ----------
+    osc_bands : ?
+        xx
+
+    Returns
+    -------
+    ordered_bands : ?
+        xx
+    sort_inds : ?
+        xx
+    """
+    
+    # Check how many oscillation bands there are
+    n_bands = len(osc_bands)
+    
+    # Get low end for each band
+    band_names = []
+    lower_bounds = np.array([])
+    
+    # 
+    for band in osc_bands:
+        band_names.append(band)
+        lower_bounds = np.append(lower_bounds, osc_bands[band][0])
+        
+    #
+    sort_inds = np.argsort(lower_bounds)
+    
+    #
+    ordered_bands = []
+    ordered_bands[:] = [band_names[i] for i in sort_inds]
+    
+    return ordered_bands, sort_inds
 
 
 def _load_foof_pickle(path):
