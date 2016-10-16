@@ -64,11 +64,15 @@ class OMDB():
         save_type : str, optional
             Which file type to check files for. Only used for foof files.
                 Options: {'pickle', 'csv'}
+        verbose : boolean, optional
+            Whether to print out information during run.
 
         Returns
         -------
         sub_nums : list(int)
             A list of subject numbers of all the available files.
+        source : list(str)
+            A list with the source database for each available file.
         """
 
         # Set up which files to look for
@@ -82,12 +86,12 @@ class OMDB():
             word = 'foof'
             f_l = 'first'
 
-        # ?
+        # If looking for a particular database, find file, get subject numbers and source
         if self.dat_source is not 'both':
             sub_nums = _check_files(os.path.join(dat_path, self.dat_source, save_type), word, f_l)
             source = [self.dat_source] * len(sub_nums)
 
-        # ?
+        # If looking across both databases, get info from each database and then combine
         else:
             sub_nums_omega = _check_files(os.path.join(dat_path, 'OMEGA', save_type), word, f_l)
             n_omega = len(sub_nums_omega)
@@ -114,6 +118,8 @@ class OMDB():
         res_type : str
             Which data type to check files for.
                 Options: {'md', 'mc'}
+        verbose : boolean, optional
+            Whether to print out information during run.
 
         Returns
         -------
@@ -171,11 +177,11 @@ class Osc_Dict():
 
     def __init__(self, input_bands=None):
 
-        # If supplied, use the given dictionary of oscillation bands.
+        # If supplied, use the given dictionary of oscillation bands
         if input_bands:
             self.bands = input_bands
 
-        # Otherwise, use the default oscillation bands.
+        # Otherwise, use the default oscillation bands
         else:
             self.bands = dict({'Theta': (3, 8),
                                'Alpha': (8, 13),
@@ -194,6 +200,7 @@ class Osc_Dict():
             The lower and upper frequency limit of the band.
         """
 
+        # Add the given band to oscillation definition
         self.bands[band_name] = band_lims
 
 
@@ -206,6 +213,7 @@ class Osc_Dict():
             Band name to remove from oscillation band definitions.
         """
 
+        # Remove requested band from oscillation definition
         self.bands.pop(old_band)
 
 
@@ -215,10 +223,10 @@ class FigInfo():
     def __init__(self):
 
         # Default Settings - font sizes
-        self.t_fs = 22           # Title font size
-        self.sp_fs = 20          # Subplot title font size
-        self.ax_fs = 20          # Axis font size
-        self.ti_fs = 14          # Ticks font size
+        self.t_fs = 22         # Title font size
+        self.sp_fs = 20        # Subplot title font size
+        self.ax_fs = 20        # Axis font size
+        self.ti_fs = 14        # Ticks font size
 
         # Default Settings - other settings
         self.ax_lw = 2.5
@@ -285,9 +293,9 @@ def load_meg_psds(dat_source, meg_path, subj_num):
     Returns
     -------
     psd : 2d array
-        xx
+        Matrix of PSD results for each vertex [n_verts, n_freqs].
     freqs : 1d array
-        xx
+        Vector of the frequencies estimated in the PSD.
     """
 
     # Set file name and get full path
@@ -304,9 +312,6 @@ def load_meg_psds(dat_source, meg_path, subj_num):
     freqs = data_mat['Freqs']
     psd = data_mat['TF']
 
-    # Label data is also available: Scout names if it's scout data, or Sensor/vertex numbers.
-    #labels = data_mat['RowNames']
-
     return psd, freqs
 
 
@@ -316,9 +321,9 @@ def extract_psd(psd, freqs, f_low, f_high):
     Parameters
     ----------
     psd : 2d array
-        xx
+        Matrix of PSD results for each vertex [n_verts, n_freqs].
     freqs : 1d array
-        xx
+        Vector of the frequencies estimated in the PSD.
     f_low : float
         Lower bound of frequencies to extract.
     f_high : float
@@ -327,9 +332,9 @@ def extract_psd(psd, freqs, f_low, f_high):
     Returns
     -------
     psd_ext : 2d array
-        xx
+        Matrix of extracted PSD results for each vertex [n_verts, n_freqs].
     freqs_ext : 1d array
-        xx
+        Vector of extracted frequencies estimated in the PSD.
     """
 
     # Drop frequencies below f_low
@@ -345,68 +350,14 @@ def extract_psd(psd, freqs, f_low, f_high):
     return psd_ext, freqs_ext
 
 
-def meg_foof(psd_ext, freqs_ext, min_p, freq_res, method):
-    """Run FOOF on MEG-PSD data.
-    NOTE: OLD - NOT CURRENTLY USED.
-        REPLACED BY STANDALONE SCRIPT.
-
-    Parameters
-    ----------
-    psd_ext : 2d array
-        Matrix of PSDs in the form of [n_verts, n_freqs].
-    freqs_ext : 1d array
-        Vector of the frequency values for each power value in psd_ext.
-    min_p : float
-        Minimum probability for splitting peaks. Parameter for FOOF.
-    freqs_res : float
-        Frequency resolution.
-    method : str
-        Which method to use to run FOOF.
-        Options:
-            'linear', 'parallel'
-
-    Returns
-    -------
-    results : list
-        List of tuples of FOOF results. Length of list is number of vertices.
-            Each tuple is (slope value, centers (list), amps (list), bws (list)).
-    """
-
-    # Check how many PSDs there are
-    [nPSDs, n_freqs] = np.shape(psd_ext)
-
-    # Initialize foof
-    foof = FOOF(min_p=min_p, res=freq_res, fmin=freqs_ext.min(), fmax=freqs_ext.max())
-
-    # Set up PSD as a list of 2-D np arrays
-    psd_list = list(psd_ext)
-    for i in range(0, nPSDs):
-        psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
-
-    # Run FOOF linearly
-    if method is 'linear':
-        results = [_run_foof_l(foof, freqs_ext, psd) for psd in psd_list]
-
-    # Run FOOF in parallel
-    if method is 'parallel':
-
-        # Set up Pool and run
-        pool = Pool(4)
-        results = pool.map(_run_foof_p, psd_list)
-        #results = pool.map(_run_foof_l, [foof, psd_list, freqs_ext])
-        pool.close()
-        pool.join()
-
-    return results
-
-
 def save_foof_pickle(results, save_path, sub_num):
     """Save out the FOOF results as a pickle file.
 
     Parameters
     ----------
-    results : list
-        xx
+    results : list(tuple)
+        List of tuples of FOOF results. Length of list is number of vertices.
+            Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     save_path: str
         Filepath of where to save out the file.
     sub_num : int
@@ -426,41 +377,42 @@ def save_foof_csv(results, save_path, sub_num):
 
     Parameters
     ----------
-    results : list
-        xx
+    results : list(tuple)
+        List of tuples of FOOF results. Length of list is number of vertices.
+            Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     save_path : str
-        xx
+        Filepath of where to save out the file.
     sub_num : int
         Subject identifier number.
     """
 
-    #
+    # Set index values for oscillation parameters
     i_cen = 1
     i_amp = 2
     i_bw = 3
 
-    #
+    # Check how many vertices there are
     n_verts = len(results)
 
-    #
+    # Initialize file names for oscillation and slope csv files
     csv_sl_fname = save_path + '/csv/' + str(sub_num) + '_Slopes.csv'
     csv_osc_fname = save_path + '/csv/' + str(sub_num) + '_Oscs.csv'
 
-    #
+    # Open files to write to
     sl_csv = open(csv_sl_fname, 'w')
     osc_csv = open(csv_osc_fname, 'w')
 
-    #
-    for vert in range(0, n_verts):
+    # Loop through each vertex
+    for vert in range(n_verts):
 
-        #
+        # Save out slope value to csv file
         sl_csv.write(str(results[vert][0]) + '\n')
 
-        #
+        # Check how oscillations at current vertex
         n_oscs = len(results[vert][1])
 
-        #
-        for osc in range(0, n_oscs):
+        # Loop through each oscillation, writing each one to file
+        for osc in range(n_oscs):
 
             cur_osc_dat = list([vert + 1, results[vert][i_cen][osc],
                                 results[vert][i_amp][osc], results[vert][i_bw][osc]])
@@ -479,8 +431,9 @@ def load_foof_pickle(dat_path, sub_num):
 
     Returns
     -------
-    results : ?
-        xx
+    results : list(tuple)
+        List of tuples of FOOF results. Length of list is number of vertices.
+            Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     """
 
     # Get list of available files to load
@@ -597,7 +550,7 @@ def rm_files_ext(files_in):
 
 
 def get_section(section, n_ROIs, roi_lr):
-    """Get indices for desired section of ...
+    """Get indices for desired section of connectivity matrix.
 
     Parameters
     ----------
@@ -637,6 +590,48 @@ def get_section(section, n_ROIs, roi_lr):
     return ind_st_a, ind_en_a, ind_st_b, ind_en_b
 
 
+def meg_foof(psd_ext, freqs_ext, min_p, freq_res):
+    """Run FOOF on MEG-PSD data.
+
+    NOTE: This is an old version, can run foof linearly.
+        For parallel, use standalone script.
+
+    Parameters
+    ----------
+    psd_ext : 2d array
+        Matrix of PSDs in the form of [n_verts, n_freqs].
+    freqs_ext : 1d array
+        Vector of the frequency values for each power value in psd_ext.
+    min_p : float
+        Minimum probability for splitting peaks. Parameter for FOOF.
+    freqs_res : float
+        Frequency resolution.
+
+    Returns
+    -------
+    results : list(tuple)
+        List of tuples of FOOF results. Length of list is number of vertices.
+            Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+    """
+
+    # Check how many PSDs there are
+    [nPSDs, n_freqs] = np.shape(psd_ext)
+
+    # Initialize foof
+    foof = FOOF(min_p=min_p, res=freq_res, fmin=freqs_ext.min(), fmax=freqs_ext.max())
+
+    # Set up PSD as a list of 2-D np arrays
+    psd_list = list(psd_ext)
+    for i in range(0, nPSDs):
+        psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
+
+    # Run FOOF linearly
+    if method is 'linear':
+        results = [_run_foof_l(foof, freqs_ext, psd) for psd in psd_list]
+
+    return results
+
+
 #########################################################################################
 ###################################### OM GEN - ERRORS ##################################
 #########################################################################################
@@ -665,7 +660,6 @@ def _run_foof_l(foof, freqs_ext, psd_ext):
     """Local helper function to run FOOF linearly.
 
     Used by meg_foof().
-    NOTE: CURRENTLY UNUSED.
 
     Parameters
     ----------
@@ -680,19 +674,7 @@ def _run_foof_l(foof, freqs_ext, psd_ext):
     -------
     out : tuple
         Tuple of FOOF results.
-            Tuple is (slope value, centers (list), amps (list), bws (list)).
-    """
-
-    # Fit FOOF
-    foof.model(freqs_ext, psd_ext)
-
-    # Store vals in tuple and return
-    return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
-
-
-def _run_foof_p(psd_ext):
-    """ ???
-    NOTE: CURRENTLY UNUSED.
+            Tuple is (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     """
 
     # Fit FOOF
@@ -703,26 +685,29 @@ def _run_foof_p(psd_ext):
 
 
 def _check_files(path, word, f_l):
-    """???
+    """Checks a directory, getting desired files and returning subject numbers.
 
     Parameters
     ----------
-    path : ?
-        xx
-    word : ?
-        xx
-    f_l : ?
-        xx
+    path : str
+        Path to directory to examine.
+    word : str
+        Word to search for in file names to keep.
+    f_l : str
+        Whether subject number is at start or end of file name.
+            Options: {'first', 'last'}
 
     Returns
     -------
-    sub_nums : ?
-        xx
+    sub_nums : list(int)
+        A list of subject numbers of all the available files.
     """
 
+    # Get list of files in desired directory
     files = os.listdir(path)
     files = clean_file_list(files, word)
 
+    # Get the list of subject numbers from directory
     sub_nums = get_sub_nums(files, f_l)
 
     return sub_nums
@@ -737,13 +722,11 @@ def _find_last(input_list, wanted):
         A list to search through.
     wanted : str
         The element for which the last index is wanted.
-
-    From here: http://stackoverflow.com/questions/6890170/how-to-find-the-last-occurrence-of-an-item-in-a-python-list
     """
 
     # Run through the list, backwards
-    for ind, el in enumerate(reversed(input_list)):
+    for ind, elem in enumerate(reversed(input_list)):
 
         # If element is the wanted one, return index
-        if el == wanted:
+        if elem == wanted:
             return len(input_list) - 1 - ind
