@@ -72,7 +72,7 @@ class MegData():
         # Initialize oscillation count
         self.osc_count = int()
 
-
+        """OLD:
         # Initialize arrays for oscillation bands - OLD
         self.thetas = np.array([])
         self.alphas = np.array([])
@@ -84,6 +84,7 @@ class MegData():
         self.peak_alpha = np.array([])
         self.peak_beta = np.array([])
         self.peak_lowgamma = np.array([])
+        """
 
 
     def import_foof(self, subnum, get_demo=True, load_type='pickle'):
@@ -168,7 +169,8 @@ class MegData():
             How to average to calculate peak frequencies.
                 Options: {'mean', 'median'}
         """
-        """
+
+        """OLD:
         ## Re-Initialize matrices to right size to save results
         self.thetas = np.zeros([self.n_PSDs, 4])
         self.alphas = np.zeros([self.n_PSDs, 4])
@@ -223,27 +225,6 @@ class MegData():
 
         # Update boolean to note that current subject has band specific oscs calculated.
         self.bands_vertex = True
-
-
-    def save_viz(self):
-        """Saves a matfile of freq info to be loaded with Brainstorm for visualization.
-        NOTE: Needs updating for Osc_Dict
-        """
-
-        # Set up paths to save to
-        save_name = str(self.subnum) + '_Foof_Viz'
-        save_file = os.path.join(self.viz_path, save_name)
-
-        # Save desired outputs into a dictionary
-        save_dict = {}
-        save_dict['slopes'] = self.slopes
-        save_dict['thetas'] = self.thetas
-        save_dict['alphas'] = self.alphas
-        save_dict['betas'] = self.betas
-        save_dict['lowgammas'] = self.lowgammas
-
-        # Save the dicionary out to a .mat file
-        sio.savemat(save_file, save_dict)
 
 
     def all_oscs(self, verbose=True):
@@ -304,7 +285,7 @@ class MegData():
                 Options: {'mean', 'median'}
         """
 
-        """
+        """OLD:
         # Get peak frequency within each frequency band
         self.peak_theta = _osc_peak(self.centers_all, osc.theta_low, osc.theta_high, avg)
         self.peak_alpha = _osc_peak(self.centers_all, osc.alpha_low, osc.alpha_high, avg)
@@ -322,7 +303,7 @@ class MegData():
     def calc_osc_param_corrs(self):
         """Calculates correlations between oscillatory parameters."""
 
-        """
+        """OLD:
         # Calculate correlations: Centers vs. Bandwidth
         corr_cen_bw, pcorr_cen_bw = pearsonr(self.centers_all, np.log10(self.bws_all))
 
@@ -361,11 +342,32 @@ class MegData():
         return corrs_mat, ps_mat, labels
 
 
+    def save_viz(self):
+        """Saves a matfile of freq info to be loaded with Brainstorm for visualization.
+        NOTE: Needs updating for Osc_Dict().
+        """
+
+        # Set up paths to save to
+        save_name = str(self.subnum) + '_Foof_Viz'
+        save_file = os.path.join(self.viz_path, save_name)
+
+        # Save desired outputs into a dictionary
+        save_dict = {}
+        save_dict['slopes'] = self.slopes
+        save_dict['thetas'] = self.thetas
+        save_dict['alphas'] = self.alphas
+        save_dict['betas'] = self.betas
+        save_dict['lowgammas'] = self.lowgammas
+
+        # Save the dicionary out to a .mat file
+        sio.savemat(save_file, save_dict)
+
+
 class GroupMegData(MegData):
     """A class to store OMEGA data from multiple subjects.
 
     Holds all oscillations, regardless of spatial location.
-    Note: Class derived from MegData
+    Note: Class derived from MegData()
     """
 
     def __init__(self, db, osc):
@@ -386,14 +388,32 @@ class GroupMegData(MegData):
         # Set title for plots
         self.title = 'Group'
 
+        # Initialize dictionary for oscillation band data - NEW
+        self.gr_oscs = dict()
+
+        # Initilaize dictionary to store oscillation probabilities - NEW
+        self.osc_probs = dict()
+
+        # Initialize dict to store oscillation power ratios - NEW
+        self.osc_pow_ratios = dict()
+
+        # Initialize to store oscillation scores - NEW
+        self.osc_scores = dict()
+
+        # Initialize vars to store slope values
+        self.vert_slopes = np.array([])
+        self.slopes_gr_avg = np.array([])
+
+        # Set booleans for what has been run
+        self.osc_prob_done = False
+        self.osc_score_done = False
+
+        """OLD:
         # Initialize matrices for oscillation band data - OLD
         self.gr_thetas = np.array([])
         self.gr_alphas = np.array([])
         self.gr_betas = np.array([])
         self.gr_lowgammas = np.array([])
-
-        # Initialize dictionary for oscillation band data - NEW
-        self.gr_oscs = dict()
 
         # Initialize to store oscillation probabilities - OLD
         self.theta_prob = np.array([])
@@ -401,34 +421,18 @@ class GroupMegData(MegData):
         self.beta_prob = np.array([])
         self.lowgamma_prob = np.array([])
 
-        # Initilaize dictionary to store oscillation probabilities - NEW
-        self.osc_probs = dict()
-
         # Initialize to store oscillation power ratios - OLD
         self.theta_pow_ratio = np.array([])
         self.alpha_pow_ratio = np.array([])
         self.beta_pow_ratio = np.array([])
         self.lowgamma_pow_ratio = np.array([])
 
-        # Initialize dict to store oscillation power ratios
-        self.osc_pow_ratios = dict()
-
         # Initialize to store oscillation scores - OLD
         self.theta_score = np.array([])
         self.alpha_score = np.array([])
         self.beta_score = np.array([])
         self.lowgamma_score = np.array([])
-
-        # Initialize to store oscillation scores - NEW
-        self.osc_scores = dict()
-
-        # Initialize vars to store slope values
-        self.vert_slopes = np.array([])
-        self.slopes_avg = np.array([])
-
-        # Set booleans for what has been run
-        self.osc_prob_done = False
-        self.osc_score_done = False
+        """
 
 
     def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False,
@@ -558,6 +562,25 @@ class GroupMegData(MegData):
         """
 
 
+    def group_slope(self, avg='median'):
+        """Calculates the average slope value for each vertex, across subjects.
+
+        Parameters
+        ----------
+        self : ?
+            xx
+        avg : str, optional
+            How to average across the group.
+                Options: {'mean', 'median'}. Default: 'median'.
+        """
+
+        # Calculate the average slope value per vertex
+        if avg is 'mean':
+            self.slopes_gr_avg = np.mean(self.vert_slopes, axis=1)
+        elif avg is 'median':
+            self.slopes_gr_avg = np.median(self.vert_slopes, axis=1)
+
+
     def osc_prob(self):
         """Calculates the probability (per vertex / across subjects) of an osc in a specific band."""
 
@@ -581,73 +604,40 @@ class GroupMegData(MegData):
         self.osc_prob_done = True
 
 
-    def group_slope(self, save_out=False, file_name=None, set_viz=False):
-        """Calculates the average slope value for each vertex, across subjects.
+    def osc_score(self):
+        """Calculate the oscillation score for each frequency band.
 
-        NOTE: UPDATE CHIS SAVE NAME, NEED TO CHECK WHAT LOADS THESE FILES.
-
-        Parameters
-        ----------
-        self : GroupMegData() object.
-            Object to store map data across a group of subjects.
-        save_out : boolean, optional
-            Whether to save out npz file of average slope values.
-        file_name : str
-            File name to save group slope file as.
-        set_viz : boolean, optional
-            Whether to save out mat file for visualization in matlab.
+        The oscillation score is .... XXXXX
         """
 
-        # Calculate the average slope value per vertex
-        self.slopes_avg = np.median(self.vert_slopes, axis=1)
+        # Check if oscillation probability is calculated. Can't proceed if it isnt.
+        if not self.osc_prob_done:
+            raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
 
-        # Save map out, if required
-        if save_out:
+        # Compute power ratio for each oscillation band - NEW
+        for band in self.bands:
+            self.osc_pow_ratios[band] = _osc_pow_ratio(self.gr_oscs[band])
 
-            # Set up
-            npz_file_name = file_name + '.npz'
-            npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
+        # Compute oscillation score for each oscillation band - NEW
+        for band in self.bands:
+            self.osc_scores[band] = self.osc_pow_ratios[band] * self.osc_probs[band]
 
-            # Save out an npz file
-            np.savez(npz_save_name, chis=self.slopes_avg, n_subjs=self.n_subjs)
+        """
+        # Compute power ratio for each oscillatory band - OLD
+        self.theta_pow_ratio = _osc_pow_ratio(self.gr_thetas)
+        self.alpha_pow_ratio = _osc_pow_ratio(self.gr_alphas)
+        self.beta_pow_ratio = _osc_pow_ratio(self.gr_betas)
+        self.lowgamma_pow_ratio = _osc_pow_ratio(self.gr_lowgammas)
 
-        # Save out as matfile for visualization with matlab, if required
-        if set_viz:
+        # Compute oscillation score for each oscillatory band - OLD
+        self.theta_score = self.theta_pow_ratio * self.theta_prob
+        self.alpha_score = self.alpha_pow_ratio * self.alpha_prob
+        self.beta_score = self.beta_pow_ratio * self.beta_prob
+        self.lowgamma_score = self.lowgamma_pow_ratio * self.lowgamma_prob
+        """
 
-            # Set up paths to save to
-            save_name = 'Group_Slopes'
-            save_file = os.path.join(self.viz_path, save_name)
-
-            # Save desired outputs into a dictionary
-            save_dict = {}
-            save_dict['chis'] = self.slopes_avg
-            save_dict['dat_source'] = self.dat_source
-            save_dict['n_subjs'] = self.n_subjs
-            save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-            # Save the dicionary out to a .mat file
-            sio.savemat(save_file, save_dict)
-
-
-    def set_prob_viz(self):
-        """Saves out a matfile (of osc probs) to be loaded with Brainstorm for visualization. """
-
-        # Set up paths to save to
-        save_name = 'Group_Osc_Prob_Viz'
-        save_file = os.path.join(self.viz_path, save_name)
-
-        # Save desired outputs into a dictionary
-        save_dict = {}
-        save_dict['theta_prob'] = self.theta_prob
-        save_dict['alpha_prob'] = self.alpha_prob
-        save_dict['beta_prob'] = self.beta_prob
-        save_dict['lowgamma_prob'] = self.lowgamma_prob
-        save_dict['dat_source'] = self.dat_source
-        save_dict['n_subjs'] = self.n_subjs
-        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-        # Save the dicionary out to a .mat file
-        sio.savemat(save_file, save_dict)
+        # Set boolean that oscillation score has been computed.
+        self.osc_score_done = True
 
 
     def osc_map_corrs(self, map_type):
@@ -733,42 +723,6 @@ class GroupMegData(MegData):
         """
 
 
-    def osc_score(self):
-        """Calculate the oscillation score for each frequency band.
-
-        The oscillation score is .... XXXXX
-        """
-
-        # Check if oscillation probability is calculated. Can't proceed if it isnt.
-        if not self.osc_prob_done:
-            raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
-
-        # Compute power ratio for each oscillation band - NEW
-        for band in self.bands:
-            self.osc_pow_ratios[band] = _osc_pow_ratio(self.gr_oscs[band])
-
-        # Compute oscillation score for each oscillation band - NEW
-        for band in self.bands:
-            self.osc_scores[band] = self.osc_pow_ratios[band] * self.osc_probs[band]
-
-        """
-        # Compute power ratio for each oscillatory band - OLD
-        self.theta_pow_ratio = _osc_pow_ratio(self.gr_thetas)
-        self.alpha_pow_ratio = _osc_pow_ratio(self.gr_alphas)
-        self.beta_pow_ratio = _osc_pow_ratio(self.gr_betas)
-        self.lowgamma_pow_ratio = _osc_pow_ratio(self.gr_lowgammas)
-
-        # Compute oscillation score for each oscillatory band - OLD
-        self.theta_score = self.theta_pow_ratio * self.theta_prob
-        self.alpha_score = self.alpha_pow_ratio * self.alpha_prob
-        self.beta_score = self.beta_pow_ratio * self.beta_prob
-        self.lowgamma_score = self.lowgamma_pow_ratio * self.lowgamma_prob
-        """
-
-        # Set boolean that oscillation score has been computed.
-        self.osc_score_done = True
-
-
     def osc_score_corrs(self):
         """Calculates the correlations between oscillations scores.
         NOTE: NO LONGER NEEDED. NOW INCLUDED IN OSC_MAP_CORRS()
@@ -842,45 +796,6 @@ class GroupMegData(MegData):
 
         return corrs, corrs_mat
         """
-
-
-    def save_osc_score(self, file_name):
-        """Save out the oscillation score as an npz file.
-
-        Parameters
-        ----------
-        self : GroupMegData() object.
-            Object to store map data across a group of subjects.
-        file_name : str
-            Name to save the file as.
-        """
-
-        # Create full file path and save file as an npz file
-        npz_file_name = file_name + '.npz'
-        npz_save_name = os.path.join(self.maps_path, 'Oscs', npz_file_name)
-        np.savez(npz_save_name, osc_score_theta=self.theta_score, osc_score_alpha=self.alpha_score,
-                 osc_score_beta=self.beta_score, osc_score_lowgamma=self.lowgamma_score)
-
-
-    def set_score_viz(self):
-        """Saves a matfile (of oscillation scores) to be loaded for visualization. """
-
-        # Set up paths to save to
-        save_name = 'Group_Osc_Score_Viz'
-        save_file = os.path.join(self.viz_path, save_name)
-
-        # Save desired outputs into a dictionary
-        save_dict = {}
-        save_dict['theta_score'] = self.theta_score
-        save_dict['alpha_score'] = self.alpha_score
-        save_dict['beta_score'] = self.beta_score
-        save_dict['lowgamma_score'] = self.lowgamma_score
-        save_dict['dat_source'] = self.dat_source
-        save_dict['n_subjs'] = self.n_subjs
-        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-        # Save the dicionary out to a .mat file
-        sio.savemat(save_file, save_dict)
 
 
     def calc_osc_peak_age(self):
@@ -989,6 +904,116 @@ class GroupMegData(MegData):
             corr_vec[f_ind], p_vec[f_ind] = pearsonr(prob_mat[:, f_ind], prob_mat[:, f_ind+f_win])
 
         return corr_vec, p_vec
+
+
+    def save_gr_slope(self, save_out=False, file_name=None, set_viz=False):
+        """Saves out the average group slope results.
+
+        NOTE: UPDATE CHIS SAVE NAME, NEED TO CHECK WHAT LOADS THESE FILES.
+
+        Parameters
+        ----------
+        self : GroupMegData() object.
+            Object to store map data across a group of subjects.
+        save_out : boolean, optional
+            Whether to save out npz file of average slope values.
+        file_name : str
+            File name to save group slope file as.
+        set_viz : boolean, optional
+            Whether to save out mat file for visualization in matlab.
+        """
+
+        # Save map out, if required
+        if save_out:
+
+            # Set up
+            npz_file_name = file_name + '.npz'
+            npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
+
+            # Save out an npz file
+            np.savez(npz_save_name, chis=self.slopes_gr_avg, n_subjs=self.n_subjs)
+
+        # Save out as matfile for visualization with matlab, if required
+        if set_viz:
+
+            # Set up paths to save to
+            save_name = 'Group_Slopes'
+            save_file = os.path.join(self.viz_path, save_name)
+
+            # Save desired outputs into a dictionary
+            save_dict = {}
+            save_dict['chis'] = self.slopes_gr_avg
+            save_dict['dat_source'] = self.dat_source
+            save_dict['n_subjs'] = self.n_subjs
+            save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+            # Save the dicionary out to a .mat file
+            sio.savemat(save_file, save_dict)
+
+
+    def save_osc_score(self, file_name):
+        """Save out the oscillation score as an npz file.
+        NOTE: Needs updating for Osc_Dict().
+
+        Parameters
+        ----------
+        self : GroupMegData() object.
+            Object to store map data across a group of subjects.
+        file_name : str
+            Name to save the file as.
+        """
+
+        # Create full file path and save file as an npz file
+        npz_file_name = file_name + '.npz'
+        npz_save_name = os.path.join(self.maps_path, 'Oscs', npz_file_name)
+        np.savez(npz_save_name, osc_score_theta=self.theta_score, osc_score_alpha=self.alpha_score,
+                 osc_score_beta=self.beta_score, osc_score_lowgamma=self.lowgamma_score)
+
+
+    def set_score_viz(self):
+        """Saves a matfile (of oscillation scores) to be loaded for visualization.
+        NOTE: Needs updating for Osc_Dict().
+        """
+
+        # Set up paths to save to
+        save_name = 'Group_Osc_Score_Viz'
+        save_file = os.path.join(self.viz_path, save_name)
+
+        # Save desired outputs into a dictionary
+        save_dict = {}
+        save_dict['theta_score'] = self.theta_score
+        save_dict['alpha_score'] = self.alpha_score
+        save_dict['beta_score'] = self.beta_score
+        save_dict['lowgamma_score'] = self.lowgamma_score
+        save_dict['dat_source'] = self.dat_source
+        save_dict['n_subjs'] = self.n_subjs
+        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        # Save the dicionary out to a .mat file
+        sio.savemat(save_file, save_dict)
+
+
+    def set_prob_viz(self):
+        """Saves out a matfile (of osc probs) to be loaded with Brainstorm for visualization.
+        NOTE: Needs updating for Osc_Dict().
+        """
+
+        # Set up paths to save to
+        save_name = 'Group_Osc_Prob_Viz'
+        save_file = os.path.join(self.viz_path, save_name)
+
+        # Save desired outputs into a dictionary
+        save_dict = {}
+        save_dict['theta_prob'] = self.theta_prob
+        save_dict['alpha_prob'] = self.alpha_prob
+        save_dict['beta_prob'] = self.beta_prob
+        save_dict['lowgamma_prob'] = self.lowgamma_prob
+        save_dict['dat_source'] = self.dat_source
+        save_dict['n_subjs'] = self.n_subjs
+        save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        # Save the dicionary out to a .mat file
+        sio.savemat(save_file, save_dict)
 
 
 ############################################################################################
@@ -1400,20 +1425,22 @@ def _band_sort(osc_bands):
     return ordered_bands, sort_inds
 
 
-def _load_foof_pickle(path):
+def _load_foof_pickle(file_name):
     """Loads FOOF data from a pickle file.
 
     Parameters
     ----------
-    path : str
-        xx
+    filename : str
+        Full path, including filename, to file to be loaded.
     """
 
-    results = pickle.load(open(path, 'rb'))
+    # Load from pickle file
+    results = pickle.load(open(file_name, 'rb'))
+
     return results
 
 
-def _load_foof_csv(path):
+def _load_foof_csv(file_name):
     """
     NOTE: not yet implemented
     """
