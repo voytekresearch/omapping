@@ -148,11 +148,11 @@ class OMDB():
         # Return file list
         return files
 
-
+"""
 class Osc():
-    """Class to store oscillations parameters.
+    "Class to store oscillations parameters.
     NOTE: Old format. Currently being updated.
-    """
+    "
 
     def __init__(self):
 
@@ -171,9 +171,10 @@ class Osc():
         # Low Gamma
         self.lowgamma_low = 30
         self.lowgamma_high = 40
+"""
 
 
-class Osc_Dict():
+class Osc():
 
     def __init__(self, input_bands=None):
 
