@@ -996,41 +996,54 @@ class GroupMegData(MegData):
 ############################################################################################
 
 def print_corrs_mat(rs_mat, ps_mat, labels):
-    """Prints out correlations.
+    """Prints out correlations - from a given matrix.
 
     Parameters
     ----------
     rs_mat : 2d array
-        xx
+        Matrix of R values.
     ps_mat : 2d array
-        xx
+        Matrix of p-values.
     labels : list(str)
-        xx
+        Labels for the rows & columns.
     """
 
     # Check how size of the matrix there are
     n = len(labels)
 
-    # ??
+    # Loop through the matrix to print out
     for x in range(n):
         for y in range(n):
 
-            # xx
+            # Skip bottom triangle and diagonal
             if x == y or y < x:
                 continue
 
+            # Print out correlation
             print('Corr of ', '{:16}'.format(labels[x]+'-'+labels[y]),
                   ' is ', '{:+1.4f}'.format(rs_mat[x, y]), '    with p-val of ',
                   '{:1.5f}'.format(ps_mat[x, y]))
 
 
 def print_corrs_vec(rs_vec, ps_vec, labels, desc):
-    """   """
+    """Prints out corrlations - from a given vector.
+
+    Parameters
+    ----------
+    rs_vec : 1d array
+        Vector of R values.
+    ps_vec : 1d array
+        Vector of p-values.
+    labels : list(str)
+        Labels for the columns.
+    desc : str
+        Label for the row.
+    """
 
     # Check the length of the vector
     n = len(labels)
 
-    #
+    # Loop through vectors, printing out the correlations.
     for x in range(n):
         print('Corr of ', '{:20}'.format(labels[x]+'-'+desc),' is ',
               '{:+1.4f}'.format(rs_vec[x]), '    with p-val of ',
@@ -1243,12 +1256,12 @@ def _osc_prob(osc_mat):
 
     Parameters
     ----------
-    osc_mat : ??
-        Matrix of [n_vertex, n_dim, n_subj]
+    osc_mat : 3d array
+        Oscillations for each subject, [n_vertex, n_dim, n_subj].
 
     Returns
     -------
-    prob : ??
+    prob : 1d array
         Vector with probability of given oscillation at each vertex.
     """
 
@@ -1274,13 +1287,13 @@ def _osc_pow_ratio(osc_mat):
 
     Parameters
     ----------
-    osc_mat : 3-d array
-        XX
+    osc_mat : 3d array
+        Oscillations for each subject, [n_vertex, n_dim, n_subj].
 
     Returns
     -------
-    pow_ratio : ??
-        xx
+    pow_ratio : 1d array
+        Vector with oscillation score of given oscillation at each vertex.
     """
 
     # Check how many vertices and subjects in group
@@ -1326,7 +1339,7 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
         Lower bound of frequency range to check.
     osc_high : float
         Upper bound of frequency range to check.
-    avg : str
+    avg : str, optional
         What kind of average to take.
             Options: {'mean', 'median'}
 
@@ -1336,11 +1349,11 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
         Peak frequency value - the average frequency within a given range.
     """
 
-    #
+    # Pull out all center frequencies between given range
     osc_inds = (centers > osc_low) & (centers < osc_high)
     osc_cens = centers[osc_inds]
 
-    #
+    # Take the average of the center frequencies
     if avg is 'mean':
         peak = np.mean(osc_cens)
     elif avg is 'median':
@@ -1350,7 +1363,7 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
 
 
 def _band_sort(osc_bands):
-    """
+    """Sort oscillation dictionary into order.
 
     Parameters
     ----------
@@ -1362,25 +1375,25 @@ def _band_sort(osc_bands):
     ordered_bands : list(str)
         A list of the oscillation band names, in order.
     sort_inds : list(int)
-        A list of indices that ...
+        A list of indices to sort oscillation bands.
     """
 
     # Check how many oscillation bands there are
     n_bands = len(osc_bands)
 
-    # Get low end for each band
+    # Initialize to store names and lower bounds
     band_names = []
     lower_bounds = np.array([])
 
-    # xx
+    # Loop through, and grab name and lower bound for each band
     for band in osc_bands:
         band_names.append(band)
         lower_bounds = np.append(lower_bounds, osc_bands[band][0])
 
-    #
+    # Get the indices to sort the lower bounds
     sort_inds = np.argsort(lower_bounds)
 
-    #
+    # Use indices to sort band names into order
     ordered_bands = []
     ordered_bands[:] = [band_names[i] for i in sort_inds]
 
