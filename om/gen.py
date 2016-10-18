@@ -176,18 +176,34 @@ class Osc():
 
 class Osc():
 
-    def __init__(self, input_bands=None):
+    def __init__(self, default=False, input_bands=None):
+        """Initialize the Osc() object. 
 
-        # If supplied, use the given dictionary of oscillation bands
-        if input_bands:
-            self.bands = input_bands
+        Parameters
+        ----------
+        input_bands : dict, optional
+            A dictionary of oscillation bands to use. 
+        default : boolean, optional
+            Whether to use the default oscillation bands. Default it False.
 
-        # Otherwise, use the default oscillation bands
-        else:
+        Notes:
+        - If supplied, an input_bands will over-ride the default bands option, 
+            even if it is set as True. 
+        """
+
+        # Initialize bands as a dictionary
+        self.bands = dict()
+
+        # If requested use the default oscillation bands
+        if default:
             self.bands = dict({'Theta': (3, 8),
                                'Alpha': (8, 13),
                                'Beta': (13, 30),
                                'LowGamma': (30, 40)})
+
+        # If supplied, use the given dictionary of oscillation bands
+        if input_bands:
+            self.bands = input_bands
 
 
     def add_band(self, band_name, band_lims):
@@ -200,6 +216,10 @@ class Osc():
         band_lims : tuple(float, float)
             The lower and upper frequency limit of the band.
         """
+
+        # Safety check that limits are in correct order
+        if not band_lims[0] < band_lims[1]:
+            raise InconsistentDataError('Band limits are incorrect.')
 
         # Add the given band to oscillation definition
         self.bands[band_name] = band_lims
