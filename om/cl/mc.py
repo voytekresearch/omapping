@@ -12,6 +12,9 @@ from ipyparallel.util import interactive
 # Import custom om code
 from om.gen import *
 
+# TODO: Update anything in here relevant to the update to Osc_Dict().
+#   Anything with hard coded oscillation bands need fixing. 
+
 ###########################################################################################
 ############################ OMEGAMAPPIN - MAP COMPARE CLASSES ############################
 ###########################################################################################
@@ -922,7 +925,13 @@ def _mat_mult(vec):
 
 
 def _make_list(dat_df):
-    """   """
+    """Turns a dataframe into a list.
+
+    Parameters
+    ----------
+    dat_df : DataFrame
+        Input data, to be converted into a list.
+    """
 
     # Get size of the data to
     [n_vert, n_dat] = dat_df.shape
@@ -938,7 +947,13 @@ def _make_list(dat_df):
 
 
 def _pull_out_results(dat_in):
-    """   """
+    """Given a list of correlation results, pulls them out into arrays.
+
+    Parameters
+    ----------
+    dat_in : list(tuple)
+        A list of correlation results. Each tuple is (R-val, p-val).
+    """
 
     # Check length of data
     n = len(dat_in)
@@ -957,7 +972,17 @@ def _pull_out_results(dat_in):
 
 @interactive
 def _run_corr(dat):
-    """   """
+    """Run correlation between maps. Used for parallel runs.
+
+    Parameters
+    ----------
+    dat : 1d array
+        An array of map data to be compared to projected meg map.
+
+    Note:
+    - meg_map has to be projected to workers.
+    - numpy and pearsonr have to be imported on workers.
+    """
 
     # Get inds of data that contains numbers
     inds_non_nan = [i for i in range(len(dat)) if not numpy.isnan(dat[i])]
