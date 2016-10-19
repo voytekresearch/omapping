@@ -175,7 +175,7 @@ class MegData():
             for band in osc.bands:
 
                 # Get oscillations in specific band
-                self.oscs[band][i, :] = _get_osc(centers_temp, powers_temp, bws_temp,
+                self.oscs[band][i, :] = _get_single_osc(centers_temp, powers_temp, bws_temp,
                                                  osc.bands[band][0], osc.bands[band][1])
 
         # Update boolean to note that current subject has band specific oscs calculated.
@@ -875,7 +875,7 @@ def load_md_pickle(file_name):
 #################################################################################################
 
 
-def _get_osc(centers, powers, bws, osc_low, osc_high):
+def _get_single_osc(centers, powers, bws, osc_low, osc_high):
     """ Searches for an oscillations of specified frequency band.
 
     Returns a single oscillation in that band.
@@ -901,7 +901,7 @@ def _get_osc(centers, powers, bws, osc_low, osc_high):
     """
 
     # Find indices of oscillations in the specified range
-    osc_inds = (centers > osc_low) & (centers < osc_high)
+    osc_inds = (centers >= osc_low) & (centers <= osc_high)
 
     # Get cen, pow & bw for oscillations in specfied range
     osc_cens = centers[osc_inds]

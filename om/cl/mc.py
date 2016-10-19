@@ -893,7 +893,7 @@ def _init_stat_dict(bands):
     Parameters
     ----------
     bands : list(str)
-        xx
+        Oscillation bands to initialize.
     """
 
     # Initialize dictionary to return
