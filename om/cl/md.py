@@ -670,12 +670,6 @@ class GroupMegData(MegData):
         # Save out with pickle
         pickle.dump(dat_out, open(pickle_save_name, 'wb'))
 
-        """OLD:
-        # Save out an npz file
-        np.savez(npz_save_name, dat_source=self.dat_source, slopes=self.slopes_gr_avg, 
-                 n_subjs=self.n_subjs, save_time=cur_time)
-        """
-
 
     def save_map(self, map_type, file_name):
         """Save oscillation map data out to disc.
@@ -716,13 +710,6 @@ class GroupMegData(MegData):
 
         # Save out with pickle
         pickle.dump(dat_out, open(pickle_save_name, 'wb'))
-
-        """OLD:
-        # Save out data with npz
-        np.savez(npz_save_name, dat_source=self.dat_source, map_type=map_type, 
-                 osc_dat=dat, n_subjs = self.n_subjs, bands = self.bands,
-                 save_time=cur_time)
-        """
 
 
     def set_slope_viz(self):
