@@ -655,15 +655,26 @@ class GroupMegData(MegData):
         """
 
         # Set up
-        npz_file_name = file_name + '.npz'
-        npz_save_name = os.path.join(self.maps_path, 'Slopes', npz_file_name)
+        pickle_file_name = file_name + '.p'
+        pickle_save_name = os.path.join(self.maps_path, 'Slopes', pickle_file_name)
 
         # Check current time for when file is saved
         cur_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
+        # Collect data together to save out
+        dat_out = dict({'dat_source': self.dat_source, 
+                        'slopes': self.slopes_gr_avg,
+                        'n_subjs': self.n_subjs,
+                        'save_time': cur_time})
+
+        # Save out with pickle
+        pickle.dump(dat_out, open(pickle_save_name, 'wb'))
+
+        """OLD:
         # Save out an npz file
         np.savez(npz_save_name, dat_source=self.dat_source, slopes=self.slopes_gr_avg, 
                  n_subjs=self.n_subjs, save_time=cur_time)
+        """
 
 
     def save_map(self, map_type, file_name):
@@ -692,12 +703,26 @@ class GroupMegData(MegData):
         cur_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         # Set file name, and create full file path
-        npz_file_name = file_name + '_' + map_type + '.npz'
-        npz_save_name = os.path.join(self.maps_path, 'Oscs', npz_file_name)
+        pickle_file_name = file_name + '_Osc_' + map_type + '.p'
+        pickle_save_name = os.path.join(self.maps_path, 'Oscs', pickle_file_name)
 
-        # Save out data
+        # Collect data together to save out
+        dat_out = dict({'dat_source': self.dat_source, 
+                        'map_type': map_type,
+                        'osc_dat': dat,
+                        'bands':self.bands,
+                        'n_subjs': self.n_subjs,
+                        'save_time': cur_time})
+
+        # Save out with pickle
+        pickle.dump(dat_out, open(pickle_save_name, 'wb'))
+
+        """OLD:
+        # Save out data with npz
         np.savez(npz_save_name, dat_source=self.dat_source, map_type=map_type, 
-                 osc_dat=dat, n_subjs = self.n_subjs, save_time=cur_time)
+                 osc_dat=dat, n_subjs = self.n_subjs, bands = self.bands,
+                 save_time=cur_time)
+        """
 
 
     def set_slope_viz(self):
