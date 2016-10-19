@@ -1,10 +1,11 @@
 from __future__ import print_function, division
 import numpy as np
 import om.cl.md as md
+from om.gen import Osc
 
-#####################################################################
-#################### TESTS - OMEGAMAPPIN - CL_MD ####################
-#####################################################################
+#################################################################################
+########################## TESTS - OMEGAMAPPIN - CL_MD ##########################
+#################################################################################
 
 def test_get_osc():
     """   """
@@ -17,6 +18,10 @@ def test_get_all_osc():
 
 
 def test_get_single_osc_power():
+    """   """
+    pass
+
+def test_get_demo_csv():
     """   """
     pass
 
@@ -45,4 +50,17 @@ def test_osc_peak():
     # Check the returned answer is close to the actual answer
     actual_ans = (2 + 3) / 2
     assert np.isclose(test_ans, actual_ans)
+
+
+def test_band_sort():
+    """   """
+
+    # Initialize osc object, add some bands
+    #osc_bands = Osc()
+    #osc_bands.add_band('b', [12, 14])
+    #osc_bands.add_band('a')
+    pass
+
+
+
 
