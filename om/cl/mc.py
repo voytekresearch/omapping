@@ -744,7 +744,7 @@ class MapCompROI(MapComp):
         """
 
         # Initialize dict for current ROI data
-        roi_meg_dat = _init_meg_map_dict(self.nROIs)
+        roi_meg_dat = _init_meg_map_dict(self.bands.keys(), self.nROIs)
 
         # Loop through all ROIs
         for r in range(0, self.nROIs):
@@ -786,7 +786,7 @@ class MapCompROI(MapComp):
         """
 
         # Initialize the dictionary to store MEG connectivity data
-        self.meg_con = _init_meg_map_dict()
+        self.meg_con = _init_meg_map_dict(self.bands.keys())
 
         # Get section indices to run comparisons
         ind_st, ind_en, x, x = get_section(section, self.nROIs, self.roi_lr)
@@ -796,7 +796,7 @@ class MapCompROI(MapComp):
             self.meg_con[key] = _mat_mult(self.meg_ROI_maps[key][ind_st:ind_en])
 
         # Initialize a dictionary to store data
-        meg_stats = _init_meg_map_dict(length=2)
+        meg_stats = _init_meg_map_dict(self.bands.keys(), length=2)
 
         # Get nROIs used in comparison
         nROIs_used = ind_en - ind_st
