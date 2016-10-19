@@ -884,14 +884,6 @@ def _init_meg_map_dict(bands, length=0):
     for band in bands:
         meg_map[band] = np.zeros(length)
 
-    """OLD:
-    # Initialize dictionary. Will be empty arrays if length = 0.
-    meg_map = dict([('Theta',     np.zeros(length)),
-                    ('Alpha',     np.zeros(length)),
-                    ('Beta',      np.zeros(length)),
-                    ('LowGamma',  np.zeros(length))])
-    """
-
     return meg_map
 
 
