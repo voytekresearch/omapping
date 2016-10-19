@@ -1,8 +1,76 @@
+from py.test import raises
 from om.gen import *
 
-###########################################################################
-######################## TESTS - OMEGAMAPPIN - GEN ########################
-###########################################################################
+###############################################################################
+########################## TESTS - OMEGAMAPPIN - OMDB #########################
+###############################################################################
+
+def test_omdb():
+    """Test that OMDB() returns properly."""
+
+    # Check that OMDB returns properly
+    assert(OMDB())
+
+###############################################################################
+########################## TESTS - OMEGAMAPPIN - OSC ##########################
+###############################################################################
+
+def test_osc():
+    """Test that Osc() returns properly."""
+
+    # Check tha Osc returns properly
+    assert(Osc())
+
+
+def test_add_band():
+    """Test that Osc.add_band() adds band properly."""
+
+    # Initialize an Osc object
+    osc = Osc()
+    
+    # Add a new band to osc
+    osc.add_band('test', [0, 100])
+
+    # Check it added properly
+    assert('test' in osc.bands.keys())
+    assert(osc.bands['test'][0] == 0)
+    assert(osc.bands['test'][1] == 100)
+
+
+def test_osc_add_band_error():
+    """Test that Osc.add_band() returns errors appropriately."""
+
+    # Initialize an Osc object
+    osc = Osc()
+
+    # Test that it raises an error given illegal band definitions
+    with raises(InconsistentDataError):
+        osc.add_band('bad', [0, 0])
+
+    with raises(InconsistentDataError):
+        osc.add_band('worse', [10, 5])
+
+
+def test_rm_band():
+    """Test that Osc.rm_band() removes bands properly."""
+
+    # Initialize an Osc object
+    osc = Osc()
+
+    # Add a band
+    osc.add_band('test', [1, 2])
+
+    # Remove the band
+    osc.rm_band('test')
+
+    # Check that band is no longer there
+    with raises(KeyError):
+        assert(osc.bands['test'])
+
+
+###################################################################################
+############################ TESTS - OMEGAMAPPIN - GEN ############################
+###################################################################################
 
 def test_clean_file_list():
     """Test that clean_file_list works properly. 
@@ -42,6 +110,7 @@ def test_extract_psd():
     assert()
     """
     pass
+
 
 def test_get_sub_nums_first():
     """   """
