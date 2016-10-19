@@ -134,17 +134,6 @@ class MapComp():
         # Update boolean that oscs are loaded
         self.oscs_loaded = True
 
-        """ OLD:
-        # Load osc file data
-        with np.load(osc_maps_file) as data:
-
-            # Load osc maps into the meg_map dictionary
-            self.meg_maps['Theta']      = data['osc_score_theta']
-            self.meg_maps['Alpha']      = data['osc_score_alpha']
-            self.meg_maps['Beta']       = data['osc_score_beta']
-            self.meg_maps['LowGamma']   = data['osc_score_lowgamma']
-        """
-
 
     def load_slope_map(self, slope_file):
         """Load the spatial map of MEG slope data.
@@ -166,14 +155,6 @@ class MapComp():
 
         # Update boolean that slopes are loaded
         self.slopes_loaded = True
-
-        """OLD:
-        # Load slope file data
-        with np.load(slopes_map_file) as data:
-
-            # Load the slope map into the meg_map dictionary
-            self.meg_maps['Slopes']     = data['slopes']
-        """
 
 
     def load_gene_maps(self, subject):
@@ -934,26 +915,6 @@ def _init_stat_dict(bands):
     out['Slopes'] = np.array([])
 
     return out
-
-
-"""OLD:
-def _init_stat_dict():
-    ""Initialize a dictionary to store stat data for inter-data correlations.
-
-    Returns
-    -------
-    out : dict
-        A dictionary to store stats for terms/genes across all meg dat types.
-    "
-
-    out = dict([('TermsTheta',  np.array([])), ('TermsAlpha',    np.array([])),
-                ('TermsBeta',   np.array([])), ('TermsLowGamma', np.array([])),
-                ('GenesTheta',  np.array([])), ('GenesAlpha',    np.array([])),
-                ('GenesBeta',   np.array([])), ('GenesLowGamma', np.array([])),
-                ('TermsSlopes', np.array([])), ('GenesSlopes',   np.array([]))])
-
-    return out
-"""
 
 
 def _mat_mult(vec):
