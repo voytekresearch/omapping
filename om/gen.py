@@ -359,12 +359,12 @@ def extract_psd(psd, freqs, f_low, f_high):
     """
 
     # Drop frequencies below f_low
-    f_low_mask = freqs > f_low
+    f_low_mask = freqs >= f_low
     freqs_ext = freqs[f_low_mask]
     psd_ext = psd[:, f_low_mask]
 
     # Drop frequencies above f_high
-    f_high_mask = freqs_ext < f_high
+    f_high_mask = freqs_ext <= f_high
     freqs_ext = freqs_ext[f_high_mask]
     psd_ext = psd_ext[:, f_high_mask]
 
@@ -604,8 +604,7 @@ def get_section(section, n_ROIs, roi_lr):
         ind_st_b = roi_lr.index('L')
         ind_en_b = _find_last(roi_lr, 'L')
     else:
-        print('Section range unclear!')
-        ind_st_a = ind_en_a = ind_st_b = ind_en_b = 0
+        raise InconsistentDataError('Section range is unclear.')
 
     # Return indices
     return ind_st_a, ind_en_a, ind_st_b, ind_en_b
