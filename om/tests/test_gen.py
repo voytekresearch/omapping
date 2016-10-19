@@ -1,3 +1,4 @@
+import numpy as np
 from py.test import raises
 from om.gen import *
 
@@ -8,18 +9,24 @@ from om.gen import *
 def test_omdb():
     """Test that OMDB() returns properly."""
 
-    # Check that OMDB returns properly
-    assert(OMDB())
+    # Check that OMDB returns properly, with different data source settings
+    assert OMDB()
+    assert OMDB('OMEGA')
+    assert OMDB('HCP')
+    with raises(UnknownDataSourceError):
+        assert(OMDB('bad data selection'))
 
 ###############################################################################
 ########################## TESTS - OMEGAMAPPIN - OSC ##########################
 ###############################################################################
 
 def test_osc():
-    """Test that Osc() returns properly."""
+    """Test that Osc() returns properly, with different inputs."""
 
     # Check tha Osc returns properly
-    assert(Osc())
+    assert Osc()
+    assert Osc(default=True)
+    assert Osc(input_bands=dict({'Test Band': (5, 10)}))
 
 
 def test_add_band():
@@ -32,9 +39,9 @@ def test_add_band():
     osc.add_band('test', [0, 100])
 
     # Check it added properly
-    assert('test' in osc.bands.keys())
-    assert(osc.bands['test'][0] == 0)
-    assert(osc.bands['test'][1] == 100)
+    assert 'test' in osc.bands.keys() 
+    assert osc.bands['test'][0] == 0
+    assert osc.bands['test'][1] == 100
 
 
 def test_osc_add_band_error():
@@ -65,7 +72,7 @@ def test_rm_band():
 
     # Check that band is no longer there
     with raises(KeyError):
-        assert(osc.bands['test'])
+        assert osc.bands['test']
 
 
 ###################################################################################
@@ -73,9 +80,9 @@ def test_rm_band():
 ###################################################################################
 
 def test_clean_file_list():
-    """Test that clean_file_list works properly. 
+    """Test that clean_file_list() works properly.
 
-    Tests that the function returns one item to chosen query, 
+    Tests that the function returns one item to chosen query,
         and that it is case-insensitive. 
     """
 
@@ -87,59 +94,73 @@ def test_clean_file_list():
     out = clean_file_list(files, string)
 
     # Check that returns a list of 1 item, that is 'FiNd_WorD.ys'
-    assert(len(out) == 1)
-    assert(out[0] is files[2])
+    assert len(out) == 1
+    assert out[0] is files[2]
 
 
 def test_extract_psd():
-    """
-
-    TODO: Finish this test. 
-
+    """Test that extract_psd() works properly."""
 
     # Initialize input vars
-    psd = []
-    freqs = range(16)
-    f_low = 10
-    f_high = 5
+    psd = np.zeros([5, 16])
+    freqs = np.array(range(16))
+    f_low = 5
+    f_high = 10
 
     # Run extract psd
     psd_out, freqs_out = extract_psd(psd, freqs, f_low, f_high)
+    x, y = np.shape(psd_out)
 
     # Check if answers as expected
-    assert()
-    """
-    pass
+    assert freqs_out.min() == 5
+    assert freqs_out.max() == 10
+    assert (x == 5) & (y == len(freqs_out))
 
 
 def test_get_sub_nums_first():
-    """   """
+    """Test that get_sub_num() works properly with numbers first."""
 
     subj_files = ['123_test.py', '234_test.py', '345_test.py']
     out = get_sub_nums(subj_files, 'first')
 
-    assert(len(out) == len(subj_files))
-    assert(out[0] == 123)
-    assert(out[-1] == 345)
+    assert len(out) == len(subj_files)
+    assert out[0] == 123
+    assert out[-1] == 345
 
 
 def test_get_sub_nums_last():
-    """   """
+    """Test that get_sub_num() works properly with numbers last."""
 
     subj_files = ['test_123.py', 'test_234.py', 'test_345.py']
     out = get_sub_nums(subj_files, 'last')
 
-    assert(len(out) == len(subj_files))
-    assert(out[0] == 123)
-    assert(out[-1] == 345)
+    assert len(out) == len(subj_files)
+    assert out[0] == 123
+    assert out[-1] == 345
 
 
 def test_get_cur_subj():
-    """   """
+    """Tests that get_cur_subj() returns correct file name."""
 
     cur_subj = 123
     subj_files = ['123_test.npz', '456_meg.csv', '12_3.aa', 'aa_231.ok']
     out = get_cur_subj(cur_subj, subj_files)
 
-    assert(str(cur_subj) in out)
+    assert str(cur_subj) in out
 
+
+def test_rm_files_ext():
+    """   """
+
+    subj_files = ['123_test.npz', '456_meg.csv', '12_3.aa', 'aa_231.ok']
+    files_out = rm_files_ext(subj_files)
+
+    assert len(files_out) == 4
+    assert '123_test' in files_out[0]
+    assert not ('npz' in files_out[0])
+    assert not ('.ok' in files_out[3])
+
+
+def test_get_section():
+    """   """
+    pass
