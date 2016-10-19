@@ -181,10 +181,10 @@ class Osc():
 
         Parameters
         ----------
-        input_bands : dict, optional
-            A dictionary of oscillation bands to use. 
         default : boolean, optional
             Whether to use the default oscillation bands. Default it False.
+        input_bands : dict, optional
+            A dictionary of oscillation bands to use. 
 
         Notes:
         - If supplied, an input_bands will over-ride the default bands option, 
