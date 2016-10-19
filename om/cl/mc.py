@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 import os
 import csv
+import pickle
 import numpy as np
 import pandas as pd
 import scipy.io as sio
@@ -12,8 +13,10 @@ from ipyparallel.util import interactive
 # Import custom om code
 from om.gen import *
 
-# TODO: Update anything in here relevant to the update to Osc_Dict().
-#   Anything with hard coded oscillation bands need fixing. 
+# TODO: 
+#   - Update anything in here relevant to the update to Osc_Dict().
+#       Anything with hard coded oscillation bands need fixing. 
+#   - Update docs for ROI stuff
 
 ###########################################################################################
 ############################ OMEGAMAPPIN - MAP COMPARE CLASSES ############################
@@ -43,9 +46,12 @@ class MapComp():
         self.n_terms = len(self.term_names)
         self.n_genes = len(self.gene_names)
 
-        # Initialize a dictionary to store maps of meg data (oscillations & slopes)
+        # Initialize a dictionary to store maps of meg data (oscillation bands)
         self.meg_maps = dict()
-        #self.meg_maps = _init_meg_map_dict()
+        self.bands = dict()
+
+        # Initialize a dictionary to store slope map
+        self.slope_map = dict({'Slopes': np.array([])})
 
         # Initialize variable to store the term maps
         self.term_maps = np.array([])
@@ -55,10 +61,10 @@ class MapComp():
         self.gene_subj = str()
 
         # Initialize a dictionary to store all the R-value results from spatial correlations
-        self.corrs = _init_stat_dict()
+        self.corrs = dict({'Terms': dict(), 'Genes': dict()})
 
         # Initialize a dictionary to store all the p-value results from spatial correlations
-        self.p_vals = _init_stat_dict()
+        self.p_vals = dict({'Terms': dict(), 'Genes': dict()})
 
         # Initialize booleans that keep track of what is loaded
         self.oscs_loaded = False
@@ -98,57 +104,76 @@ class MapComp():
             return osc_files, slope_files, term_files, gene_files
 
 
-    def load_meg_maps(self, osc_file=None, slope_file=None):
-        """Load the spatial maps of MEG data (oscillations and slopes).
+    def load_meg_maps(self, osc_file):
+        """Load the spatial maps of MEG data (oscillation bands).
 
         Parameters
         ----------
         self : MapComp() object
             Object for storing and comparing map data.
         osc_file : str, optional
-            File path to the file with oscillations data.
-        slope_file : str, optional
-            File path to the file with slope data.
+            File name of the pickle file with oscillations data.
         """
 
+        # Get the full path for the file name
+        osc_maps_file = os.path.join(self.oscs_path, osc_file + '.p')
+
+        # Load data from pickle file
+        dat_in = pickle.load(open(osc_maps_file, 'rb'))
+
+        # Get the oscillation bands used in current maps
+        self.bands = dat_in['bands']
+
         # Initialize the var to store meg map data
-        if slope_file is not None:
-            self.meg_maps = _init_meg_map_dict()
-        else:
-            self.meg_maps = _init_meg_map_dict(slopes=False)
+        self.meg_maps = _init_meg_map_dict(self.bands.keys())
 
-        # If a filename is provided, load oscillation data
-        if osc_file is not None:
+        # Pull out oscillation band data
+        for band in self.bands:
+            self.meg_maps[band] = dat_in['osc_dat'][band]
 
-            # Get the full path for the file name
-            oscs_map_file = os.path.join(self.oscs_path, osc_file + '.npz')
+        # Update boolean that oscs are loaded
+        self.oscs_loaded = True
 
-            # Load osc file data
-            with np.load(oscs_map_file) as data:
+        """ OLD:
+        # Load osc file data
+        with np.load(osc_maps_file) as data:
 
-                # Load osc maps into the meg_map dictionary
-                self.meg_maps['Theta']      = data['osc_score_theta']
-                self.meg_maps['Alpha']      = data['osc_score_alpha']
-                self.meg_maps['Beta']       = data['osc_score_beta']
-                self.meg_maps['LowGamma']   = data['osc_score_lowgamma']
+            # Load osc maps into the meg_map dictionary
+            self.meg_maps['Theta']      = data['osc_score_theta']
+            self.meg_maps['Alpha']      = data['osc_score_alpha']
+            self.meg_maps['Beta']       = data['osc_score_beta']
+            self.meg_maps['LowGamma']   = data['osc_score_lowgamma']
+        """
 
-            # Update boolean that oscs are loaded
-            self.oscs_loaded = True
 
-        # If a filename is provided, load slope data
-        if slope_file is not None:
+    def load_slope_map(self, slope_file):
+        """Load the spatial map of MEG slope data.
 
-            # Get the full path for the file name
-            slopes_map_file = os.path.join(self.slopes_path, slope_file + '.npz')
+        Parameters
+        ----------
+        slope_file : str
+            File name of the pickle file with slope data.
+        """
 
-            # Load slope file data
-            with np.load(slopes_map_file) as data:
+        # Get the full path for the file name
+        slopes_map_file = os.path.join(self.slopes_path, slope_file + '.p')
 
-                # Load the slope map into the meg_map dictionary
-                self.meg_maps['Slopes']     = data['chis']
+        # Load data from pickle file
+        dat_in = pickle.load(open(slopes_map_file, 'rb'))
 
-            # Update boolean that slopes are loaded
-            self.slopes_loaded = True
+        # Pull out the slope data
+        self.slope_map['Slopes'] = dat_in['slopes']
+
+        # Update boolean that slopes are loaded
+        self.slopes_loaded = True
+
+        """OLD:
+        # Load slope file data
+        with np.load(slopes_map_file) as data:
+
+            # Load the slope map into the meg_map dictionary
+            self.meg_maps['Slopes']     = data['slopes']
+        """
 
 
     def load_gene_maps(self, subject):
@@ -164,6 +189,7 @@ class MapComp():
 
         # Check if gene data already loaded - if so, unload
         if self.genes_loaded:
+            print('Unloading previously loaded genes.')
             self.unload_data('Genes')
 
         # Set subject marker
@@ -239,10 +265,10 @@ class MapComp():
         self : MapComp() object
             Object for storing and comparing map data.
         dat_type : str
-            Type of data to correlate with meg data
-                'Terms' or 'Genes' only
+            Type of data to correlate with meg data.
+                Options: {'Terms', 'Genes'}
         meg_dat : str
-            Specific type of meg data to correlate
+            Specific type of meg data to correlate.
                 osc_band or 'Slopes' only
         method : str
             Run method (linear or parallel) to use.
@@ -260,10 +286,27 @@ class MapComp():
             raise UnknownDataTypeError('Data Type not understood.')
 
         # Get the specified meg map
-        try:
-            meg_map = self.meg_maps[meg_dat]
-        except KeyError:
-            raise UnknownDataTypeError('MEG Data not understood.')
+        if meg_dat is 'Slopes':
+
+            # Check that slopes are loaded
+            if not self.slopes_loaded:
+                raise DataNotComputedError('Slope data has not been loaded.')
+            meg_map = self.slope_map[meg_dat]
+
+        else:
+
+            # Check that oscillation data is loaded
+            if not self.oscs_loaded:
+                raise DataNotComputedError('Oscillation data has not been loaded.')
+            try:
+                meg_map = self.meg_maps[meg_dat]
+            except KeyError:
+                raise UnknownDataTypeError('MEG Data not understood.')
+
+        # Initialize dictionaries to store correlation data
+        if not self.corrs[dat_type]:
+            self.corrs[dat_type] = _init_stat_dict(self.bands)
+            self.p_vals[dat_type] = _init_stat_dict(self.bands)
 
         # Print out status
         print('Calculating corrs between', str(dat_type), 'and', str(meg_dat))
@@ -313,8 +356,8 @@ class MapComp():
             [corr_vals, p_vals] = _pull_out_results(results)
 
         # Save correlations results to MapComp object
-        self.corrs[dat_type + meg_dat] = corr_vals
-        self.p_vals[dat_type + meg_dat] = p_vals
+        self.corrs[dat_type][meg_dat] = corr_vals
+        self.p_vals[dat_type][meg_dat] = p_vals
 
 
     def check_corrs(self, dat_type, meg_dat, n_check=20, top=True):
@@ -345,13 +388,14 @@ class MapComp():
             raise UnknownDataTypeError('Data type not understood.')
 
         # Check that asked for correlations have been computed
-        #if not self.corrs[dat_type + meg_dat]:
-        #    print("Those correlations not calculated. Quitting.")
-        #    return
+        if not self.corrs[dat_type]:
+            raise DataNotComputedError('No correlations calculated for requested data type.')
+        elif len(self.corrs[dat_type][meg_dat]) == 0:
+            raise DataNotComputedError('Requested meg data correlation not calculated.')
 
         # Get R and p values of specified correlations
-        meg_corr = np.squeeze(self.corrs[dat_type + meg_dat])
-        meg_p = np.squeeze(self.p_vals[dat_type + meg_dat])
+        meg_corr = np.squeeze(self.corrs[dat_type][meg_dat])
+        meg_p = np.squeeze(self.p_vals[dat_type][meg_dat])
 
         # Sort the corr vector
         inds_max = np.argsort(meg_corr, axis=0)
@@ -392,7 +436,7 @@ class MapComp():
 
             # Check if terms are currently loaded. Return if not.
             if not self.terms_loaded:
-                print("Terms are not loaded - can not unload.")
+                raise DataNotComputedError('Terms not loaded - can not unload.')
 
             # Unload terms by resetting map variable as empty
             self.term_maps = np.array([])
@@ -405,7 +449,7 @@ class MapComp():
 
             # Check if genes are currently loaded. Return if not.
             if not self.genes_loaded:
-                print("Genes are not loaded - can not unload.")
+                raise DataNotComputedError('Terms not loaded - can not unload.')
 
             # Unload genes by resetting map variable as empty
             self.gene_maps = np.array([])
@@ -453,13 +497,12 @@ class MapComp():
             raise UnknownDataTypeError('Data type not understood.')
 
         # Check that asked for correlations have been computed
-        #if not self.corrs[dat_type + meg_dat]:
-        #    print("Those correlations not calculated. Quitting.")
-        #    return
+        if not self.corrs[dat_type][meg_dat]:
+            raise DataNotComputedError('Requested correlation not calculated.')
 
         # Get the correlation data of interest
-        meg_corrs = np.squeeze(self.corrs[dat_type + meg_dat])
-        meg_p_vals = np.squeeze(self.p_vals[dat_type + meg_dat])
+        meg_corrs = np.squeeze(self.corrs[dat_type][meg_dat])
+        meg_p_vals = np.squeeze(self.p_vals[dat_type][meg_dat])
 
         # Save a numpy npz file
         if save_as_npz:
@@ -643,8 +686,7 @@ class MapCompROI(MapComp):
 
         # Check if ROIs loaded - return if not
         if (not self.elec_roi_names) or (not self.anat_roi_names):
-            print('One or Both ROIs not loaded! Cant proceed!')
-            return
+            raise DataNotComputedError('One or Both ROIs not loaded! Cant proceed!')
 
         # Elec L/Rs - standardize names
         for r in range(0, self.elec_nROIs):
@@ -763,7 +805,7 @@ class MapCompROI(MapComp):
         """
 
         # Initialize the dictionary to store MEG connectivity data
-        self.meg_con = _init_meg_map_dict(slopes=False)
+        self.meg_con = _init_meg_map_dict()
 
         # Get section indices to run comparisons
         ind_st, ind_en, x, x = get_section(section, self.nROIs, self.roi_lr)
@@ -773,7 +815,7 @@ class MapCompROI(MapComp):
             self.meg_con[key] = _mat_mult(self.meg_ROI_maps[key][ind_st:ind_en])
 
         # Initialize a dictionary to store data
-        meg_stats = _init_meg_map_dict(length=2, slopes=False)
+        meg_stats = _init_meg_map_dict(length=2)
 
         # Get nROIs used in comparison
         nROIs_used = ind_en - ind_st
@@ -837,17 +879,16 @@ def _get_map_names(names_file, path):
     return names
 
 
-def _init_meg_map_dict(length=0, slopes=True):
+def _init_meg_map_dict(bands, length=0):
     """Initialize a dictionary to store meg data.
 
     Parameters
     ----------
+    bands : list(str)
+        Oscillation bands to initialize.
     length : int, optional
         If non-zero, length of zeros array to initialize.
             Defaults to 0, which initializes an empty array.
-    slopes : boolean, optional
-        Whether to include the 'Slopes' key in the dictonary.
-            Defaults to True
 
     Returns
     -------
@@ -855,37 +896,55 @@ def _init_meg_map_dict(length=0, slopes=True):
         Dictionary with fields for MEG oscillation data.
     """
 
-    # If length 0, initialize dict with empty arrays
-    if length == 0:
-        meg_map = dict([('Theta',     np.array([])),
-                        ('Alpha',     np.array([])),
-                        ('Beta',      np.array([])),
-                        ('LowGamma',  np.array([])),
-                        ('Slopes',    np.array([]))])
+    # Initialize dictionary
+    meg_map = dict()
 
-    # If given a number, initialize zeros arrays of given length
-    else:
-        meg_map = dict([('Theta',     np.zeros(length)),
-                        ('Alpha',     np.zeros(length)),
-                        ('Beta',      np.zeros(length)),
-                        ('LowGamma',  np.zeros(length)),
-                        ('Slopes',    np.zeros(length))])
+    # Add oscillation bands
+    for band in bands:
+        meg_map[band] = np.zeros(length)
 
-    # If requested, drop the Slopes field
-    if not slopes:
-        meg_map.pop('Slopes')
+    """OLD:
+    # Initialize dictionary. Will be empty arrays if length = 0.
+    meg_map = dict([('Theta',     np.zeros(length)),
+                    ('Alpha',     np.zeros(length)),
+                    ('Beta',      np.zeros(length)),
+                    ('LowGamma',  np.zeros(length))])
+    """
 
     return meg_map
 
 
-def _init_stat_dict():
+def _init_stat_dict(bands):
     """Initialize a dictionary to store stat data for inter-data correlations.
+
+    Parameters
+    ----------
+    bands : list(str)
+        xx
+    """
+
+    # Initialize dictionary to return
+    out = dict()
+
+    # Add to dictionary for each band
+    for band in bands:
+        out[band] = np.array([])
+
+    # Add a field for slope correlations
+    out['Slopes'] = np.array([])
+
+    return out
+
+
+"""OLD:
+def _init_stat_dict():
+    ""Initialize a dictionary to store stat data for inter-data correlations.
 
     Returns
     -------
     out : dict
         A dictionary to store stats for terms/genes across all meg dat types.
-    """
+    "
 
     out = dict([('TermsTheta',  np.array([])), ('TermsAlpha',    np.array([])),
                 ('TermsBeta',   np.array([])), ('TermsLowGamma', np.array([])),
@@ -894,6 +953,7 @@ def _init_stat_dict():
                 ('TermsSlopes', np.array([])), ('GenesSlopes',   np.array([]))])
 
     return out
+"""
 
 
 def _mat_mult(vec):
