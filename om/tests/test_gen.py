@@ -14,7 +14,7 @@ def test_omdb():
     assert OMDB('OMEGA')
     assert OMDB('HCP')
     with raises(UnknownDataSourceError):
-        assert(OMDB('bad data selection'))
+        assert OMDB('bad data selection')
 
 ###############################################################################
 ########################## TESTS - OMEGAMAPPIN - OSC ##########################
@@ -34,12 +34,12 @@ def test_add_band():
 
     # Initialize an Osc object
     osc = Osc()
-    
+
     # Add a new band to osc
     osc.add_band('test', [0, 100])
 
     # Check it added properly
-    assert 'test' in osc.bands.keys() 
+    assert 'test' in osc.bands.keys()
     assert osc.bands['test'][0] == 0
     assert osc.bands['test'][1] == 100
 
@@ -83,7 +83,7 @@ def test_clean_file_list():
     """Test that clean_file_list() works properly.
 
     Tests that the function returns one item to chosen query,
-        and that it is case-insensitive. 
+        and that it is case-insensitive.
     """
 
     # Initiate vars to pass in
@@ -157,8 +157,8 @@ def test_rm_files_ext():
 
     assert len(files_out) == 4
     assert '123_test' in files_out[0]
-    assert not ('npz' in files_out[0])
-    assert not ('.ok' in files_out[3])
+    assert not 'npz' in files_out[0]
+    assert not '.ok' in files_out[3]
 
 
 def test_get_section():

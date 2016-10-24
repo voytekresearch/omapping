@@ -14,13 +14,13 @@ def test_init_meg_map_dict():
     """   """
 
     bands = ['a', 'b', 'c', 'd']
-    
+
     assert mc._init_meg_map_dict(bands)
     assert mc._init_meg_map_dict(bands, 100)
 
 def test_init_stat_dict():
     """   """
-    
+
     assert mc._init_stat_dict(['a', 'b', 'c'])
 
 def test_mat_mult():
