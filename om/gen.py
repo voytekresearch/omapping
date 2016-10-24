@@ -13,7 +13,7 @@ from foof.fit import FOOF
 ########################## OMEGAMAPPIN - GENERAL CLASSES ##########################
 ###################################################################################
 
-class OMDB():
+class OMDB(object):
     """Class to hold database information for MEG project. """
 
     def __init__(self, dat_source='both'):
@@ -148,47 +148,23 @@ class OMDB():
         # Return file list
         return files
 
-"""
-class Osc():
-    "Class to store oscillations parameters.
-    NOTE: Old format. Currently being updated.
-    "
 
-    def __init__(self):
-
-        # Theta
-        self.theta_low = 3
-        self.theta_high = 8
-
-        # Alpha
-        self.alpha_low = 8
-        self.alpha_high = 13
-
-        # Beta
-        self.beta_low = 13
-        self.beta_high = 30
-
-        # Low Gamma
-        self.lowgamma_low = 30
-        self.lowgamma_high = 40
-"""
-
-
-class Osc():
+class Osc(object):
+    """Class to hold definition of oscillation bands."""
 
     def __init__(self, default=False, input_bands=None):
-        """Initialize the Osc() object. 
+        """Initialize the Osc() object.
 
         Parameters
         ----------
         default : boolean, optional
             Whether to use the default oscillation bands. Default it False.
         input_bands : dict, optional
-            A dictionary of oscillation bands to use. 
+            A dictionary of oscillation bands to use.
 
         Notes:
-        - If supplied, an input_bands will over-ride the default bands option, 
-            even if it is set as True. 
+        - If supplied, an input_bands will over-ride the default bands option,
+            even if it is set as True.
         """
 
         # Initialize bands as a dictionary
@@ -238,7 +214,7 @@ class Osc():
         self.bands.pop(old_band)
 
 
-class FigInfo():
+class FigInfo(object):
     """Object to hold settings to save figures. """
 
     def __init__(self):
@@ -260,7 +236,8 @@ class FigInfo():
         self.vis_opac = 0.005
 
         # Save Information
-        self.save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/4-Figures/MegAnalysis/'
+        self.save_path = ("/Users/thomasdonoghue/Documents/Research/"
+                          "1-Projects/OMEGA/4-Figures/MegAnalysis/")
         self.format = 'svg'
         self.bbox = 'tight'
         self.dpi = 150
@@ -635,14 +612,14 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res):
     """
 
     # Check how many PSDs there are
-    [nPSDs, n_freqs] = np.shape(psd_ext)
+    [n_PSDs, n_freqs] = np.shape(psd_ext)
 
     # Initialize foof
     foof = FOOF(min_p=min_p, res=freq_res, fmin=freqs_ext.min(), fmax=freqs_ext.max())
 
     # Set up PSD as a list of 2-D np arrays
     psd_list = list(psd_ext)
-    for i in range(0, nPSDs):
+    for i in range(0, n_PSDs):
         psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
 
     # Run FOOF linearly
