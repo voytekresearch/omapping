@@ -13,7 +13,7 @@ from om.gen import *
 ##########################################################################################
 
 
-class MegData():
+class MegData(object):
     """Class for a single subject of FOOF results for MEG Source PSDs."""
 
     def __init__(self, db):
@@ -176,7 +176,7 @@ class MegData():
 
                 # Get oscillations in specific band
                 self.oscs[band][i, :] = _get_single_osc(centers_temp, powers_temp, bws_temp,
-                                                 osc.bands[band][0], osc.bands[band][1])
+                                                        osc.bands[band][0], osc.bands[band][1])
 
         # Update boolean to note that current subject has band specific oscs calculated.
         self.bands_vertex = True
@@ -242,7 +242,8 @@ class MegData():
 
         # Loop through each band, calculating peak frequency
         for band in osc.bands:
-            self.peaks[band] = _osc_peak(self.centers_all, osc.bands[band][0], osc.bands[band][1], avg)
+            self.peaks[band] = _osc_peak(
+                self.centers_all, osc.bands[band][0], osc.bands[band][1], avg)
 
 
     def calc_osc_param_corrs(self):
@@ -462,7 +463,10 @@ class GroupMegData(MegData):
 
 
     def osc_prob(self):
-        """Calculates the probability (per vertex / across subjects) of an osc in a specific band."""
+        """Calculates the probability of an osc in a specific band.
+
+         This is done per vertex, across subjects.
+         """
 
         # Check if vertex data is set
         if not self.bands_vertex:
@@ -555,7 +559,7 @@ class GroupMegData(MegData):
 
     def calc_osc_peak_age(self):
         """Compares age and peak frequency within frequency bands.
-        
+    
         Returns
         -------
         corrs : dict
@@ -662,7 +666,7 @@ class GroupMegData(MegData):
         cur_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         # Collect data together to save out
-        dat_out = dict({'dat_source': self.dat_source, 
+        dat_out = dict({'dat_source': self.dat_source,
                         'slopes': self.slopes_gr_avg,
                         'n_subjs': self.n_subjs,
                         'save_time': cur_time})
@@ -701,7 +705,7 @@ class GroupMegData(MegData):
         pickle_save_name = os.path.join(self.maps_path, 'Oscs', pickle_file_name)
 
         # Collect data together to save out
-        dat_out = dict({'dat_source': self.dat_source, 
+        dat_out = dict({'dat_source': self.dat_source,
                         'map_type': map_type,
                         'osc_dat': dat,
                         'bands':self.bands,
@@ -822,7 +826,7 @@ def print_corrs_vec(rs_vec, ps_vec, labels, desc):
 
     # Loop through vectors, printing out the correlations.
     for x in range(n):
-        print('Corr of ', '{:20}'.format(labels[x]+'-'+desc),' is ',
+        print('Corr of ', '{:20}'.format(labels[x]+'-'+desc), ' is ',
               '{:+1.4f}'.format(rs_vec[x]), '    with p-val of ',
               '{:1.5f}'.format(ps_vec[x]))
 

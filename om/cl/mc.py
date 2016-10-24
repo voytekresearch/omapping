@@ -13,16 +13,14 @@ from ipyparallel.util import interactive
 # Import custom om code
 from om.gen import *
 
-# TODO: 
-#   - Update anything in here relevant to the update to Osc_Dict().
-#       Anything with hard coded oscillation bands need fixing. 
+# TODO:
 #   - Update docs for ROI stuff
 
 ###########################################################################################
 ############################ OMEGAMAPPIN - MAP COMPARE CLASSES ############################
 ###########################################################################################
 
-class MapComp():
+class MapComp(object):
     """Class for storing and comparing spatial topographies."""
 
     def __init__(self, db):
@@ -180,7 +178,8 @@ class MapComp():
         subj_str = subject + '_gene_estimations'
 
         # Get list of files available for requested subject
-        genes_file_names = clean_file_list(os.listdir(os.path.join(self.genes_path, subj_str)), 'r10')
+        genes_file_names = clean_file_list(
+            os.listdir(os.path.join(self.genes_path, subj_str)), 'r10')
 
         # If one file given, load this as the gene map
         if len(genes_file_names) == 1:
@@ -191,13 +190,13 @@ class MapComp():
         else:
 
             # Check how many files there are
-            nFiles = len(genes_file_names)
+            n_files = len(genes_file_names)
 
             # Loop through all files given
-            for i in range(0, nFiles):
+            for i in range(0, n_files):
 
                 # Print loading status
-                print('Loading file #', str(i+1), ' of ', str(nFiles))
+                print('Loading file #', str(i+1), ' of ', str(n_files))
 
                 # If first file, initialize as first part of the gene map
                 if i == 0:
@@ -309,7 +308,8 @@ class MapComp():
                 inds_non_nan = [i for i in range(len(dat)) if not np.isnan(dat[i])]
 
                 # Calculate correlation between data and meg map
-                [corr_vals[comp], p_vals[comp]] = sps.pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
+                [corr_vals[comp], p_vals[comp]] = sps.pearsonr(
+                    dat[inds_non_nan], meg_map[inds_non_nan])
 
         # Run in parallel
         elif method is 'parallel':
@@ -755,13 +755,13 @@ class MapCompROI(MapComp):
 
                 #
                 cur_verts = np.squeeze(self.roi_verts[r] - 1)
-                nVerts = len(cur_verts)
+                n_verts = len(cur_verts)
 
                 #
                 temp_dat = self.meg_maps[key][cur_verts]
 
                 #
-                roi_meg_dat[key][r] = (sum(temp_dat) / nVerts)
+                roi_meg_dat[key][r] = (sum(temp_dat) / n_verts)
 
         # Add the current ROI data to object
         self.meg_ROI_maps = roi_meg_dat
@@ -947,7 +947,7 @@ def _make_list(dat_df):
     """
 
     # Get size of the data to
-    [n_vert, n_dat] = dat_df.shape
+    [n_verts, n_dat] = dat_df.shape
 
     # Initialize list to return
     out_list = list()
