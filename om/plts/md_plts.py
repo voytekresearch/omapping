@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import numpy as np
 import matplotlib.pyplot as plt
-from om.gen import FigInfo, UnkownDataTypeError
+from om.gen import FigInfo, UnknownDataTypeError
 
 #######################################################################################
 ############################## OM - PLTS - MEGDATA PLOTS ##############################
