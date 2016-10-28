@@ -31,7 +31,7 @@ class MegData(object):
 
         # Initialize subject number
         self.subnum = int()
-        self.n_PSDs = int()
+        self.n_psds = int()
 
         # Initialize data arrays
         self.slopes = np.array([])
@@ -46,6 +46,7 @@ class MegData(object):
         self.n_oscs = np.array([])
 
         # Initialize list to store all centers histogram
+        #  This is used for the subject specific oscillation analysis/plots
         self.centers_hist = []
 
         # Initialize dictionary to store osc bands - NEW
@@ -109,28 +110,34 @@ class MegData(object):
         # Load data file
         if load_type is 'pickle':
             results = _load_foof_pickle(cur_subj_path)
-        elif load_type is 'csv':
+        elif load_type is 'csv': # NOTE: not yet implemented
             results = _load_foof_csv(cur_subj_path)
 
-        # Check how many
-        self.n_PSDs = len(results)
+        # Pull out data from results - NOTE: New version.
+        self.centers, self.powers, self.bws, self.slopes, self.n_psds \
+            = extract_foof_pickle(results)
+
+        """OLD:
+        # Check how many psds there are
+        self.n_psds = len(results)
 
         # Initialize numpy arrays to pull out different result params
-        self.slopes = np.zeros([self.n_PSDs, 1])
-        self.centers = np.zeros([self.n_PSDs, 8])
-        self.powers = np.zeros([self.n_PSDs, 8])
-        self.bws = np.zeros([self.n_PSDs, 8])
+        self.slopes = np.zeros([self.n_psds, 1])
+        self.centers = np.zeros([self.n_psds, 8])
+        self.powers = np.zeros([self.n_psds, 8])
+        self.bws = np.zeros([self.n_psds, 8])
 
         # Loop through FOOF results, pulling out individual findings
-        for i in range(0, self.n_PSDs):
+        for i in range(self.n_psds):
             self.slopes[i] = results[i][0]
             self.centers[i, 0:len(results[i][1])] = results[i][1]
             self.powers[i, 0:len(results[i][2])] = results[i][2]
             self.bws[i, 0:len(results[i][3])] = results[i][3]
+        """
 
         # Check how many oscillations per vertex
-        self.osc_count = np.zeros([self.n_PSDs, 1])
-        for i in range(0, self.n_PSDs):
+        self.osc_count = np.zeros([self.n_psds, 1])
+        for i in range(0, self.n_psds):
             self.osc_count[i, 0] = len(np.nonzero(self.centers[i, :])[0])
 
         # Get demographic data
@@ -161,10 +168,10 @@ class MegData(object):
 
         # Initialize matrices to store oscillations in each band
         for band in osc.bands:
-            self.oscs[band] = np.zeros([self.n_PSDs, 4])
+            self.oscs[band] = np.zeros([self.n_psds, 4])
 
         # Loop through each vertex
-        for i in range(self.n_PSDs):
+        for i in range(self.n_psds):
 
             # Get centers, powers and bws from individual vertex
             centers_temp = self.centers[i, :]
@@ -559,7 +566,7 @@ class GroupMegData(MegData):
 
     def calc_osc_peak_age(self):
         """Compares age and peak frequency within frequency bands.
-    
+
         Returns
         -------
         corrs : dict
