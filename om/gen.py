@@ -27,7 +27,8 @@ class OMDB(object):
         self.dat_source = dat_source
 
         # Set base path for OMEGA data
-        self.project_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/'
+        self.project_path = ("/Users/thomasdonoghue/Documents/Research/"
+                             "1-Projects/OMEGA/2-Data/")
 
         # Set paths for different data types
         self.maps_path = os.path.join(self.project_path, 'Maps')
@@ -364,7 +365,7 @@ def save_foof_pickle(results, save_path, sub_num):
 
     # Set save name and path
     save_name = str(sub_num) + '_Foof_Vertex.p'
-    foof_save_path = os.path.join(save_path, save_name)
+    foof_save_path = os.path.join(save_path, 'pickle', save_name)
 
     # Save out data to pickle file
     pickle.dump(results, open(foof_save_path, 'wb'))
@@ -446,6 +447,47 @@ def load_foof_pickle(dat_path, sub_num):
     results = pickle.load(open(subj_path, 'rb'))
 
     return results
+
+
+def extract_foof_pickle(results):
+    """Pull out the foof data from pickled list.
+
+    Parameters
+    ----------
+    results : ?
+        xx
+
+    Returns
+    -------
+    centers : 2d array
+        xx
+    powers : 2d array
+        xx
+    bws : 2d array
+        xx
+    slopes : 1d array
+        xx
+    n_psds : int
+        xx
+    """
+
+    # Check how many psds there are
+    n_psds = len(results)
+
+    # Initialize numpy arrays to pull out different result parameters
+    slopes = np.zeros([n_psds, 1])
+    centers = np.zeros([n_psds, 8])
+    powers = np.zeros([n_psds, 8])
+    bws = np.zeros([n_psds, 8])
+
+    # Pull out the data from each vertex
+    for i in range(n_psds):
+        slopes[i] = results[i][0]
+        centers[i, 0:len(results[i][1])] = results[i][1]
+        powers[i, 0:len(results[i][2])] = results[i][2]
+        bws[i, 0:len(results[i][3])] = results[i][3]
+
+    return centers, powers, bws, slopes, n_psds
 
 
 def load_foof_csv():
@@ -623,8 +665,7 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res):
         psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
 
     # Run FOOF linearly
-    if method is 'linear':
-        results = [_run_foof_l(foof, freqs_ext, psd) for psd in psd_list]
+    results = [_run_foof_l(foof, freqs_ext, psd) for psd in psd_list]
 
     return results
 
