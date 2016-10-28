@@ -14,17 +14,19 @@ from om.gen import *
 from ipyparallel import Client
 from ipyparallel.util import interactive
 
-## TODO: Add a report to save out.
+## TODO:
+# - Add a report to save out
+# - Figure out ipyparallel to launch from within script
 
 ######################################################################
 ############################## SETTINGS ##############################
 ######################################################################
 
 # Set which data set to run. Options {'HCP', 'OMEGA'}
-dat_source = 'OMEGA'
+dat_source = 'HCP'
 
 # Initiate queue of subjects to process
-meg_queue = [559176, 369737]
+meg_queue = [352132, 352738, 353740]
 
 ###################################################################
 ############################ FUNCTIONS ############################
@@ -65,6 +67,10 @@ with view.sync_imports():
     sys.path.append('/Users/thomasdonoghue/Documents/GitCode/')
     from foof.fit import FOOF
 
+# Set up database object
+db = OMDB(dat_source)
+
+"""
 ## Set Paths to MEG Data
 # OMEGA
 if dat_source is 'OMEGA':
@@ -77,14 +83,16 @@ elif dat_source is 'HCP':
 else:
     print('Data source not understood.')
     time.sleep(5)
+"""
 
 # Check Availabe Subjects
-files = os.listdir(meg_path)
+#files = os.listdir(meg_path)
+files = os.listdir(db.psd_path)
 files = clean_file_list(files, 'Subject_')
 all_sub_nums = get_sub_nums(files, 'last')
 
 # Get list of subjects who have already been FOOFed
-foofed_subj_files = os.listdir(save_path)
+foofed_subj_files = os.listdir(os.path.join(db.foof_path, 'pickle'))
 foofed_subj_files = clean_file_list(foofed_subj_files, 'foof')
 foofed_subj_nums = get_sub_nums(foofed_subj_files, 'first')
 
@@ -116,7 +124,7 @@ for subj in meg_queue:
     print('Starting at ', time.strftime('%H:%M:%S', time.localtime()))
 
     # Load MEG Data
-    psd, freqs = load_meg_psds(meg_path, subj)
+    psd, freqs = load_meg_psds(db.dat_source, db.psd_path, subj)
 
     # Check data - get number of PSDs and frequency resolution
     [nPSDs, nFreqs] = np.shape(psd)
@@ -127,7 +135,7 @@ for subj in meg_queue:
 
     # Set up PSD as a list of 2-D np arrays
     psd_list = list(psd_ext)
-    for i in range(0, nPSDs):
+    for i in range(nPSDs):
         psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
 
     # Send required vars to workers
@@ -142,7 +150,7 @@ for subj in meg_queue:
     foof_results = foof_map.get()
 
     # Save out results
-    save_foof_pickle(foof_results, save_path, subj)
+    save_foof_pickle(foof_results, db.foof_path, subj)
 
     # Print status
     print('FOOF finished and saved for subj ', str(subj))
