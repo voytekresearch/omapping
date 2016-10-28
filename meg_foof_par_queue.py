@@ -70,23 +70,7 @@ with view.sync_imports():
 # Set up database object
 db = OMDB(dat_source)
 
-"""
-## Set Paths to MEG Data
-# OMEGA
-if dat_source is 'OMEGA':
-    meg_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/2-PSDs/OMEGA/'
-    save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/OMEGA/pickle'
-# HCP
-elif dat_source is 'HCP':
-    meg_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/2-PSDs/HCP/'
-    save_path = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/3-FOOF/HCP/pickle'
-else:
-    print('Data source not understood.')
-    time.sleep(5)
-"""
-
 # Check Availabe Subjects
-#files = os.listdir(meg_path)
 files = os.listdir(db.psd_path)
 files = clean_file_list(files, 'Subject_')
 all_sub_nums = get_sub_nums(files, 'last')
@@ -161,5 +145,3 @@ for subj in meg_queue:
 
 # Print out end status
 print('\nFINISHED FOOF ON MEG DATA\n\n')
-
-
