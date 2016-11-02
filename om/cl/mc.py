@@ -478,8 +478,10 @@ class MapComp(object):
             raise UnknownDataTypeError('Data type not understood.')
 
         # Check that asked for correlations have been computed
-        if not self.corrs[dat_type][meg_dat]:
-            raise DataNotComputedError('Requested correlation not calculated.')
+        if not self.corrs[dat_type]:
+            raise DataNotComputedError('No correlations calculated for requested data type.')
+        elif len(self.corrs[dat_type][meg_dat]) == 0:
+            raise DataNotComputedError('Requested meg data correlation not calculated.')
 
         # Get the correlation data of interest
         meg_corrs = np.squeeze(self.corrs[dat_type][meg_dat])
