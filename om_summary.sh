@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Check how many lines there are in module - excludes blank lines
-printf "\nNumber of lines of code & commets in OM: "
+printf "\nNumber of lines of code & comments in OM: "
 find ./om -name "*.py" -type f -exec grep . {} \; | wc -l
 printf "\n"
 
