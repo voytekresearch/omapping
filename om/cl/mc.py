@@ -24,6 +24,12 @@ class MapComp(object):
     """Class for storing and comparing spatial topographies."""
 
     def __init__(self, db):
+        """
+        Parameters
+        ----------
+        db : xx
+            xx
+        """
 
         # Pull out needed paths from OMDB object
         self.project_path = db.project_path
@@ -78,9 +84,9 @@ class MapComp(object):
         ----------
         self : MapComp() object
             Object for storing and comparing map data.
-        print_files : boolean, optional
+        print_files : boolean, optional (default = True)
             Whether or not to print out available file names.
-        return_files : boolean, optional
+        return_files : boolean, optional (default = False)
             Whether or not to return lists of filenames.
         """
 
@@ -253,9 +259,8 @@ class MapComp(object):
         meg_dat : str
             Specific type of meg data to correlate.
                 osc_band or 'Slopes' only
-        method : str, optional (default = 'linear')
+        method : {'linear', 'parallel'}
             Run method (linear or parallel) to use.
-                Options: {'linear', 'parallel'}.
         """
 
         # Check with data type and set data accordingly
@@ -351,13 +356,13 @@ class MapComp(object):
         ----------
         self : MapComp() object
             Object for storing and comparing map data.
-        dat_type : str
+        dat_type : {'Terms', 'Genes'}
             Data type (Terms or Genes) of corrs to check.
         meg_dat : str
             Specific MEG data of corrs to check.
-        n_check : int, optional
+        n_check : int, optional (default = 20)
             Number of correlations to check.
-        top : boolean, optional.
+        top : boolean, optional (default = True)
             Get Top (True) or Bottom (False) set of correlations.
         """
 
@@ -410,9 +415,8 @@ class MapComp(object):
         ----------
         self : MapComp() object
             Object for storing and comparing map data.
-        dat_type : str
+        dat_type : {'Terms', 'Genes'}
             Indicator of which set of data to unload from object.
-                Options: 'Terms', 'Genes'
         """
 
         # Unload Term data
@@ -454,12 +458,10 @@ class MapComp(object):
         ----------
         self : MapComp() object
             Object for storing and comparing map data.
-        dat_type : str
+        dat_type : {'Terms', 'Genes'}
             Data type to save corrs for.
-                Options: {'Terms', 'Genes'}
         meg_dat : str
             MEG data to save corrs for.
-                Options: {'Theta', 'Alpha', 'Beta', 'LowGamma', 'Slopes'}
         save_as_npz : boolean, optional (default = True)
             Whether to save an npz file.
         save_as_csv : boolean, optional (default = True)
@@ -539,6 +541,13 @@ class MapCompROI(MapComp):
     """Class for storing and comparing spatial topographies in ROIs."""
 
     def __init__(self, db):
+        """
+
+        Parameters
+        ----------
+        db : ?
+            xx
+        """
 
         # Inherit from MapComp() class
         MapComp.__init__(self, db)
@@ -782,9 +791,8 @@ class MapCompROI(MapComp):
         ----------
         self : MapCompROI() object
             Object for storing and comparing map data, in ROI format.
-        section : str
+        section : {'all, 'left', 'right'}
             Which section of data to compare.
-                Options: 'all', 'left', 'right'
         print_out : boolean, optional (default = True)
             Whether to print out the stats results.
         """
@@ -838,8 +846,10 @@ def calc_avg_gene_map(subj_list, file_title):
 
     Parameters
     ----------
-    subj_list : list(str)
+    subj_list : list of str
         List of subject numbers to average together
+    file_title : xx
+        xx
 
     Outputs
     -------
@@ -889,6 +899,7 @@ def _avg_csv_files(f_in, f_out, avg='mean'):
         xx
     f_out : ?
         xx
+    avg : {'mean', 'median'}
     """
 
     # Open out file object
@@ -927,7 +938,10 @@ def _avg_csv_files(f_in, f_out, avg='mean'):
             temp[f_ind, :] = np.array([float(i) for i in in_readers[f_ind].next()])
 
         # Take average
-        avg_dat = np.nanmean(temp, 0)
+        if avg is 'mean':
+            avg_dat = np.nanmean(temp, 0)
+        elif avg is 'median':
+            avg_dat = np.nanmedian(temp, 0)
 
         # Write out line to average csv file
         out_writer.writerow(avg_dat.tolist())
@@ -954,7 +968,7 @@ def _get_map_names(names_file, path):
 
     Returns
     -------
-    names : list(str)
+    names : list of str
         A list of the map names
     """
 
@@ -981,7 +995,7 @@ def _get_gene_files(subj):
 
     Outputs
     -------
-    file_names_path : list(str)
+    file_names_path : list of str
         A list of full file names for all gene files for given subject
     """
 
@@ -1012,7 +1026,7 @@ def _init_meg_map_dict(bands, length=0):
 
     Parameters
     ----------
-    bands : list(str)
+    bands : list of str
         Oscillation bands to initialize.
     length : int, optional (default = 0)
         If non-zero, length of zeros array to initialize.
@@ -1038,7 +1052,7 @@ def _init_stat_dict(bands):
 
     Parameters
     ----------
-    bands : list(str)
+    bands : list of str
         Oscillation bands to initialize.
     """
 
@@ -1110,7 +1124,7 @@ def _pull_out_results(dat_in):
 
     Parameters
     ----------
-    dat_in : list(tuple)
+    dat_in : list of tuple
         A list of correlation results. Each tuple is (R-val, p-val).
     """
 
