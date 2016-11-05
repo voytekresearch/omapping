@@ -253,9 +253,9 @@ class MapComp(object):
         meg_dat : str
             Specific type of meg data to correlate.
                 osc_band or 'Slopes' only
-        method : str
+        method : str, optional (default = 'linear')
             Run method (linear or parallel) to use.
-                Options: {'linear', 'parallel'}. Default: 'linear'.
+                Options: {'linear', 'parallel'}.
         """
 
         # Check with data type and set data accordingly
@@ -460,10 +460,10 @@ class MapComp(object):
         meg_dat : str
             MEG data to save corrs for.
                 Options: {'Theta', 'Alpha', 'Beta', 'LowGamma', 'Slopes'}
-        save_as_npz : boolean, optional
-            Whether to save an npz file. Default is True.
-        save_as_csv : boolean, optional
-            Whether to save a csv file. Default is True.
+        save_as_npz : boolean, optional (default = True)
+            Whether to save an npz file.
+        save_as_csv : boolean, optional (default = True)
+            Whether to save a csv file.
         """
 
         # Check which type of data and set names, filenames & save paths accordingly
@@ -785,9 +785,8 @@ class MapCompROI(MapComp):
         section : str
             Which section of data to compare.
                 Options: 'all', 'left', 'right'
-        print_out : boolean, optional
+        print_out : boolean, optional (default = True)
             Whether to print out the stats results.
-                Defaults to True
         """
 
         # Initialize the dictionary to store MEG connectivity data
@@ -1015,9 +1014,8 @@ def _init_meg_map_dict(bands, length=0):
     ----------
     bands : list(str)
         Oscillation bands to initialize.
-    length : int, optional
+    length : int, optional (default = 0)
         If non-zero, length of zeros array to initialize.
-            Defaults to 0, which initializes an empty array.
 
     Returns
     -------
