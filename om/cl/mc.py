@@ -84,6 +84,9 @@ class MapComp(object):
             Whether or not to return lists of filenames.
         """
 
+        # Get OMDB object
+        db = OMDB()
+
         # Get lists of files from data directories
         osc_files = clean_file_list(os.listdir(self.oscs_path), 'osc')
         slope_files = clean_file_list(os.listdir(self.slopes_path), 'slope')
@@ -827,10 +830,118 @@ class MapCompROI(MapComp):
                 print('    P value: ', format(self.meg_stats[key][1], '1.4'))
 
 
-#################################################################################################
-############################ OMEGAMAPPIN - CL_MC - PRIVATE FUNCTIONS ############################
-#################################################################################################
+##############################################################################################
+########################## OMEGAMAPPIN - CL_MC - FUNCTIONS (PUBLIC) ##########################
+##############################################################################################
 
+def calc_avg_gene_map(subj_list, file_title):
+    """
+
+    Parameters
+    ----------
+    subj_list : list(str)
+        List of subject numbers to average together
+
+    Outputs
+    -------
+    xx : xx
+        xx
+    """
+
+    # Get OMDB object, and use to set genes path
+    db = OMDB()
+    genes_path = os.path.join(db.maps_path, 'Genes')
+
+    # Check how many subjects to average over
+    n_subjs = len(subj_list)
+
+    #
+    in_files_path = []
+    for subj in subj_list:
+        in_files_path.append(_get_gene_files(subj))
+
+    # Loop through three file parts
+    for part in range(3):
+
+        # Set up output file
+        out_file = file_title + '_genes_average_' + str(part+1) + 'of3.csv'
+        out_file_path = os.path.join(genes_path, 'avg', out_file)
+
+        # Get current set of input files
+        cur_part_files = []
+        for s in range(n_subjs):
+            cur_part_in_files.append(in_files_path[s][part])
+
+        #return cur_part_in_files
+
+        _avg_csv_files(cur_part_in_files, out_file_path)
+
+
+def _avg_csv_files(f_in, f_out, avg='mean'):
+    """
+
+    Note: This function assumes csv files with a constant number of rows
+        and columns, the same for all input files. Will fail, perhaps
+        silently if this is not the case.
+
+    Parameters
+    ----------
+    f_in : ?
+        xx
+    f_out : ?
+        xx
+    """
+
+    # Open out file object
+    out_file = open(f_out, 'wb')
+    out_writer = csv.writer(out_file)
+
+    # Check how many input files there are
+    n_in = len(f_in)
+
+    # Create input file objects
+    in_files = []
+    in_readers = []
+    for i in range(n_in):
+        in_files.append(open(f_in[i]))
+        in_readers.append(csv.reader(in_files[i]))
+
+    n_col = False
+
+    # Loop through each line of
+    for row in in_readers[0]:
+
+        #
+        if not n_col:
+            n_col = len(row)
+
+        # Initialize a temporary array to store
+        temp = np.zeros([n_in, n_col])
+
+        # Add first row to
+        temp[0, :] = np.array([float(i) for i in row])
+
+        #
+        for f_ind in range(1, n_in):
+
+            # Load row of data into the temporary array
+            temp[f_ind, :] = np.array([float(i) for i in in_readers[f_ind].next()])
+
+        # Take average
+        avg_dat = np.nanmean(temp, 0)
+
+        # Write out line to average csv file
+        out_writer.writerow(avg_dat.tolist())
+
+    # Close out all files
+    for i in range(n_in):
+        in_files[i].close()
+    out_file.close()
+
+
+###############################################################################################
+########################## OMEGAMAPPIN - CL_MC - FUNCTIONS (PRIVATE) ##########################
+###############################################################################################
 
 def _get_map_names(names_file, path):
     """Get the map names from a given file.
@@ -853,13 +964,48 @@ def _get_map_names(names_file, path):
 
     # Open csv file
     with open(csv_path, 'rb') as f_name:
-
         reader = csv.reader(f_name, delimiter=',')
 
         # Get list of names from first row in csv
         names = list(reader)[0]
 
     return names
+
+
+def _get_gene_files(subj):
+    """Returns full file paths for all gene files for a given subject.
+
+    Parameters
+    ----------
+    subj : str
+        Which subject to get files for
+
+    Outputs
+    -------
+    file_names_path : list(str)
+        A list of full file names for all gene files for given subject
+    """
+
+    # Get OMDB object, and use to set genes path
+    db = OMDB()
+    genes_path = os.path.join(db.maps_path, 'Genes')
+
+    # Make var for the name of the folder of gene data
+    subj_folder = subj + '_gene_estimations'
+
+    # Get a list of all the files in the folder
+    file_names = clean_file_list(os.listdir(os.path.join(
+        genes_path, subj_folder)), 'r10')
+
+    # Check how many files there are
+    n_files = len(file_names)
+
+    # Make a list of the full file names, including full path
+    file_names_path = []
+    for f in range(n_files):
+        file_names_path.append(os.path.join(genes_path, subj_folder, file_names[f]))
+
+    return file_names_path
 
 
 def _init_meg_map_dict(bands, length=0):
@@ -1005,5 +1151,4 @@ def _run_corr(dat):
     # Calculate corr between data and MEG map
     [corr_vals, p_vals] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
 
-    # Return results
     return (corr_vals, p_vals)
