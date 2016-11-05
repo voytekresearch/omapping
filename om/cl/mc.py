@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import scipy.io as sio
 import scipy.stats.stats as sps
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from ipyparallel import Client
 from ipyparallel.util import interactive
 
