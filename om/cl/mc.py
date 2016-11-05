@@ -183,6 +183,10 @@ class MapComp(object):
         # Set subject marker
         self.gene_subj = subject
 
+        # Get the list of gene file names for given subject
+        genes_file_names = _get_gene_files(subject)
+
+        """
         # Make string for folder name of subject gene data directory
         subj_str = subject + '_gene_estimations'
 
@@ -194,29 +198,28 @@ class MapComp(object):
         if len(genes_file_names) == 1:
             genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[0])
             self.gene_maps = pd.read_csv(genes_file_names[0], header=None)
+        """
 
-        # If multiple files, load them all and concatenate
-        else:
+        # Check how many files there are
+        n_files = len(genes_file_names)
 
-            # Check how many files there are
-            n_files = len(genes_file_names)
+        # Loop through all files given
+        #for i in range(0, n_files):
+        for ind, genes_csv in enumerate(genes_file_names):
 
-            # Loop through all files given
-            for i in range(0, n_files):
+            # Print loading status
+            print('Loading file #', str(ind+1), ' of ', str(n_files))
 
-                # Print loading status
-                print('Loading file #', str(i+1), ' of ', str(n_files))
+            # If first file, initialize as first part of the gene map
+            if ind == 0:
+                #genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[0])
+                self.gene_maps = pd.read_csv(genes_csv, header=None)
 
-                # If first file, initialize as first part of the gene map
-                if i == 0:
-                    genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[0])
-                    self.gene_maps = pd.read_csv(genes_csv, header=None)
-
-                # For all subsequent files, concatenate to end of gene map
-                else:
-                    genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[i])
-                    temp_df = pd.read_csv(genes_csv, header=None)
-                    self.gene_maps = pd.concat([self.gene_maps, temp_df])
+            # For all subsequent files, concatenate to end of gene map
+            else:
+                #genes_csv = os.path.join(self.genes_path, subj_str, genes_file_names[i])
+                temp_df = pd.read_csv(genes_csv, header=None)
+                self.gene_maps = pd.concat([self.gene_maps, temp_df])
 
         # Print status
         print('All files loaded!')
@@ -900,6 +903,7 @@ def _avg_csv_files(f_in, f_out, avg='mean'):
     f_out : ?
         xx
     avg : {'mean', 'median'}
+        xx
     """
 
     # Open out file object
