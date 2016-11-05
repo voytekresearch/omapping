@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import scipy.io as sio
 import scipy.stats.stats as sps
-#import matplotlib.pyplot as plt
 from ipyparallel import Client
 from ipyparallel.util import interactive
 
@@ -863,12 +862,11 @@ def calc_avg_gene_map(subj_list, file_title):
         out_file_path = os.path.join(genes_path, 'avg', out_file)
 
         # Get current set of input files
-        cur_part_files = []
+        cur_part_in_files = []
         for s in range(n_subjs):
             cur_part_in_files.append(in_files_path[s][part])
 
-        #return cur_part_in_files
-
+        # Save out an average csv file from input files
         _avg_csv_files(cur_part_in_files, out_file_path)
 
 
