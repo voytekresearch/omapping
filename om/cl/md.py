@@ -17,6 +17,13 @@ class MegData(object):
     """Class for a single subject of FOOF results for MEG Source PSDs."""
 
     def __init__(self, db):
+        """
+
+        Parameters
+        ----------
+        db : ?
+            xx
+        """
 
         # Store which db is set
         self.dat_source = db.dat_source
@@ -83,11 +90,10 @@ class MegData(object):
             Object to store MEG FOOF data.
         subnum : int
             Number of the subject to import.
-        get_demo : boolean, optional
+        get_demo : boolean, optional (default = True)
             Whether to load demographic data from csv file.
-        load_type : str, optional
+        load_type : {'pickle', 'csv'}, optional
             What type of file to load data from.
-                Options: 'pickle', 'csv'
         """
 
         # Check if object already has data
@@ -158,9 +164,8 @@ class MegData(object):
             MegData object.
         osc : Osc object
             An object containing frequency bands to use.
-        avg : str, optional
+        avg : {'mean', 'median'}, optional
             How to average to calculate peak frequencies.
-                Options: {'mean', 'median'}
         """
 
         # Save bands used
@@ -191,6 +196,11 @@ class MegData(object):
 
     def all_oscs(self, verbose=True):
         """Flatten osc data to vectors.
+
+        Parameters
+        ----------
+        verbose : xx
+            xx
 
         When imported, oscillation data is in matrix form [n_vertex, osc_slots].
         This functions converts these matrices into 1-D vectors.
@@ -242,9 +252,8 @@ class MegData(object):
         ----------
         osc : Osc object
             Object with oscillation frequency details
-        avg : str
+        avg : {'mean', 'median'}, optional
             Which type of averaging to do.
-                Options: {'mean', 'median'}
         """
 
         # Loop through each band, calculating peak frequency
@@ -309,6 +318,15 @@ class GroupMegData(MegData):
     """
 
     def __init__(self, db, osc):
+        """
+
+        Parameters
+        ----------
+        db : ?
+            xx
+        osc : ?
+            xx
+        """
 
         # Initialize from MegData() object
         MegData.__init__(self, db)
@@ -357,15 +375,15 @@ class GroupMegData(MegData):
             Object to store map data across a group of subjects.
         new_subj : MegData() Object
             MEG subject (instance of MegData)
-        add_all_oscs : boolean, optional
+        add_all_oscs : boolean, optional (default: False)
             Whether to add the vectors of all oscillations, collapsed across vertices.
-        add_vertex_bands : boolean, optional
+        add_vertex_bands : boolean, optional (default: False)
             Whether to add the oscillation band data, across vertices.
-        add_vertex_oscs : boolean, optional
+        add_vertex_oscs : boolean, optional (default: False)
             Whether to add all oscillations, across vertices.
-        add_peak_freqs : boolean, optional
+        add_peak_freqs : boolean, optional (default: False)
             Whether to add peak frequencies.
-        add_vertex_slopes : boolean, optional
+        add_vertex_slopes : boolean, optional (default: False)
             Whether to add the slopes.
         """
 
@@ -450,16 +468,15 @@ class GroupMegData(MegData):
         self.age = np.append(self.age, new_subj.age)
 
 
-    def group_slope(self, avg='median'):
+    def group_slope(self, avg='mean'):
         """Calculates the average slope value for each vertex, across subjects.
 
         Parameters
         ----------
         self : GroupMegData() object.
             Object to store map data across a group of subjects.
-        avg : str, optional
+        avg : {'mean', 'median'}, optional
             How to average across the group.
-                Options: {'mean', 'median'}. Default: 'median'.
         """
 
         # Calculate the average slope value per vertex
@@ -516,9 +533,8 @@ class GroupMegData(MegData):
         ----------
         self : GroupMegData() object.
             Object to store map data across a group of subjects.
-        map_type : str
+        map_type : {'prob', 'score'}
             Which map data type to save out.
-                Options: {'prob', 'score'}
 
         Returns
         -------
@@ -569,8 +585,12 @@ class GroupMegData(MegData):
 
         Returns
         -------
-        corrs : dict
+        corrs_mat : dict
             A dictionary containing correlations results comparing age to oscillations.
+        ps_mat : ?
+            xx
+        sorted_bands : ?
+            xx
         """
 
         # Check how many bands there are
@@ -689,9 +709,8 @@ class GroupMegData(MegData):
         ----------
         self : GroupMegData() object.
             Object to store map data across a group of subjects.
-        map_type : str
+        map_type : {'prob', 'score'}
             Which map data type to save out.
-                Options: {'prob', 'score'}
         file_name : str
             String to add to the file name.
         """
@@ -746,9 +765,8 @@ class GroupMegData(MegData):
 
         Parameters
         ----------
-        map_type : str
+        map_type : {'prob', 'score'}
             Which map data type to set as viz.
-                Options: {'prob', 'score'}
         """
 
         # Set data type
@@ -792,7 +810,7 @@ def print_corrs_mat(rs_mat, ps_mat, labels):
         Matrix of R values.
     ps_mat : 2d array
         Matrix of p-values.
-    labels : list(str)
+    labels : list of str
         Labels for the rows & columns.
     """
 
@@ -822,7 +840,7 @@ def print_corrs_vec(rs_vec, ps_vec, labels, desc):
         Vector of R values.
     ps_vec : 1d array
         Vector of p-values.
-    labels : list(str)
+    labels : list of str
         Labels for the columns.
     desc : str
         Label for the row.
@@ -962,13 +980,12 @@ def _get_demo_csv(subnum, meg_path, dat_source):
         Subject number to get demographic info for.
     meg_path : str
         String for path to csv file.
-    dat_source: str
+    dat_source: {'OMEGA', 'HCP'}
         Which database subject is from.
-            Options: {'OMEGA', 'HCP'}
 
     Returns
     -------
-    sex : str
+    sex : {'M', 'F'}
         Sex ['M'/'F'] of specified subject.
     age : int
         Age (in whole years) of specified subject.
@@ -1127,9 +1144,8 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
         Lower bound of frequency range to check.
     osc_high : float
         Upper bound of frequency range to check.
-    avg : str, optional
+    avg : {'mean', 'median'}, optional (default = 'mean')
         What kind of average to take.
-            Options: {'mean', 'median'}
 
     Returns
     -------
@@ -1160,9 +1176,9 @@ def _band_sort(osc_bands):
 
     Returns
     -------
-    ordered_bands : list(str)
+    ordered_bands : list of str
         A list of the oscillation band names, in order.
-    sort_inds : list(int)
+    sort_inds : list of int
         A list of indices to sort oscillation bands.
     """
 
