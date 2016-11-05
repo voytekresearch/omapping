@@ -17,6 +17,13 @@ class OMDB(object):
     """Class to hold database information for MEG project. """
 
     def __init__(self, dat_source='both'):
+        """
+
+        Parameters
+        ----------
+        dat_source : {'both', 'OMEGA', 'HCP'}
+            xx
+        """
 
         # Check dat_source is acceptable
         pos_sources = ['both', 'OMEGA', 'HCP']
@@ -59,20 +66,18 @@ class OMDB(object):
 
         Parameters
         ----------
-        dat_type : str
+        dat_type : {'PSD', 'foof'}
             Which data type to check files for.
-                Options: {'PSD', 'foof'}
-        save_type : str, optional
+        save_type : {'pickle', 'csv'}, optional (default = 'pickle')
             Which file type to check files for. Only used for foof files.
-                Options: {'pickle', 'csv'}
         verbose : boolean, optional
             Whether to print out information during run.
 
         Returns
         -------
-        sub_nums : list(int)
+        sub_nums : list of int
             A list of subject numbers of all the available files.
-        source : list(str)
+        source : list of str
             A list with the source database for each available file.
         """
 
@@ -116,15 +121,14 @@ class OMDB(object):
 
         Parameters
         ----------
-        res_type : str
+        res_type : {'md', 'mc'}
             Which data type to check files for.
-                Options: {'md', 'mc'}
-        verbose : boolean, optional
+        verbose : boolean, optional (default = True)
             Whether to print out information during run.
 
         Returns
         -------
-        files : list(str)
+        files : list of str
             A list of all the available files.
         """
 
@@ -158,9 +162,9 @@ class Osc(object):
 
         Parameters
         ----------
-        default : boolean, optional
+        default : boolean, optional (default = False)
             Whether to use the default oscillation bands. Default it False.
-        input_bands : dict, optional
+        input_bands : dict, optional (default = None)
             A dictionary of oscillation bands to use.
 
         Notes:
@@ -253,7 +257,7 @@ def clean_file_list(files_in, string):
 
     Parameters
     ----------
-    files_in : list (str)
+    files_in : list of str
         A list of strings, each one being a file name.
     string : str OR list
         A string to look for in file list, to keep those who have it.
@@ -284,6 +288,8 @@ def load_meg_psds(dat_source, meg_path, subj_num):
 
     Parameters
     ----------
+    dat_source : {'OMEGA', 'HCP'}
+        xx
     meg_path : str
         Path where data to load is located.
     subj_num : int
@@ -354,7 +360,7 @@ def save_foof_pickle(results, save_path, sub_num):
 
     Parameters
     ----------
-    results : list(tuple)
+    results : list of tuple
         List of tuples of FOOF results. Length of list is number of vertices.
             Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     save_path: str
@@ -376,7 +382,7 @@ def save_foof_csv(results, save_path, sub_num):
 
     Parameters
     ----------
-    results : list(tuple)
+    results : list of tuple
         List of tuples of FOOF results. Length of list is number of vertices.
             Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     save_path : str
@@ -430,7 +436,7 @@ def load_foof_pickle(dat_path, sub_num):
 
     Returns
     -------
-    results : list(tuple)
+    results : list of tuple
         List of tuples of FOOF results. Length of list is number of vertices.
             Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     """
@@ -503,15 +509,14 @@ def get_sub_nums(files_in, f_l):
 
     Parameters
     ----------
-    files_in : list[str]
+    files_in : list of str
         List of filenames.
-    f_l : str
+    f_l : {'first', 'last'}
         Whether subject numbers are first or last in file name.
-        Options: 'first', 'last'
 
     Returns
     -------
-    subnums : list[int]
+    subnums : list of int
         List of subject numbers.
     """
 
@@ -539,7 +544,7 @@ def get_cur_subj(cur_subj, files):
     ----------
     cur_subj : int
         Subject number to search for in given file list.
-    files : list[str]
+    files : list of str
         List of files to search through.
 
     Returns
@@ -562,12 +567,12 @@ def rm_files_ext(files_in):
 
     Parameters
     ----------
-    files_in : list[str]
+    files_in : list of str
         A list of file and/or directory names.
 
     Returns
     -------
-    files_out : list[str]
+    files_out : list of str
         A list of file and/or directory names with file extensions removed.
     """
 
@@ -594,11 +599,11 @@ def get_section(section, n_ROIs, roi_lr):
 
     Parameters
     ----------
-    section : str
+    section : {'all', 'left', 'right', 'lr', 'rl'}
         Which section to get indices for.
     n_ROIs : int
         The number of ROIs.
-    roi_lr : list(str)
+    roi_lr : list of str
         List of L/R for each ROI.
     """
 
@@ -648,7 +653,7 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res):
 
     Returns
     -------
-    results : list(tuple)
+    results : list of tuple
         List of tuples of FOOF results. Length of list is number of vertices.
             Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     """
@@ -731,13 +736,12 @@ def _check_files(path, word, f_l):
         Path to directory to examine.
     word : str
         Word to search for in file names to keep.
-    f_l : str
+    f_l : {'first', 'last'}
         Whether subject number is at start or end of file name.
-            Options: {'first', 'last'}
 
     Returns
     -------
-    sub_nums : list(int)
+    sub_nums : list of int
         A list of subject numbers of all the available files.
     """
 
