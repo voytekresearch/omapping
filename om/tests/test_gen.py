@@ -1,3 +1,6 @@
+"""MODULE DOCSTRING - TO FILL IN
+"""
+
 import numpy as np
 from py.test import raises
 from om.gen import *
@@ -74,6 +77,15 @@ def test_rm_band():
     with raises(KeyError):
         assert osc.bands['test']
 
+###############################################################################
+########################## TESTS - OMEGAMAPPIN - OSC ##########################
+###############################################################################
+
+def test_fig_info():
+    """Test that FigInfo() returns properly."""
+
+    # Check tha Osc returns properly
+    assert FigInfo()
 
 ###################################################################################
 ############################ TESTS - OMEGAMAPPIN - GEN ############################
@@ -109,12 +121,12 @@ def test_extract_psd():
 
     # Run extract psd
     psd_out, freqs_out = extract_psd(psd, freqs, f_low, f_high)
-    x, y = np.shape(psd_out)
+    n_row, n_col = np.shape(psd_out)
 
     # Check if answers as expected
-    assert freqs_out.min() == 5
-    assert freqs_out.max() == 10
-    assert (x == 5) & (y == len(freqs_out))
+    assert freqs_out.min() == f_low
+    assert freqs_out.max() == f_high
+    assert (n_row == 5) & (n_col == len(freqs_out))
 
 
 def test_get_sub_nums_first():
