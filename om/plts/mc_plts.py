@@ -17,7 +17,7 @@ def plot_corrs(corrs, p_vals, save_out=False):
         Vector of R values to plot distribution of.
     p_vals : 1d array
         Vector of R values to plot distribution of.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -62,12 +62,11 @@ def plot_con_mat(dat, section, roi_lr, save_out=False):
     ----------
     dat : ?
         xx
-    section : str
+    section : {'all', 'left', 'right', 'lr', 'rl'}
         Which part of the matrix to plot.
-            Options: {'all', 'left', 'right', 'lr', 'rl'}
-    roi_lr : list(str)
+    roi_lr : list of str
         List of L/R of ROIs.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
