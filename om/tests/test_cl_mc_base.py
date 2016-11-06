@@ -1,9 +1,16 @@
 from __future__ import print_function, division
-import om.cl.mc as mc
+from om.gen import OMDB
+import om.cl.mc_base as mc
 
-#####################################################################
-#################### TESTS - OMEGAMAPPIN - CL_MC ####################
-#####################################################################
+######################################################################
+################## TESTS - OMEGAMAPPIN - CL_MC_BASE ##################
+######################################################################
+
+def test_mc_base():
+    """   """
+
+    db = OMDB()
+    assert MapCompBase(db)
 
 def test_get_map_names():
     """   """
