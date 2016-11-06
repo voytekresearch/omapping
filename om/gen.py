@@ -38,14 +38,21 @@ class OMDB(object):
                              "1-Projects/OMEGA/2-Data/")
 
         # Set paths for different data types
-        self.maps_path = os.path.join(self.project_path, 'Maps')
         self.meg_path = os.path.join(self.project_path, 'MEG')
+        self.maps_path = os.path.join(self.project_path, 'Maps')
         self.corrs_path = os.path.join(self.project_path, 'Corrs')
 
         # Set paths for MEG data types
         self.psd_base_path = os.path.join(self.meg_path, '2-PSDs')
         self.foof_base_path = os.path.join(self.meg_path, '3-FOOF')
         self.viz_path = os.path.join(self.meg_path, '4-Viz')
+
+        # Set paths for Maps data types
+        self.maps_oscs_path = os.path.join(self.maps_path, 'Oscs')
+        self.maps_slopes_path = os.path.join(self.maps_path, 'Slopes')
+        self.maps_terms_path = os.path.join(self.maps_path, 'Terms')
+        self.maps_genes_path = os.path.join(self.maps_path, 'Genes')
+        self.maps_anat_path = os.path.join(self.maps_path, 'Anat')
 
         # Set path for database specific stuff
         if dat_source is 'both':
@@ -152,6 +159,35 @@ class OMDB(object):
 
         # Return file list
         return files
+
+
+    def check_map_files(self, print_files=True, return_files=False):
+        """Gets the list of files in the map directories. Can return and/or print.
+
+        Parameters
+        ----------
+        print_files : boolean, optional (default = True)
+            Whether or not to print out available file names.
+        return_files : boolean, optional (default = False)
+            Whether or not to return lists of filenames.
+        """
+
+        # Get lists of files from data directories
+        osc_files = clean_file_list(os.listdir(self.maps_oscs_path), 'osc')
+        slope_files = clean_file_list(os.listdir(self.maps_slopes_path), 'slope')
+        gene_files = clean_file_list(os.listdir(self.maps_genes_path), 'gene')
+        term_files = clean_file_list(os.listdir(self.maps_terms_path), 'terms')
+
+        # If asked for, print out lists of files
+        if print_files:
+            print('Oscillation Files:\n', '\n'.join(osc_files), '\n')
+            print('Slope Files:\n', '\n'.join(slope_files), '\n')
+            print('Terms Files:\n', '\n'.join(term_files), '\n')
+            print('Genes Files:\n', '\n'.join(gene_files), '\n')
+
+        # If asked for, return lists of files
+        if return_files:
+            return osc_files, slope_files, term_files, gene_files
 
 
 class Osc(object):
