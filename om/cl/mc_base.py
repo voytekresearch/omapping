@@ -1,11 +1,11 @@
+"""MODULE DOCSTRING - TO FILL IN
+
+"""
+
 from __future__ import print_function, division
 import os
 import pickle
 import numpy as np
-import scipy.io as sio
-
-# Import custom om code
-from om.gen import *
 
 ############################################################################################
 ############################ OMEGAMAPPIN - CL_MC_BASE - CLASSES ############################
