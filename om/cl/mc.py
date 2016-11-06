@@ -30,6 +30,10 @@ class MapComp(object):
             xx
         """
 
+        # Add database object
+        self.db = db
+
+        """
         # Pull out needed paths from OMDB object
         self.project_path = db.project_path
         self.maps_path = db.maps_path
@@ -40,10 +44,12 @@ class MapComp(object):
         self.slopes_path = os.path.join(self.maps_path, 'Slopes')
         self.terms_path = os.path.join(self.maps_path, 'Terms')
         self.genes_path = os.path.join(self.maps_path, 'Genes')
+        """
+
 
         # Import the vectors of gene & term names
-        self.term_names = _get_map_names('ns_terms.csv', self.terms_path)
-        self.gene_names = _get_map_names('real_gene_names.csv', self.genes_path)
+        self.term_names = _get_map_names('ns_terms.csv', self.db.maps_terms_path)
+        self.gene_names = _get_map_names('real_gene_names.csv', self.db.maps_genes_path)
 
         # Get number of terms and genes used
         self.n_terms = len(self.term_names)
@@ -93,10 +99,10 @@ class MapComp(object):
         db = OMDB()
 
         # Get lists of files from data directories
-        osc_files = clean_file_list(os.listdir(self.oscs_path), 'osc')
-        slope_files = clean_file_list(os.listdir(self.slopes_path), 'slope')
-        gene_files = clean_file_list(os.listdir(self.genes_path), 'gene')
-        term_files = clean_file_list(os.listdir(self.terms_path), 'terms')
+        osc_files = clean_file_list(os.listdir(self.db.maps_oscs_path), 'osc')
+        slope_files = clean_file_list(os.listdir(self.db.maps_slopes_path), 'slope')
+        gene_files = clean_file_list(os.listdir(self.db.maps_genes_path), 'gene')
+        term_files = clean_file_list(os.listdir(self.db.maps_terms_path), 'terms')
 
         # If asked for, print out lists of files
         if print_files:
@@ -122,7 +128,7 @@ class MapComp(object):
         """
 
         # Get the full path for the file name
-        osc_maps_file = os.path.join(self.oscs_path, osc_file + '.p')
+        osc_maps_file = os.path.join(self.db.maps_oscs_path, osc_file + '.p')
 
         # Load data from pickle file
         dat_in = pickle.load(open(osc_maps_file, 'rb'))
@@ -151,7 +157,7 @@ class MapComp(object):
         """
 
         # Get the full path for the file name
-        slopes_map_file = os.path.join(self.slopes_path, slope_file + '.p')
+        slopes_map_file = os.path.join(self.db.maps_slopes_path, slope_file + '.p')
 
         # Load data from pickle file
         dat_in = pickle.load(open(slopes_map_file, 'rb'))
@@ -222,7 +228,7 @@ class MapComp(object):
         """
 
         # Get full path for the csv file
-        terms_csv = os.path.join(self.terms_path, term_file_name)
+        terms_csv = os.path.join(self.db.maps_terms_path, term_file_name)
 
         # Load the terms map
         self.term_maps = pd.read_csv(terms_csv, header=None)
@@ -540,8 +546,12 @@ class MapCompROI(MapComp):
         # Initialize var to store number of ROIs
         self.nROIs = int()
 
+
+
         # Add path for anatomy data
-        self.anat_path = os.path.join(self.maps_path, 'Anat')
+        #self.anat_path = os.path.join(self.maps_path, 'Anat')
+
+
 
         # Add vars to save ROI data from anat data
         self.anat_roi_names = list()
@@ -592,7 +602,7 @@ class MapCompROI(MapComp):
         """
 
         # Get full path for the anat mat file
-        anat_mat_file = os.path.join(self.anat_path, anat_file_name)
+        anat_mat_file = os.path.join(self.db.maps_anat_path, anat_file_name)
 
         # Load the anat data
         dat = sio.loadmat(anat_mat_file)
@@ -842,9 +852,9 @@ def calc_avg_gene_map(subj_list, file_title):
         xx
     """
 
-    # Get OMDB object, and use to set genes path
+    # Get OMDB object
     db = OMDB()
-    genes_path = os.path.join(db.maps_path, 'Genes')
+    #maps_genes_path = os.path.join(db.maps_path, 'Genes')
 
     # Check how many subjects to average over
     n_subjs = len(subj_list)
@@ -859,7 +869,7 @@ def calc_avg_gene_map(subj_list, file_title):
 
         # Set up output file
         out_file = file_title + '_genes_average_' + str(part+1) + 'of3.csv'
-        out_file_path = os.path.join(genes_path, 'avg', out_file)
+        out_file_path = os.path.join(db.maps_genes_path, 'avg', out_file)
 
         # Get current set of input files
         cur_part_in_files = []
@@ -917,16 +927,16 @@ def _get_gene_files(subj):
         A list of full file names for all gene files for given subject
     """
 
-    # Get OMDB object, and use to set genes path
+    # Get OMDB object
     db = OMDB()
-    genes_path = os.path.join(db.maps_path, 'Genes')
+    #maps_genes_path = os.path.join(db.maps_path, 'Genes')
 
     # Make var for the name of the folder of gene data
     subj_folder = subj + '_gene_estimations'
 
     # Get a list of all the files in the folder
     file_names = clean_file_list(os.listdir(os.path.join(
-        genes_path, subj_folder)), 'r10')
+        db.maps_genes_path, subj_folder)), 'r10')
 
     # Check how many files there are
     n_files = len(file_names)
@@ -934,7 +944,7 @@ def _get_gene_files(subj):
     # Make a list of the full file names, including full path
     file_names_path = []
     for f in range(n_files):
-        file_names_path.append(os.path.join(genes_path, subj_folder, file_names[f]))
+        file_names_path.append(os.path.join(db.maps_genes_path, subj_folder, file_names[f]))
 
     return file_names_path
 
