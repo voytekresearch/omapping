@@ -13,9 +13,11 @@ from ipyparallel.util import interactive
 
 # Import custom om code
 from om.gen import OMDB, DataNotComputedError, UnknownDataTypeError, clean_file_list
-#from om.gen import *
 from om.cl.mc_base import MapCompBase
 
+######################################################################################
+########################## OMEGAMAPPIN - CL_MC_TG - CLASSES ##########################
+######################################################################################
 
 class MapCompTG(MapCompBase):
     """DOCSTRING"""
@@ -416,9 +418,9 @@ class MapCompTG(MapCompBase):
             # Close the csv file
             csv_file.close()
 
-##############################################################################################
-########################## OMEGAMAPPIN - CL_MC - FUNCTIONS (PUBLIC) ##########################
-##############################################################################################
+###############################################################################################
+######################### OMEGAMAPPIN - CL_MC_TG - FUNCTIONS (PUBLIC) #########################
+###############################################################################################
 
 def calc_avg_gene_map(subj_list, file_title):
     """
