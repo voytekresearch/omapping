@@ -28,13 +28,16 @@ class MegData(object):
         # Store which db is set
         self.dat_source = db.dat_source
 
+        # Add database object
+        self.db = db
+
         # Pull out needed paths from OMDB object
-        self.project_path = db.project_path
-        self.maps_path = db.maps_path
-        self.meg_path = db.meg_path
-        self.foof_path = db.foof_path
-        self.viz_path = db.viz_path
-        self.md_save_path = db.md_save_path
+        #self.project_path = db.project_path
+        #self.maps_path = db.maps_path
+        #self.meg_path = db.meg_path
+        #self.foof_path = db.foof_path
+        #self.viz_path = db.viz_path
+        #self.md_save_path = db.md_save_path
 
         # Initialize subject number
         self.subnum = int()
@@ -106,12 +109,12 @@ class MegData(object):
         self.title = 'S-' + str(self.subnum)
 
         # Set up paths, get list of files for available subjects
-        files = os.listdir(os.path.join(self.foof_path, load_type))
+        files = os.listdir(os.path.join(self.db.foof_path, load_type))
         files = clean_file_list(files, 'Foof_Vertex')
 
         # Get specific file path for specific subject
         cur_subj_file = get_cur_subj(subnum, files)
-        cur_subj_path = os.path.join(self.foof_path, load_type, cur_subj_file)
+        cur_subj_path = os.path.join(self.db.foof_path, load_type, cur_subj_file)
 
         # Load data file
         if load_type is 'pickle':
@@ -148,7 +151,7 @@ class MegData(object):
 
         # Get demographic data
         if get_demo:
-            self.sex, self.age = _get_demo_csv(self.subnum, self.meg_path, self.dat_source)
+            self.sex, self.age = _get_demo_csv(self.subnum, self.db.meg_path, self.dat_source)
 
         # Update boolean to say current subject has data attached
         self.has_data = True
@@ -293,7 +296,7 @@ class MegData(object):
 
         # Set up paths to save to
         save_name = str(self.subnum) + '_Foof_Viz'
-        save_file = os.path.join(self.viz_path, save_name)
+        save_file = os.path.join(self.db.viz_path, save_name)
 
         # Initialzie dictionary, save basic information and slope data
         save_dict = {}
@@ -687,7 +690,7 @@ class GroupMegData(MegData):
 
         # Set up
         pickle_file_name = file_name + '.p'
-        pickle_save_name = os.path.join(self.maps_path, 'Slopes', pickle_file_name)
+        pickle_save_name = os.path.join(self.db.maps_path, 'Slopes', pickle_file_name)
 
         # Check current time for when file is saved
         cur_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -728,7 +731,7 @@ class GroupMegData(MegData):
 
         # Set file name, and create full file path
         pickle_file_name = file_name + '_Osc_' + map_type + '.p'
-        pickle_save_name = os.path.join(self.maps_path, 'Oscs', pickle_file_name)
+        pickle_save_name = os.path.join(self.db.maps_path, 'Oscs', pickle_file_name)
 
         # Collect data together to save out
         dat_out = dict({'dat_source': self.dat_source,
@@ -747,7 +750,7 @@ class GroupMegData(MegData):
 
         # Set up paths to save to
         save_name = 'Group_Slopes'
-        save_file = os.path.join(self.viz_path, save_name)
+        save_file = os.path.join(self.db.viz_path, save_name)
 
         # Save desired outputs into a dictionary
         save_dict = {}
@@ -780,7 +783,7 @@ class GroupMegData(MegData):
             raise UnknownDataTypeError('Map type not understood.')
 
         # Set up paths to save to
-        save_file = os.path.join(self.viz_path, save_name)
+        save_file = os.path.join(self.db.viz_path, save_name)
 
         # Initialize dictionary to save out, and save basic info
         save_dict = {}
