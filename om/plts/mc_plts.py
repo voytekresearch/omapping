@@ -1,3 +1,6 @@
+""" MODULE DOCSTRING - TO FILL IN
+"""
+
 from __future__ import print_function, division
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,11 +25,11 @@ def plot_corrs(corrs, p_vals, save_out=False):
     """
 
     # Get FigInto
-    fi = FigInfo()
+    f_info = FigInfo()
 
     # Plot settings
-    st_fs = fi.t_fs              # Super Title Font Size
-    sp_fs = fi.sp_fs             # Subplot Title Font Size
+    st_fs = f_info.t_fs              # Super Title Font Size
+    sp_fs = f_info.sp_fs             # Subplot Title Font Size
 
     # Check that input data is right dimension
     corrs = np.squeeze(corrs)
@@ -51,8 +54,8 @@ def plot_corrs(corrs, p_vals, save_out=False):
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + '201-CorrData' + '.' + fi.format
-        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+        save_name = f_info.save_path + '201-CorrData' + '.' + f_info.format
+        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
 
 def plot_con_mat(dat, section, roi_lr, save_out=False):
@@ -71,10 +74,10 @@ def plot_con_mat(dat, section, roi_lr, save_out=False):
     """
 
     # Get FigInto
-    fi = FigInfo()
+    f_info = FigInfo()
 
     # Plot settings
-    st_fs = fi.t_fs              # Super Title Font Size
+    st_fs = f_info.t_fs              # Super Title Font Size
 
     # Check the number of ROIs
     n_rois = len(roi_lr)
@@ -83,23 +86,23 @@ def plot_con_mat(dat, section, roi_lr, save_out=False):
     ind_st_a, ind_en_a, ind_st_b, ind_en_b = get_section(section, n_rois, roi_lr)
 
     # Initialize figure
-    f = plt.figure(figsize=(12, 12))
-    ax = f.add_subplot(111)
+    fig = plt.figure(figsize=(12, 12))
+    ax = fig.add_subplot(111)
 
     # Create the figure
-    m = ax.imshow(dat[ind_st_a:ind_en_a, ind_st_b:ind_en_b],
-                  interpolation='none')
+    mat = ax.imshow(dat[ind_st_a:ind_en_a, ind_st_b:ind_en_b],
+                    interpolation='none')
 
     # Add title
     plt.title('Connectivity Matrix', fontsize=st_fs, fontweight='bold')
 
     # Add colour bar as a legend
-    f.colorbar(m)
+    fig.colorbar(mat)
 
     # Save out (if requested)
     if save_out:
 
         # Set up save name & save out
-        save_name = fi.save_path + '202-ConnectivityMatrix' + '.' + fi.format
-        plt.savefig(save_name, format=fi.format, bbox_inches=fi.bbox, dpi=fi.dpi)
+        save_name = f_info.save_path + '202-ConnectivityMatrix' + '.' + f_info.format
+        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
