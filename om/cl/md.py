@@ -118,24 +118,6 @@ class MegData(object):
         self.centers, self.powers, self.bws, self.slopes, self.n_psds \
             = extract_foof_pickle(results)
 
-        """OLD:
-        # Check how many psds there are
-        self.n_psds = len(results)
-
-        # Initialize numpy arrays to pull out different result params
-        self.slopes = np.zeros([self.n_psds, 1])
-        self.centers = np.zeros([self.n_psds, 8])
-        self.powers = np.zeros([self.n_psds, 8])
-        self.bws = np.zeros([self.n_psds, 8])
-
-        # Loop through FOOF results, pulling out individual findings
-        for i in range(self.n_psds):
-            self.slopes[i] = results[i][0]
-            self.centers[i, 0:len(results[i][1])] = results[i][1]
-            self.powers[i, 0:len(results[i][2])] = results[i][2]
-            self.bws[i, 0:len(results[i][3])] = results[i][3]
-        """
-
         # Check how many oscillations per vertex
         self.osc_count = np.zeros([self.n_psds, 1])
         for i in range(0, self.n_psds):
