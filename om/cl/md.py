@@ -1,3 +1,7 @@
+""" MODULE DOCSTRING - TO FILL IN
+
+"""
+
 from __future__ import print_function, division
 import os
 import csv
@@ -6,12 +10,15 @@ import datetime
 import numpy as np
 import scipy.io as sio
 from scipy.stats.stats import pearsonr
-from om.gen import *
+
+# Import custom om code
+#from om.gen import *
+from om.gen import OMDB, clean_file_list, get_cur_subj, extract_foof_pickle
+from om.gen import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
 
 ##########################################################################################
 ###############################  OMEGAMAPPIN - MD CLASSES  ###############################
 ##########################################################################################
-
 
 class MegData(object):
     """Class for a single subject of FOOF results for MEG Source PSDs."""
@@ -131,7 +138,7 @@ class MegData(object):
         self.has_data = True
 
 
-    def osc_bands_vertex(self, osc, avg='mean'):
+    def osc_bands_vertex(self, osc):
         """Groups oscillations at each vertex in distinct frequency bands.
         Stores band specific oscillations in (self.){thetas, alphas, betas, lowgammas}.
 
@@ -141,8 +148,6 @@ class MegData(object):
             MegData object.
         osc : Osc object
             An object containing frequency bands to use.
-        avg : {'mean', 'median'}, optional
-            How to average to calculate peak frequencies.
         """
 
         # Save bands used
@@ -246,11 +251,11 @@ class MegData(object):
         labels = ['Centers', 'Powers', 'Bandwidths']
 
         # Check how many categories there are
-        n = len(labels)
+        n_label = len(labels)
 
         # Initialize matrices to store R and p values
-        corrs_mat = np.zeros([n, n])
-        ps_mat = np.zeros([n, n])
+        corrs_mat = np.zeros([n_label, n_label])
+        ps_mat = np.zeros([n_label, n_label])
 
         # Calculate correlations between all parameters
         corrs_mat[0, 1], ps_mat[0, 1] = pearsonr(self.centers_all, np.log10(self.powers_all))
@@ -792,20 +797,20 @@ def print_corrs_mat(rs_mat, ps_mat, labels):
     """
 
     # Check how size of the matrix there are
-    n = len(labels)
+    n_label = len(labels)
 
     # Loop through the matrix to print out
-    for x in range(n):
-        for y in range(n):
+    for x_dat in range(n_label):
+        for y_dat in range(n_label):
 
             # Skip bottom triangle and diagonal
-            if x == y or y < x:
+            if x_dat == y_dat or y_dat < x_dat:
                 continue
 
             # Print out correlation
-            print('Corr of ', '{:18}'.format(labels[x]+'-'+labels[y]),
-                  ' is ', '{:+1.4f}'.format(rs_mat[x, y]), '    with p-val of ',
-                  '{:1.5f}'.format(ps_mat[x, y]))
+            print('Corr of ', '{:18}'.format(labels[x_dat]+'-'+labels[y_dat]),
+                  ' is ', '{:+1.4f}'.format(rs_mat[x_dat, y_dat]), '    with p-val of ',
+                  '{:1.5f}'.format(ps_mat[x_dat, y_dat]))
 
 
 def print_corrs_vec(rs_vec, ps_vec, labels, desc):
@@ -824,13 +829,13 @@ def print_corrs_vec(rs_vec, ps_vec, labels, desc):
     """
 
     # Check the length of the vector
-    n = len(labels)
+    n_label = len(labels)
 
     # Loop through vectors, printing out the correlations.
-    for x in range(n):
-        print('Corr of ', '{:20}'.format(labels[x]+'-'+desc), ' is ',
-              '{:+1.4f}'.format(rs_vec[x]), '    with p-val of ',
-              '{:1.5f}'.format(ps_vec[x]))
+    for cur_label in range(n_label):
+        print('Corr of ', '{:20}'.format(labels[cur_label]+'-'+desc), ' is ',
+              '{:+1.4f}'.format(rs_vec[cur_label]), '    with p-val of ',
+              '{:1.5f}'.format(ps_vec[cur_label]))
 
 
 def save_md_pickle(obj, save_name):
