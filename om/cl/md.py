@@ -31,14 +31,6 @@ class MegData(object):
         # Add database object
         self.db = db
 
-        # Pull out needed paths from OMDB object
-        #self.project_path = db.project_path
-        #self.maps_path = db.maps_path
-        #self.meg_path = db.meg_path
-        #self.foof_path = db.foof_path
-        #self.viz_path = db.viz_path
-        #self.md_save_path = db.md_save_path
-
         # Initialize subject number
         self.subnum = int()
         self.n_psds = int()
