@@ -1,3 +1,7 @@
+"""MODULE DOCSTRING - TO FILL IN
+
+"""
+
 from __future__ import print_function, division
 import os
 import numpy as np
@@ -5,7 +9,7 @@ import scipy.io as sio
 import scipy.stats.stats as sps
 
 # Import custom om code
-from om.gen import *
+from om.gen import get_section, DataNotComputedError
 from om.cl.mc_base import MapCompBase, _init_meg_map_dict
 
 ################################################################
@@ -13,7 +17,7 @@ from om.cl.mc_base import MapCompBase, _init_meg_map_dict
 ################################################################
 
 class MapCompAnat(MapCompBase):
-    """Class for storing and comparing spatial topographies in ROIs."""
+    """Class for storing and comparing spatial topographies in rois."""
 
     def __init__(self, db):
         """
@@ -27,30 +31,29 @@ class MapCompAnat(MapCompBase):
         # Inherit from MapComp() class
         MapCompBase.__init__(self, db)
 
-        # Initialize var to store number of ROIs
-        self.nROIs = int()
+        # Initialize var to store number of rois
+        self.n_rois = int()
 
-        # Add vars to save ROI data from anat data
+        # Add vars to save roi data from anat data
         self.anat_roi_names = list()
         self.anat_roi_lrs = list()
-        self.anat_nROIs = int
+        self.anat_n_rois = int()
         self.anat_con = np.ndarray(0)
         self.anat_type = str()
 
-        # Add vars to save ROI data from MEG data
+        # Add vars to save roi data from MEG data
         self.elec_roi_names = list()
         self.elec_roi_lrs = list()
-        self.elec_nROIs = int
+        self.elec_n_rois = int
         self.elec_roi_verts = list()
 
-        # Initialize list to store ROI labels
+        # Initialize list to store roi labels
         self.roi_labels = list()
         self.roi_verts = list()
         self.roi_lr = list()
-        self.nROIs = int
 
-        # Initialize var to store MEG ROI data
-        self.meg_ROI_maps = dict()
+        # Initialize var to store MEG roi data
+        self.meg_roi_maps = dict()
 
         # Initialize var to store MEG connectivity data
         self.meg_con = dict()
@@ -62,7 +65,7 @@ class MapCompAnat(MapCompBase):
         self.anat_loaded = False
         self.elec_loaded = False
         self.rois_aligned = False
-        self.meg_ROIs = False
+        self.meg_rois = False
 
 
     def load_anat_maps(self, anat_file_name, anat_type):
@@ -70,8 +73,8 @@ class MapCompAnat(MapCompBase):
 
         Parameters
         ----------
-        self : MapCompROI() object
-            Object for storing and comparing map data, in ROI format.
+        self : MapComproi() object
+            Object for storing and comparing map data, in roi format.
         anat_file_name : str
             File name of anat data file.
         anat_type : str
@@ -88,12 +91,12 @@ class MapCompAnat(MapCompBase):
         roi_names = dat['roi_labels'].tolist()
         self.anat_con = dat['connectivity']
 
-        # Get number of ROIs
-        self.anat_nROIs = len(roi_names)
+        # Get number of rois
+        self.anat_n_rois = len(roi_names)
 
         # Loop through and fix roi labels
-        for r in range(0, self.anat_nROIs):
-            self.anat_roi_names.append(str(roi_names[r][0][0]))
+        for roi in range(0, self.anat_n_rois):
+            self.anat_roi_names.append(str(roi_names[roi][0][0]))
 
         # Update which type of anatomy data is loaded
         self.anat_type = anat_type
@@ -103,12 +106,12 @@ class MapCompAnat(MapCompBase):
 
 
     def load_elec_rois(self, roi_file_name=None):
-        """Load the ROI file for the MEG data.
+        """Load the roi file for the MEG data.
 
         Parameters
         ----------
-        self : MapCompROI() object
-            Object for storing and comparing map data, in ROI format.
+        self : MapComproi() object
+            Object for storing and comparing map data, in roi format.
         roi_file_name : str, optional
             File name (including path) to the matlab scout definition file.
         """
@@ -117,25 +120,25 @@ class MapCompAnat(MapCompBase):
         if not roi_file_name:
             roi_file_name = 'scout_Desikan-Killiany_68.mat'
 
-        # Load ROI dat from mat file
+        # Load roi dat from mat file
         dat = sio.loadmat(os.path.join(self.db.maps_scouts_path, roi_file_name),
                           struct_as_record=True)
 
         # Pull out data from mat file
         scouts = np.squeeze(dat['Scouts'])
 
-        # Check how many ROIs there are
-        self.elec_nROIs = len(scouts)
+        # Check how many rois there are
+        self.elec_n_rois = len(scouts)
 
         # Initiliaze vars to store scout names and vertices
         sc_names = list()
         sc_verts = list()
 
         # Loop through, pull out names and verts into lists
-        for i in range(0, self.elec_nROIs):
-            sc = scouts[i]
-            sc_verts.append(sc[0])
-            sc_names.append(str(sc[3]))
+        for i in range(0, self.elec_n_rois):
+            scout = scouts[i]
+            sc_verts.append(scout[0])
+            sc_names.append(str(scout[3]))
 
             # Drop brackets in scout name
             sc_names[i] = sc_names[i][3:-2]
@@ -149,64 +152,64 @@ class MapCompAnat(MapCompBase):
 
 
     def align_rois(self):
-        """Align ROIs used and names between anat and meg ROIs.
+        """Align rois used and names between anat and meg rois.
 
         NOTES
         -----
         xxxxxxxx
         """
 
-        # Check if ROIs loaded - return if not
+        # Check if rois loaded - return if not
         if (not self.elec_roi_names) or (not self.anat_roi_names):
-            raise DataNotComputedError('One or Both ROIs not loaded! Cant proceed!')
+            raise DataNotComputedError('One or Both rois not loaded! Cant proceed!')
 
         # Elec L/Rs - standardize names
-        for r in range(0, self.elec_nROIs):
+        for roi in range(0, self.elec_n_rois):
 
             # Check if left side scout
-            if self.elec_roi_names[r][-1] is 'L':
+            if self.elec_roi_names[roi][-1] is 'L':
                 self.elec_roi_lrs.append('L')
 
             # Check if right side scout
-            elif self.elec_roi_names[r][-1] is 'R':
+            elif self.elec_roi_names[roi][-1] is 'R':
                 self.elec_roi_lrs.append('R')
 
             else:
                 pass
 
             # Drop the L/R from the names
-            self.elec_roi_names[r] = self.elec_roi_names[r][:-2]
+            self.elec_roi_names[roi] = self.elec_roi_names[roi][:-2]
 
         # Anat L/Rs - standardize names
-        for r in range(0, self.anat_nROIs):
+        for roi in range(0, self.anat_n_rois):
 
             # Check if left side scout
-            if self.anat_roi_names[r][0] is 'l':
+            if self.anat_roi_names[roi][0] is 'l':
                 self.anat_roi_lrs.append('L')
-                self.anat_roi_names[r] = self.anat_roi_names[r][5:]
+                self.anat_roi_names[roi] = self.anat_roi_names[roi][5:]
 
             # Check if right side scout
-            elif self.anat_roi_names[r][0] is 'r':
+            elif self.anat_roi_names[roi][0] is 'r':
                 self.anat_roi_lrs.append('R')
-                self.anat_roi_names[r] = self.anat_roi_names[r][6:]
+                self.anat_roi_names[roi] = self.anat_roi_names[roi][6:]
 
             else:
                 pass
 
             # Drop the underscores
-            self.anat_roi_names[r] = self.anat_roi_names[r].replace("_", "")
+            self.anat_roi_names[roi] = self.anat_roi_names[roi].replace("_", "")
 
         # Loop through and line up scout names
-        for i in range(0, self.anat_nROIs):
+        for i in range(0, self.anat_n_rois):
 
-            # Grab current ROI from anat ROI list
+            # Grab current roi from anat roi list
             cur_roi = self.anat_roi_names[i]
             cur_lr = self.anat_roi_lrs[i]
 
-            # Loop through elec ROIs to match up
-            for j in range(0, self.elec_nROIs):
+            # Loop through elec rois to match up
+            for j in range(0, self.elec_n_rois):
 
-                # Check if current elec ROI matches current roi
+                # Check if current elec roi matches current roi
                 if self.elec_roi_names[j] == cur_roi:
 
                     # Check if L/R is right
@@ -216,49 +219,49 @@ class MapCompAnat(MapCompBase):
                         self.roi_labels.append(cur_roi)
                         self.roi_lr.append(cur_lr)
 
-                        # Add vertices to overall ROI list
+                        # Add vertices to overall roi list
                         self.roi_verts.append(self.elec_roi_verts[j])
 
-        # Check how many ROIs there are
-        self.nROIs = len(self.roi_labels)
+        # Check how many rois there are
+        self.n_rois = len(self.roi_labels)
 
-        # Set boolean that ROIs have been aligned
+        # Set boolean that rois have been aligned
         self.rois_aligned = True
 
 
     def conv_meg_rois(self):
-        """Convert MEG data to ROIs.
+        """Convert MEG data to rois.
 
         NOTES
         -----
         This XXXXX
         """
 
-        # Initialize dict for current ROI data
-        roi_meg_dat = _init_meg_map_dict(self.bands.keys(), self.nROIs)
+        # Initialize dict for current roi data
+        roi_meg_dat = _init_meg_map_dict(self.bands.keys(), self.n_rois)
 
-        # Loop through all ROIs
-        for r in range(0, self.nROIs):
+        # Loop through all rois
+        for roi in range(0, self.n_rois):
 
-            # Add current ROI data to dict
+            # Add current roi data to dict
             # Loop through all oscs
             for key in self.meg_maps.keys():
 
                 #
-                cur_verts = np.squeeze(self.roi_verts[r] - 1)
+                cur_verts = np.squeeze(self.roi_verts[roi] - 1)
                 n_verts = len(cur_verts)
 
                 #
                 temp_dat = self.meg_maps[key][cur_verts]
 
                 #
-                roi_meg_dat[key][r] = (sum(temp_dat) / n_verts)
+                roi_meg_dat[key][roi] = (sum(temp_dat) / n_verts)
 
-        # Add the current ROI data to object
-        self.meg_ROI_maps = roi_meg_dat
+        # Add the current roi data to object
+        self.meg_roi_maps = roi_meg_dat
 
-        # Update boolean that meg data has been converted to ROIs
-        self.meg_ROIs = True
+        # Update boolean that meg data has been converted to rois
+        self.meg_rois = True
 
 
     def comp_meg_anat(self, section='all', print_out=True):
@@ -266,8 +269,8 @@ class MapCompAnat(MapCompBase):
 
         Parameters
         ----------
-        self : MapCompROI() object
-            Object for storing and comparing map data, in ROI format.
+        self : MapComproi() object
+            Object for storing and comparing map data, in roi format.
         section : {'all, 'left', 'right'}
             Which section of data to compare.
         print_out : boolean, optional (default = True)
@@ -278,17 +281,17 @@ class MapCompAnat(MapCompBase):
         self.meg_con = _init_meg_map_dict(self.bands.keys())
 
         # Get section indices to run comparisons
-        ind_st, ind_en, x, x = get_section(section, self.nROIs, self.roi_lr)
+        ind_st, ind_en, _, _ = get_section(section, self.n_rois, self.roi_lr)
 
         # Calculate the meg connectivity data for each oscillation band
         for key in self.meg_con.keys():
-            self.meg_con[key] = _mat_mult(self.meg_ROI_maps[key][ind_st:ind_en])
+            self.meg_con[key] = _mat_mult(self.meg_roi_maps[key][ind_st:ind_en])
 
         # Initialize a dictionary to store data
         meg_stats = _init_meg_map_dict(self.bands.keys(), length=2)
 
-        # Get nROIs used in comparison
-        nROIs_used = ind_en - ind_st
+        # Get n_rois used in comparison
+        n_rois_used = ind_en - ind_st
 
         # Extract anat range to use
         anat_comp = self.anat_con[ind_st:ind_en, ind_st:ind_en]
@@ -296,8 +299,8 @@ class MapCompAnat(MapCompBase):
         # Calculate the correlations between each oscillation and anat data
         for key in meg_stats.keys():
             meg_stats[key][0], meg_stats[key][1] = sps.pearsonr(
-                self.meg_con[key][np.triu_indices(nROIs_used, 1)],
-                anat_comp[np.triu_indices(nROIs_used, 1)])
+                self.meg_con[key][np.triu_indices(n_rois_used, 1)],
+                anat_comp[np.triu_indices(n_rois_used, 1)])
 
         # Attach the meg stats dictionary to object
         self.meg_stats = meg_stats
@@ -333,14 +336,14 @@ def _mat_mult(vec):
     """
 
     # Get length of first vector
-    l = len(vec)
+    vec_len = len(vec)
 
     # Initialize a matrix
-    out = np.zeros([l, l])
+    out = np.zeros([vec_len, vec_len])
 
     # Loop through vector, multiplying each element
-    for i in range(0, l):
-        for j in range(0, l):
+    for i in range(0, vec_len):
+        for j in range(0, vec_len):
             out[i, j] = vec[i] * vec[j]
 
     return out
