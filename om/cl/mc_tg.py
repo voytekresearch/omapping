@@ -1,3 +1,7 @@
+"""MODULE DOCSTRING - TO FILL IN
+
+"""
+
 from __future__ import print_function, division
 import os
 import csv
@@ -8,12 +12,13 @@ from ipyparallel import Client
 from ipyparallel.util import interactive
 
 # Import custom om code
-from om.gen import *
+from om.gen import OMDB, DataNotComputedError, UnknownDataTypeError, clean_file_list
+#from om.gen import *
 from om.cl.mc_base import MapCompBase
 
 
 class MapCompTG(MapCompBase):
-    """   """
+    """DOCSTRING"""
 
     def __init__(self, db):
         """
@@ -198,8 +203,8 @@ class MapCompTG(MapCompBase):
         elif method is 'parallel':
 
             # Initialize client & gather workers
-            c = Client()
-            view = c[:]
+            client = Client()
+            view = client[:]
 
             # Import required libraries for each worker
             with view.sync_imports():
@@ -347,12 +352,12 @@ class MapCompTG(MapCompBase):
         if dat_type is 'Terms':
             names = self.term_names
             file_name = 'Corrs_' + dat_type + '_' + meg_dat
-            save_path = os.path.join(self.corrs_path, dat_type)
+            save_path = os.path.join(self.db.corrs_path, dat_type)
             sub_name = ''
         elif dat_type is 'Genes':
             names = self.gene_names
             file_name = self.gene_subj + '_Corrs_' + dat_type + '_' + meg_dat
-            save_path = os.path.join(self.corrs_path, dat_type)
+            save_path = os.path.join(self.db.corrs_path, dat_type)
             sub_name = self.gene_subj
         else:
             raise UnknownDataTypeError('Data type not understood.')
@@ -405,8 +410,8 @@ class MapCompTG(MapCompBase):
 
                 # Set data as string to print out to csv file
                 out_list = [names[ind].replace(',', ' '), str(meg_corrs[ind]), str(meg_p_vals[ind])]
-                out_list = ",".join(out_list)
-                csv_file.write(out_list + '\n')
+                out_str = ",".join(out_list)
+                csv_file.write(out_str + '\n')
 
             # Close the csv file
             csv_file.close()
@@ -452,8 +457,8 @@ def calc_avg_gene_map(subj_list, file_title):
 
         # Get current set of input files
         cur_part_in_files = []
-        for s in range(n_subjs):
-            cur_part_in_files.append(in_files_path[s][part])
+        for subj in range(n_subjs):
+            cur_part_in_files.append(in_files_path[subj][part])
 
         # Save out an average csv file from input files
         _avg_csv_files(cur_part_in_files, out_file_path)
@@ -522,8 +527,8 @@ def _get_gene_files(subj):
 
     # Make a list of the full file names, including full path
     file_names_path = []
-    for f in range(n_files):
-        file_names_path.append(os.path.join(db.maps_genes_path, subj_folder, file_names[f]))
+    for cur_file in range(n_files):
+        file_names_path.append(os.path.join(db.maps_genes_path, subj_folder, file_names[cur_file]))
 
     return file_names_path
 
@@ -649,14 +654,14 @@ def _pull_out_results(dat_in):
     """
 
     # Check length of data
-    n = len(dat_in)
+    n_dat = len(dat_in)
 
     # Initializ vectors
-    out_1 = np.zeros([n, 1])
-    out_2 = np.zeros([n, 1])
+    out_1 = np.zeros([n_dat, 1])
+    out_2 = np.zeros([n_dat, 1])
 
     # Loop through and pull out data
-    for i in range(n):
+    for i in range(n_dat):
         out_1[i] = dat_in[i][0]
         out_2[i] = dat_in[i][1]
 
