@@ -18,7 +18,7 @@ def plot_slopes(slopes, title, save_out=False):
         A vector of slope values to plot.
     title : str
         A string to append to the title.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -60,7 +60,7 @@ def plot_hist_count(osc_count, save_out=False):
     ----------
     osc_count : 1d Vector
         An array of the number of oscillations found in each vertex.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -108,7 +108,7 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
         Vector of the bandwidths for all oscillations.
     title : str
         A string to append to the title.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -169,17 +169,17 @@ def plot_all_oscs_single(data, dat_type, title, n_bins=160, size=(15, 5), save_o
     ----------
     data : 1d array
         Vector of oscillation parameter data.
-    dat_type : int
+    dat_type : {0, 1, 2}
         Int refers to which osc parameter is being plotted.
-            Options: {0:'Center Frequency', 1:'Power', 2:'Bandwidth'
+            Key: {0:'Center Frequency', 1:'Power', 2:'Bandwidth'
     title : str
         A string to append to the title.
-    n_bins : int, optional
-        Number of bins to use for the plot. Default: 160.
-    size : tuple, optional
-        Size of the figure to make. Default: (15, 5).
-    save_out : boolean, optional
-        Whether to save out a copy of the figure. Default: False.
+    n_bins : int, optional (default = 160)
+        Number of bins to use for the plot.
+    size : tuple, optional (default = (15, 5))
+        Size of the figure to make.
+    save_out : boolean, optional (default = False)
+        Whether to save out a copy of the figure.
     """
 
     # Get FigInto
@@ -255,7 +255,7 @@ def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=
         Vector of the bandwidths for all oscillations.
     title : str
         A string to append to the title.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -321,7 +321,7 @@ def plot_band_corr_matrix(corr_dat, save_out=False):
     ----------
     corr_dat : ?
         xx
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -372,7 +372,7 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
         Vector of peak frequencies for given oscillation band.
     osc_band : str
         Label of which osc band is being plotted.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -429,7 +429,7 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
         Vector of correlations between frequency bins (y-data).
     p_vec : 1d array
         Vector of p-values for each correlation.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -509,7 +509,7 @@ def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, peak_lowgamma, save_ou
         Vector of peak beta frequency for each subject.
     peak_lowgamma : 1d array
         Vector of peak low gamma frequency for each subject.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -564,7 +564,7 @@ def plot_age_n_oscs(ages, n_oscs, save_out=False):
         Vector of ages for each subject.
     n_oscs : 1d array
         Vector of the number of oscillations for each subject.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
@@ -598,9 +598,9 @@ def plot_osc_profiles(centers_hist, save_out=False):
 
     Parameters
     ----------
-    centers_hist : list[list]
+    centers_hist : list of list
         Contains the oscillation profile for each subject.
-    save_out : boolean, optional
+    save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
