@@ -1,22 +1,25 @@
-from __future__ import print_function, division
+"""DOCSTRING - TO FILL IN
 
-# Import required packages
+"""
+
+from __future__ import print_function, division
 import os
 import sys
 import time
 import numpy as np
 
-# Import general code from custom module om
-sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
-from om.gen import *
-
 # Import required things from ipyparallel
 from ipyparallel import Client
 from ipyparallel.util import interactive
 
+# Import general code from custom module om
+sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
+from om.gen import OMDB, clean_file_list, get_sub_nums, load_meg_psds, save_foof_pickle, extract_psd
+
 ## TODO:
 # - Add a report to save out
 # - Figure out ipyparallel to launch from within script
+# - Turn into proper python script with main() function
 
 ##########################################################################
 ################################ SETTINGS ################################
@@ -35,6 +38,7 @@ meg_queue = [358144, 433839, 512835, 555348, 559053, 568963, 581450, 599671]
 # Define function to run foof
 @interactive
 def run_foof(psd_in):
+    """DOCSTRING"""
 
     # Initialize foof object
     foof = FOOF(min_p=min_p, res=freq_res, fmin=fmin, fmax=fmax)
