@@ -9,8 +9,9 @@ printf "\n"
 printf "\n CLOC OUTPUT: \n"
 cloc om
 
-# Run Tests
+# Run Tests & Check Coverage
 printf "\n RUN TESTS: \n"
-py.test
+coverage run --source om -m py.test
+coverage report
 
 # Find a way to get summary from pylint?
