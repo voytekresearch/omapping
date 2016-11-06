@@ -33,20 +33,6 @@ class MapComp(object):
         # Add database object
         self.db = db
 
-        """
-        # Pull out needed paths from OMDB object
-        self.project_path = db.project_path
-        self.maps_path = db.maps_path
-        self.corrs_path = db.corrs_path
-
-        # Set specific paths for different data types
-        self.oscs_path = os.path.join(self.maps_path, 'Oscs')
-        self.slopes_path = os.path.join(self.maps_path, 'Slopes')
-        self.terms_path = os.path.join(self.maps_path, 'Terms')
-        self.genes_path = os.path.join(self.maps_path, 'Genes')
-        """
-
-
         # Import the vectors of gene & term names
         self.term_names = _get_map_names('ns_terms.csv', self.db.maps_terms_path)
         self.gene_names = _get_map_names('real_gene_names.csv', self.db.maps_genes_path)
@@ -80,40 +66,6 @@ class MapComp(object):
         self.slopes_loaded = False
         self.terms_loaded = False
         self.genes_loaded = False
-
-
-    def check_files(self, print_files=True, return_files=False):
-        """Gets the list of files in the map directories. Can return and/or print.
-
-        Parameters
-        ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
-        print_files : boolean, optional (default = True)
-            Whether or not to print out available file names.
-        return_files : boolean, optional (default = False)
-            Whether or not to return lists of filenames.
-        """
-
-        # Get OMDB object
-        db = OMDB()
-
-        # Get lists of files from data directories
-        osc_files = clean_file_list(os.listdir(self.db.maps_oscs_path), 'osc')
-        slope_files = clean_file_list(os.listdir(self.db.maps_slopes_path), 'slope')
-        gene_files = clean_file_list(os.listdir(self.db.maps_genes_path), 'gene')
-        term_files = clean_file_list(os.listdir(self.db.maps_terms_path), 'terms')
-
-        # If asked for, print out lists of files
-        if print_files:
-            print('Oscillation Files:\n', '\n'.join(osc_files), '\n')
-            print('Slope Files:\n', '\n'.join(slope_files), '\n')
-            print('Terms Files:\n', '\n'.join(term_files), '\n')
-            print('Genes Files:\n', '\n'.join(gene_files), '\n')
-
-        # If asked for, return lists of files
-        if return_files:
-            return osc_files, slope_files, term_files, gene_files
 
 
     def load_meg_maps(self, osc_file):
@@ -545,13 +497,6 @@ class MapCompROI(MapComp):
 
         # Initialize var to store number of ROIs
         self.nROIs = int()
-
-
-
-        # Add path for anatomy data
-        #self.anat_path = os.path.join(self.maps_path, 'Anat')
-
-
 
         # Add vars to save ROI data from anat data
         self.anat_roi_names = list()
