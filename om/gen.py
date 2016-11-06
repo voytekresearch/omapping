@@ -53,6 +53,7 @@ class OMDB(object):
         self.maps_terms_path = os.path.join(self.maps_path, 'Terms')
         self.maps_genes_path = os.path.join(self.maps_path, 'Genes')
         self.maps_anat_path = os.path.join(self.maps_path, 'Anat')
+        self.maps_scouts_path = os.path.join(self.maps_path, 'Scouts')
 
         # Set path for database specific stuff
         if dat_source is 'both':
