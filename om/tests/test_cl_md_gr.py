@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
-import om.cl.md_sing as md
+import om.cl.md_gr as md
 from om.gen import OMDB, Osc
 
 #################################################################################
@@ -13,7 +13,7 @@ def test_group_meg_data():
     db = OMDB()
     osc = Osc()
 
-    assert GroupMegData(db, osc)
+    assert md.GroupMegData(db, osc)
 
 ###################################################################################
 ################## TESTS - OMEGAMAPPIN - CL_MD_GROUP - FUNCTIONS ##################
