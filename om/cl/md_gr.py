@@ -511,6 +511,31 @@ class GroupMegData(MegData):
 ############################ OMEGAMAPPIN - OM_MD - PRIVATE FUNCTIONS ############################
 #################################################################################################
 
+def _get_all_osc(centers, osc_low, osc_high):
+    """Returns all the oscillations in a specified frequency band.
+
+    Parameters
+    ----------
+    centers : 1d array
+        Vector of oscillation centers.
+    osc_low : int
+        Lower bound for frequency range.
+    osc_high : int
+        Upper bound for frequency range.
+
+    Returns
+    -------
+    osc_cens : 1d array
+        Osc centers in specified frequency band.
+    """
+
+    # Get inds of desired oscs and pull out from input data
+    osc_inds = (centers > osc_low) & (centers < osc_high)
+    osc_cens = centers[osc_inds]
+
+    return osc_cens
+
+
 def _osc_prob(osc_mat):
     """Takes a 3D matrix of oscillations across subjects, calculates probability of oscillation.
 
@@ -586,31 +611,6 @@ def _osc_pow_ratio(osc_mat):
         pow_ratio[vertex] = np.mean(osc_mat[vertex, 1, :]) / max_all
 
     return pow_ratio
-
-
-def _get_all_osc(centers, osc_low, osc_high):
-    """Returns all the oscillations in a specified frequency band.
-
-    Parameters
-    ----------
-    centers : 1d array
-        Vector of oscillation centers.
-    osc_low : int
-        Lower bound for frequency range.
-    osc_high : int
-        Upper bound for frequency range.
-
-    Returns
-    -------
-    osc_cens : 1d array
-        Osc centers in specified frequency band.
-    """
-
-    # Get inds of desired oscs and pull out from input data
-    osc_inds = (centers > osc_low) & (centers < osc_high)
-    osc_cens = centers[osc_inds]
-
-    return osc_cens
 
 
 def _band_sort(osc_bands):
