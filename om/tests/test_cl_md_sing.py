@@ -1,37 +1,37 @@
 from __future__ import print_function, division
 import numpy as np
-import om.cl.md as md
-from om.gen import Osc
+import om.cl.md_sing as md
+from om.gen import OMDB
 
-#################################################################################
-########################## TESTS - OMEGAMAPPIN - CL_MD ##########################
-#################################################################################
+##################################################################################
+################### TESTS - OMEGAMAPPIN - CL_MD_SING - CLASSES ###################
+##################################################################################
 
-def test_get_osc():
+def test_meg_data():
+    """   """
+
+    db = OMDB()
+
+    assert md.MegData(db)
+
+
+##################################################################################
+################## TESTS - OMEGAMAPPIN - CL_MD_SING - FUNCTIONS ##################
+##################################################################################
+
+def test_get_single_osc():
     """   """
     pass
-
-
-def test_get_all_osc():
-    """   """
-    pass
-
 
 def test_get_single_osc_power():
     """   """
     pass
 
+
+
+
+
 def test_get_demo_csv():
-    """   """
-    pass
-
-
-def test_osc_prob():
-    """   """
-    pass
-
-
-def test_osc_pow_ratio():
     """   """
     pass
 
@@ -52,14 +52,7 @@ def test_osc_peak():
     assert np.isclose(test_ans, actual_ans)
 
 
-def test_band_sort():
-    """   """
 
-    # Initialize osc object, add some bands
-    #osc_bands = Osc()
-    #osc_bands.add_band('b', [12, 14])
-    #osc_bands.add_band('a')
-    pass
 
 
 
