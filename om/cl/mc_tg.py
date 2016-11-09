@@ -35,8 +35,8 @@ class MapCompTG(MapCompBase):
         MapCompBase.__init__(self, db)
 
         # Import the vectors of gene & term names
-        self.term_names = _get_map_names('ns_terms.csv', self.db.maps_terms_path)
-        self.gene_names = _get_map_names('real_gene_names.csv', self.db.maps_genes_path)
+        self.term_names = _get_map_names('00-ns_terms.csv', self.db.maps_terms_path)
+        self.gene_names = _get_map_names('00-real_gene_names.csv', self.db.maps_genes_path)
 
         # Get number of terms and genes used
         self.n_terms = len(self.term_names)
@@ -442,7 +442,6 @@ def calc_avg_gene_map(subj_list, file_title):
 
     # Get OMDB object
     db = OMDB()
-    #maps_genes_path = os.path.join(db.maps_path, 'Genes')
 
     # Check how many subjects to average over
     n_subjs = len(subj_list)
@@ -456,8 +455,8 @@ def calc_avg_gene_map(subj_list, file_title):
     for part in range(3):
 
         # Set up output file
-        out_file = file_title + '_genes_average_' + str(part+1) + 'of3.csv'
-        out_file_path = os.path.join(db.maps_genes_path, 'avg', out_file)
+        out_file = file_title + '_genes_average_r10_' + str(part+1) + 'of3.csv'
+        out_file_path = os.path.join(db.maps_genes_path, 'avg_gene_estimations', out_file)
 
         # Get current set of input files
         cur_part_in_files = []
@@ -568,12 +567,13 @@ def _avg_csv_files(f_in, f_out, avg='mean'):
         in_files.append(open(f_in[i]))
         in_readers.append(csv.reader(in_files[i]))
 
+    # Initialize number of columns as false
     n_col = False
 
     # Loop through each line of
     for row in in_readers[0]:
 
-        #
+        # If unknown, check the number of columns
         if not n_col:
             n_col = len(row)
 
