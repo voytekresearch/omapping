@@ -333,7 +333,7 @@ class MapCompTG(MapCompBase):
             raise UnknownDataTypeError('Data type not understood.')
 
 
-    def save_corrs(self, dat_type, meg_dat, save_as_npz=True, save_as_csv=True):
+    def save_corrs(self, dat_type, meg_dat, save_title, save_as_npz=True, save_as_csv=True):
         """Save out the correlation results.
 
         Parameters
@@ -344,6 +344,8 @@ class MapCompTG(MapCompBase):
             Data type to save corrs for.
         meg_dat : str
             MEG data to save corrs for.
+        save_title : str
+            String to attach to the front of the save file names.
         save_as_npz : boolean, optional (default = True)
             Whether to save an npz file.
         save_as_csv : boolean, optional (default = True)
@@ -353,12 +355,12 @@ class MapCompTG(MapCompBase):
         # Check which type of data and set names, filenames & save paths accordingly
         if dat_type is 'Terms':
             names = self.term_names
-            file_name = 'Corrs_' + dat_type + '_' + meg_dat
+            file_name = save_title + '_Corrs_' + dat_type + '_' + meg_dat
             save_path = os.path.join(self.db.corrs_path, dat_type)
             sub_name = ''
         elif dat_type is 'Genes':
             names = self.gene_names
-            file_name = self.gene_subj + '_Corrs_' + dat_type + '_' + meg_dat
+            file_name = save_title + '_' + self.gene_subj + '_Corrs_' + dat_type + '_' + meg_dat
             save_path = os.path.join(self.db.corrs_path, dat_type)
             sub_name = self.gene_subj
         else:
