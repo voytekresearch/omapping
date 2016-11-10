@@ -470,22 +470,24 @@ class GroupMegData(MegData):
         sio.savemat(save_file, save_dict)
 
 
-    def set_map_viz(self, map_type):
-        """Set an oscillation map for visualization with Brainstorm.
+    def set_map_viz(self, map_type, file_name):
+        """Save out an oscillation map for visualization with Brainstorm.
 
         Parameters
         ----------
         map_type : {'prob', 'score'}
             Which map data type to set as viz.
+        file_name : str
+            Label to attach to file name to be saved out.
         """
 
         # Set data type
         if map_type is 'prob':
-            save_name = 'Group_Osc_Prob_Viz'
+            save_name = file_name + '_Group_Osc_Prob_Viz'
             dat = self.osc_probs
         elif map_type is 'score':
             dat = self.osc_scores
-            save_name = 'Group_Osc_Score_Viz'
+            save_name = file_name + '_Group_Osc_Score_Viz'
         else:
             raise UnknownDataTypeError('Map type not understood.')
 
