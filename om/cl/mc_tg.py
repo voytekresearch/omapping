@@ -157,10 +157,8 @@ class MapCompTG(MapCompBase):
 
         # Check with data type and set data accordingly
         if dat_type is 'Terms':
-            n_comps = self.n_terms
             dat_df = self.term_maps
         elif dat_type is 'Genes':
-            n_comps = self.n_genes
             dat_df = self.gene_maps
         else:
             raise UnknownDataTypeError('Data Type not understood.')
@@ -193,6 +191,9 @@ class MapCompTG(MapCompBase):
 
         # Run linearly
         if method is 'linear':
+
+            # Check how many comparisons there are to make
+            [n_verts, n_comps] = dat_df.shape
 
             # Initialize vectors to store correlation results
             corr_vals = np.zeros([n_comps, 1])
@@ -285,14 +286,14 @@ class MapCompTG(MapCompBase):
         print("\n\nCorrelations for ", str(dat_type), " &  ", str(meg_dat), ': \n')
         print('# \t', format(dat_type, la_str), '\t R-Vals \t P-vals \n')
 
-        # Print out the top group (highest positive correlations)
+        # Print out the top group (largest positive correlations)
         if top:
             for i in range(1, n_check+1):
                 ind = int(inds_max[-i])
                 print(str(i), '\t', format(names[ind][:50], la_str), '\t',
                       format(meg_corr[ind], '1.5f'), '\t', format(meg_p[ind], '1.4e'))
 
-        # Print out the bottom group (highest negative correlations)
+        # Print out the bottom group (largest negative correlations)
         else:
             for i in range(0, n_check):
                 ind = int(inds_max[i])
