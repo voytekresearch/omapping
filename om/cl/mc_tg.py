@@ -104,9 +104,9 @@ class MapCompTG(MapCompBase):
         print('All files loaded!')
 
         # Check that term data loaded matches number of term names
-        [n_vert, n_terms] = self.gene_maps.shape
-        if n_terms != self.n_terms:
-            print('NUMBER OF TERMS DOES NOT MATCH')
+        [n_vert, n_genes] = self.gene_maps.shape
+        if n_genes != self.n_genes:
+            print('NUMBER OF GENES DOES NOT MATCH')
 
         # Update boolean that genes are loaded
         self.genes_loaded = True
