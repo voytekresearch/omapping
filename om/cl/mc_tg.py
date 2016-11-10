@@ -103,6 +103,11 @@ class MapCompTG(MapCompBase):
         # Print status
         print('All files loaded!')
 
+        # Check that term data loaded matches number of term names
+        [n_vert, n_terms] = self.gene_maps.shape
+        if n_terms != self.n_terms:
+            print('NUMBER OF TERMS DOES NOT MATCH')
+
         # Update boolean that genes are loaded
         self.genes_loaded = True
 
@@ -123,6 +128,11 @@ class MapCompTG(MapCompBase):
 
         # Load the terms map
         self.term_maps = pd.read_csv(terms_csv, header=None)
+
+        # Check that term data loaded matches number of term names
+        [n_vert, n_terms] = self.term_maps.shape
+        if n_terms != self.n_terms:
+            print('NUMBER OF TERMS DOES NOT MATCH')
 
         # Update boolean that terms are loaded
         self.terms_loaded = True
