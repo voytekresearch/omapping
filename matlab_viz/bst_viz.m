@@ -44,7 +44,7 @@ disp('Data Loaded')
 %% Load FOOF Data - Osc Score
 
 % Set filename
-filename = 'Group_Osc_Score_viz.mat';
+filename = '85_Group_Osc_Score_viz.mat';
 
 % Load Grop osc-score data
 load([datapath, filename])
