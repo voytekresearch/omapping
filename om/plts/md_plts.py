@@ -197,7 +197,7 @@ def plot_all_oscs_single(data, dat_type, title, n_bins=160, size=(15, 5), save_o
     # Set up for which data type
     if dat_type is 0:
         dat_title = 'Center Frequency'
-        xlab = 'Frequency'
+        xlab = 'Center Frequency'
     elif dat_type is 1:
         dat_title = 'Power'
         xlab = 'Log Power'
