@@ -175,6 +175,17 @@ class OMDB(object):
             Whether or not to print out available file names.
         return_files : boolean, optional (default = False)
             Whether or not to return lists of filenames.
+
+        Returns
+        -------
+        osc_files : ?
+            xx
+        slope_files : ?
+            xx
+        term_files : ?
+            xx
+        gene_files : ?
+            xx
         """
 
         # Get lists of files from data directories
@@ -646,6 +657,17 @@ def get_section(section, n_ROIs, roi_lr):
         The number of ROIs.
     roi_lr : list of str
         List of L/R for each ROI.
+
+    Returns
+    -------
+    ind_st_a : ?
+        xx
+    ind_en_a : ?
+        xx
+    ind_st_b : ?
+        xx
+    ind_en_b : ?
+        xx
     """
 
     # Set section indices
