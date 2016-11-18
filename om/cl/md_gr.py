@@ -248,9 +248,11 @@ class GroupMegData(MegData):
 
         Returns
         -------
-        corrs : dict
-            Contains the correlations between all oscillation probabilities.
-        corrs_mat : array
+        corrs_mat : ?
+            xx
+        ps_mat : ?
+            xx
+        sorted_bands : ?
             xx
         """
 
