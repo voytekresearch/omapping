@@ -181,13 +181,13 @@ class MegData(object):
 
         Parameters
         ----------
-        verbose : xx
-            xx
+        verbose : boolean
+            Whether to print out status as function runs.
 
-        When imported, oscillation data is in matrix form [n_vertex, osc_slots].
-        This functions converts these matrices into 1-D vectors.
-
-        Note: This function loses information about which vertex oscillations occur at.
+        Notes:
+        - When imported, oscillation data is in matrix form [n_vertex, osc_slots].
+            This functions converts these matrices into 1-D vectors.
+        - This function loses information about which vertex oscillations occur at.
         """
 
         # Flatten osc data into vectors. Uses C-style row-major order
@@ -245,7 +245,17 @@ class MegData(object):
 
 
     def calc_osc_param_corrs(self):
-        """Calculates correlations between oscillatory parameters."""
+        """Calculates correlations between oscillatory parameters.
+
+        Returns
+        -------
+        corrs_mat : ?
+            xx
+        ps_mat : ?
+            xx
+        labels : ?
+            xx
+        """
 
         # Set labels for the things being correlated
         labels = ['Centers', 'Powers', 'Bandwidths']
@@ -380,6 +390,11 @@ def load_md_pickle(file_name):
     ----------
     file_name : str
         File name of the pickle file to be loaded.
+
+    Returns
+    -------
+    results : ?
+        xx
     """
 
     # Get database object
@@ -566,6 +581,11 @@ def _load_foof_pickle(file_name):
     ----------
     filename : str
         Full path, including filename, to file to be loaded.
+
+    Returns
+    -------
+    results : ?
+        xx
     """
 
     # Load from pickle file
