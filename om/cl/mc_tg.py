@@ -436,18 +436,13 @@ class MapCompTG(MapCompBase):
 ###############################################################################################
 
 def calc_avg_gene_map(subj_list, file_title):
-    """
+    """XXX
 
     Parameters
     ----------
     subj_list : list of str
         List of subject numbers to average together
     file_title : xx
-        xx
-
-    Outputs
-    -------
-    xx : xx
         xx
     """
 
@@ -527,7 +522,6 @@ def _get_gene_files(subj):
 
     # Get OMDB object
     db = OMDB()
-    #maps_genes_path = os.path.join(db.maps_path, 'Genes')
 
     # Make var for the name of the folder of gene data
     subj_folder = subj + '_gene_estimations'
@@ -622,6 +616,11 @@ def _init_stat_dict(bands):
     ----------
     bands : list of str
         Oscillation bands to initialize.
+
+    Returns
+    -------
+    out : ?
+        xx
     """
 
     # Initialize dictionary to return
@@ -644,6 +643,11 @@ def _make_list(dat_df):
     ----------
     dat_df : DataFrame
         Input data, to be converted into a list.
+
+    Returns
+    -------
+    out_list : ?
+        xx
     """
 
     # Get size of the data to
@@ -666,6 +670,13 @@ def _pull_out_results(dat_in):
     ----------
     dat_in : list of tuple
         A list of correlation results. Each tuple is (R-val, p-val).
+
+    Returns
+    -------
+    out_1 : ?
+        xx
+    out_2 : ?
+        xx
     """
 
     # Check length of data
@@ -691,6 +702,11 @@ def _run_corr(dat):
     ----------
     dat : 1d array
         An array of map data to be compared to projected meg map.
+
+    Returns
+    -------
+    xx : xx
+        xx
 
     Note:
     - meg_map has to be projected to workers.
