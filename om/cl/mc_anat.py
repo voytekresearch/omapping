@@ -12,9 +12,9 @@ import scipy.stats.stats as sps
 from om.gen import get_section, DataNotComputedError
 from om.cl.mc_base import MapCompBase, _init_meg_map_dict
 
-################################################################
-########## OMEGAMAPPIN - MAP COMPARE - ANAT - CLASSES ##########
-################################################################
+################################################################################
+################## OMEGAMAPPIN - MAP COMPARE - ANAT - CLASSES ##################
+################################################################################
 
 class MapCompAnat(MapCompBase):
     """Class for storing and comparing spatial topographies in rois."""
@@ -174,9 +174,6 @@ class MapCompAnat(MapCompBase):
             elif self.elec_roi_names[roi][-1] is 'R':
                 self.elec_roi_lrs.append('R')
 
-            else:
-                pass
-
             # Drop the L/R from the names
             self.elec_roi_names[roi] = self.elec_roi_names[roi][:-2]
 
@@ -192,9 +189,6 @@ class MapCompAnat(MapCompBase):
             elif self.anat_roi_names[roi][0] is 'r':
                 self.anat_roi_lrs.append('R')
                 self.anat_roi_names[roi] = self.anat_roi_names[roi][6:]
-
-            else:
-                pass
 
             # Drop the underscores
             self.anat_roi_names[roi] = self.anat_roi_names[roi].replace("_", "")
