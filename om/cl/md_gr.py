@@ -28,14 +28,14 @@ class GroupMegData(MegData):
     """
 
     def __init__(self, db, osc):
-        """
+        """Initialize object with omegamappin database, and oscillation definitions.
 
         Parameters
         ----------
-        db : ?
-            xx
-        osc : ?
-            xx
+        db : OMDB() object
+            Database object for omegamappin project.
+        osc : Osc() object
+            Object to store oscillatory band definitions.
         """
 
         # Initialize from MegData() object
@@ -54,16 +54,16 @@ class GroupMegData(MegData):
         # Set title for plots
         self.title = 'Group'
 
-        # Initialize dictionary for oscillation band data - NEW
+        # Initialize dictionary for oscillation band data
         self.gr_oscs = dict()
 
-        # Initilaize dictionary to store oscillation probabilities - NEW
+        # Initilaize dictionary to store oscillation probabilities
         self.osc_probs = dict()
 
-        # Initialize dict to store oscillation power ratios - NEW
+        # Initialize dict to store oscillation power ratios
         self.osc_pow_ratios = dict()
 
-        # Initialize to store oscillation scores - NEW
+        # Initialize to store oscillation scores
         self.osc_scores = dict()
 
         # Initialize vars to store slope values
@@ -81,8 +81,6 @@ class GroupMegData(MegData):
 
         Parameters
         ----------
-        self : GroupMegData() object.
-            Object to store map data across a group of subjects.
         new_subj : MegData() Object
             MEG subject (instance of MegData)
         add_all_oscs : boolean, optional (default: False)
@@ -183,8 +181,6 @@ class GroupMegData(MegData):
 
         Parameters
         ----------
-        self : GroupMegData() object.
-            Object to store map data across a group of subjects.
         avg : {'mean', 'median'}, optional
             How to average across the group.
         """
@@ -241,19 +237,17 @@ class GroupMegData(MegData):
 
         Parameters
         ----------
-        self : GroupMegData() object.
-            Object to store map data across a group of subjects.
         map_type : {'prob', 'score'}
             Which map data type to save out.
 
         Returns
         -------
-        corrs_mat : ?
-            xx
-        ps_mat : ?
-            xx
-        sorted_bands : ?
-            xx
+        corrs_mat : 2d array
+            Correlation R-values matrix, across all oscillation bands.
+        ps_mat : 2d array
+            Correlations p-values matrix, across all oscillation bands.
+        sorted_bands : list of str
+            Oscillation band labels, sorted into order.
         """
 
         # Check if oscillation probabilities have been calculated.
@@ -297,12 +291,12 @@ class GroupMegData(MegData):
 
         Returns
         -------
-        corrs_mat : dict
-            A dictionary containing correlations results comparing age to oscillations.
-        ps_mat : ?
-            xx
-        sorted_bands : ?
-            xx
+        corrs_mat : 1d array
+            Correlations R-values comparing age to oscillations.
+        ps_mat : 1d array
+            Correlations p-values from comparing age to oscillations.
+        sorted_bands : list of str
+            Oscillation band labels, sorted into order.
         """
 
         # Check how many bands there are
@@ -330,8 +324,6 @@ class GroupMegData(MegData):
 
         Parameters
         ----------
-        self : GroupMegData() object.
-            Object to store map data across a group of subjects.
         f_win : float
             Size of frequency window to use.
 
@@ -391,8 +383,6 @@ class GroupMegData(MegData):
 
         Parameters
         ----------
-        self : GroupMegData() object.
-            Object to store map data across a group of subjects.
         file_name : str
             File name to save group slope file as.
         """
@@ -419,8 +409,6 @@ class GroupMegData(MegData):
 
         Parameters
         ----------
-        self : GroupMegData() object.
-            Object to store map data across a group of subjects.
         map_type : {'prob', 'score'}
             Which map data type to save out.
         file_name : str
