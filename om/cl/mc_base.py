@@ -15,12 +15,12 @@ class MapCompBase(object):
     """Class for storing and comparing spatial topographies."""
 
     def __init__(self, db):
-        """
+        """Initialize object with omegamappin database.
 
         Parameters
         ----------
-        db : xx
-            xx
+        db : OMDB() object
+            Database object for omegamappin project.
         """
 
         # Add database object
@@ -43,9 +43,7 @@ class MapCompBase(object):
 
         Parameters
         ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
-        osc_file : str, optional
+        osc_file : str
             File name of the pickle file with oscillations data.
         """
 
@@ -107,7 +105,7 @@ def _init_meg_map_dict(bands, length=0):
 
     Returns
     -------
-    meg_map : dictionary
+    meg_map : dict
         Dictionary with fields for MEG oscillation data.
     """
 
