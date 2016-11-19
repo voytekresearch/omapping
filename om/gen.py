@@ -18,7 +18,7 @@ from foof.fit import FOOF
 #####################################################################################
 
 class OMDB(object):
-    """Class to hold database information for MEG project. """
+    """Class to hold database information for MEG project."""
 
     def __init__(self, dat_source='both'):
         """
@@ -26,7 +26,7 @@ class OMDB(object):
         Parameters
         ----------
         dat_source : {'both', 'OMEGA', 'HCP'}
-            xx
+            Which MEG database to use.
         """
 
         # Check dat_source is acceptable
@@ -82,7 +82,7 @@ class OMDB(object):
             Which data type to check files for.
         save_type : {'pickle', 'csv'}, optional (default = 'pickle')
             Which file type to check files for. Only used for foof files.
-        verbose : boolean, optional
+        verbose : boolean, optional (default = True)
             Whether to print out information during run.
 
         Returns
@@ -162,7 +162,6 @@ class OMDB(object):
             print('\nNumber of files available: ' + str(len(files)) + '\n')
             print('Files available: \n' + ('\n'.join(files)) + '\n')
 
-        # Return file list
         return files
 
 
@@ -178,14 +177,14 @@ class OMDB(object):
 
         Returns
         -------
-        osc_files : ?
-            xx
-        slope_files : ?
-            xx
-        term_files : ?
-            xx
-        gene_files : ?
-            xx
+        osc_files : list of str
+            All available oscillation files.
+        slope_files : list of str
+            All available slope files.
+        term_files : list of str
+            All available terms files.
+        gene_files : list of str
+            All available gene files.
         """
 
         # Get lists of files from data directories
@@ -316,7 +315,7 @@ def clean_file_list(files_in, string):
 
     Returns
     -------
-    files_out : list (str)
+    files_out : list of str
         A list of the file names that contain the given string.
     """
 
@@ -341,7 +340,7 @@ def load_meg_psds(dat_source, meg_path, subj_num):
     Parameters
     ----------
     dat_source : {'OMEGA', 'HCP'}
-        xx
+        Which database subject comes from.
     meg_path : str
         Path where data to load is located.
     subj_num : int
@@ -413,8 +412,7 @@ def save_foof_pickle(results, save_path, sub_num):
     Parameters
     ----------
     results : list of tuple
-        List of tuples of FOOF results. Length of list is number of vertices.
-            Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     save_path: str
         Filepath of where to save out the file.
     sub_num : int
@@ -435,8 +433,7 @@ def save_foof_csv(results, save_path, sub_num):
     Parameters
     ----------
     results : list of tuple
-        List of tuples of FOOF results. Length of list is number of vertices.
-            Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     save_path : str
         Filepath of where to save out the file.
     sub_num : int
@@ -489,8 +486,7 @@ def load_foof_pickle(dat_path, sub_num):
     Returns
     -------
     results : list of tuple
-        List of tuples of FOOF results. Length of list is number of vertices.
-            Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     """
 
     # Get list of available files to load
@@ -512,21 +508,21 @@ def extract_foof_pickle(results):
 
     Parameters
     ----------
-    results : ?
-        xx
+    results : list of tuple
+        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
 
     Returns
     -------
     centers : 2d array
-        xx
+        Matrix of all centers for all PSDs.
     powers : 2d array
-        xx
+        Matrix of all powers for all PSDs.
     bws : 2d array
-        xx
+        Matrix of all bws for all PSDs.
     slopes : 1d array
-        xx
+        Slope value for each PSD.
     n_psds : int
-        xx
+        The number of PSDs.
     """
 
     # Check how many psds there are
@@ -569,7 +565,7 @@ def get_sub_nums(files_in, f_l):
     Returns
     -------
     subnums : list of int
-        List of subject numbers.
+        Subject numbers for all files.
     """
 
     # Check and remove file extensions
@@ -660,48 +656,52 @@ def get_section(section, n_ROIs, roi_lr):
 
     Returns
     -------
-    ind_st_a : ?
-        xx
-    ind_en_a : ?
-        xx
-    ind_st_b : ?
-        xx
-    ind_en_b : ?
-        xx
+    ind_st_x : int
+        Starting index for the x axis data.
+    ind_en_x : int
+        Ending index for the x axis data.
+    ind_st_y : int
+        Starting index for the y axis data.
+    ind_en_y : int
+        Ending index for the y axis data.
+
+    Notes
+    -----
+    - For 'all', 'left', 'right', the 'a' and 'b' section indices are the same.
+        The 'b' indices are different when getting the 'lr' and 'rl' comparisons.
     """
 
     # Set section indices
     if section is 'all':
-        ind_st_a = ind_st_b = 0
-        ind_en_a = ind_en_b = n_ROIs
+        ind_st_x = ind_st_y = 0
+        ind_en_x = ind_en_y = n_ROIs
     elif section is 'left':
-        ind_st_a = ind_st_b = roi_lr.index('L')
-        ind_en_a = ind_en_b = _find_last(roi_lr, 'L')
+        ind_st_x = ind_st_y = roi_lr.index('L')
+        ind_en_x = ind_en_y = _find_last(roi_lr, 'L')
     elif section is 'right':
-        ind_st_a = ind_st_b = roi_lr.index('R')
-        ind_en_a = ind_en_b = _find_last(roi_lr, 'R')
+        ind_st_x = ind_st_y = roi_lr.index('R')
+        ind_en_x = ind_en_y = _find_last(roi_lr, 'R')
     elif section is 'lr':
-        ind_st_a = roi_lr.index('L')
-        ind_en_a = _find_last(roi_lr, 'L')
-        ind_st_b = roi_lr.index('R')
-        ind_en_b = _find_last(roi_lr, 'R')
+        ind_st_x = roi_lr.index('L')
+        ind_en_x = _find_last(roi_lr, 'L')
+        ind_st_y = roi_lr.index('R')
+        ind_en_y = _find_last(roi_lr, 'R')
     elif section is 'rl':
-        ind_st_a = roi_lr.index('R')
-        ind_en_a = _find_last(roi_lr, 'R')
-        ind_st_b = roi_lr.index('L')
-        ind_en_b = _find_last(roi_lr, 'L')
+        ind_st_x = roi_lr.index('R')
+        ind_en_x = _find_last(roi_lr, 'R')
+        ind_st_y = roi_lr.index('L')
+        ind_en_y = _find_last(roi_lr, 'L')
     else:
         raise InconsistentDataError('Section range is unclear.')
 
-    # Return indices
-    return ind_st_a, ind_en_a, ind_st_b, ind_en_b
+    return ind_st_x, ind_en_x, ind_st_y, ind_en_y
 
 
 def meg_foof(psd_ext, freqs_ext, min_p, freq_res):
     """Run FOOF on MEG-PSD data.
 
     NOTE: This is an old version, can run foof linearly.
-        For parallel, use standalone script.
+        For parallel, use stand-alone script.
 
     Parameters
     ----------
@@ -717,8 +717,7 @@ def meg_foof(psd_ext, freqs_ext, min_p, freq_res):
     Returns
     -------
     results : list of tuple
-        List of tuples of FOOF results. Length of list is number of vertices.
-            Tuple is: (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     """
 
     # Check how many PSDs there are
@@ -779,8 +778,7 @@ def _run_foof_l(foof, freqs_ext, psd_ext):
     Returns
     -------
     out : tuple
-        Tuple of FOOF results.
-            Tuple is (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     """
 
     # Fit FOOF
