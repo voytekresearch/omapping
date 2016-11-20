@@ -104,43 +104,12 @@ class MapCompAnat(MapCompBase):
 
     anat_con :
         xx
+    meg_con :
+        xx
 
     meg_roi_maps :
         xx
-    meg_con :
-        xx
     meg_stats :
-        xx
-
-    meg_rois : boolean
-        Whether XX...
-
-
-    n_rois : int
-        The number of ROIs.
-    roi_labels :
-        xx
-    roi_lr :
-        xx
-    roi_verts :
-        xx
-
-    elec_n_rois : int
-        xx
-    elec_roi_names :
-        xx
-    elec_roi_lrs :
-        xx
-    elec_roi_verts :
-        xx
-
-    anat_n_rois : int
-        xx
-    anat_roi_names : list of str
-        xx
-    anat_roi_lrs : list of str
-        xx
-    anat_type : str
         xx
     """
 
@@ -173,27 +142,6 @@ class MapCompAnat(MapCompBase):
 
         # Initialize var to store meg stats data
         self.meg_stats = dict()
-
-        # Add booleans for ...
-        self.meg_rois = False
-
-        # Initialize var to store roi information
-        #self.n_rois = int()
-        #self.roi_labels = list()
-        #self.roi_lr = list()
-        #self.roi_verts = list()
-
-        # Add vars to save roi data from anat data
-        #self.anat_n_rois = int()
-        #self.anat_roi_names = list()
-        #self.anat_roi_lrs = list()
-        #self.anat_type = str()
-
-        # Add vars to save roi data from MEG data
-        #self.elec_n_rois = int()
-        #self.elec_roi_names = list()
-        #self.elec_roi_lrs = list()
-        #self.elec_roi_verts = list()
 
 
     def load_anat_maps(self, anat_file_name, anat_type):
@@ -235,13 +183,6 @@ class MapCompAnat(MapCompBase):
         # Attach anat ROI object, and anat data to MapComp object
         self.anat = anat
         self.anat_con = con_dat
-
-        # Loop through and fix roi labels
-        #for roi in range(0, self.anat_n_rois):
-        #    self.anat_roi_names.append(str(roi_names[roi][0][0]))
-
-        # Get number of rois
-        #self.anat_n_rois = len(roi_names)
 
 
     def load_elec_rois(self, roi_file_name=None):
@@ -293,13 +234,6 @@ class MapCompAnat(MapCompBase):
         # Attach anat ROI object to MapComp object
         self.elec = elec
 
-        # Check how many rois there are
-        #self.elec_n_rois = len(scouts)
-
-        # Attach data to object
-        #self.elec_roi_names = sc_names
-        #self.elec_roi_verts = sc_verts
-
 
     def align_rois(self):
         """Align rois used and names between anat and meg rois.
@@ -312,70 +246,6 @@ class MapCompAnat(MapCompBase):
         # Check if rois loaded - return if not
         if (not self.elec.loaded) or (not self.anat.loaded):
             raise DataNotComputedError('One or Both rois not loaded! Cant proceed!')
-
-        # Elec L/Rs - standardize names
-        # ROIs imported from the MEG have L/R at the end of the end
-        #   of the ROI labels
-        #for roi in range(self.elec_n_rois):
-
-            # Check if left side scout
-        #    if self.elec_roi_names[roi][-1] is 'L':
-        #        self.elec_roi_lrs.append('L')
-
-            # Check if right side scout
-        #    elif self.elec_roi_names[roi][-1] is 'R':
-        #        self.elec_roi_lrs.append('R')
-
-            # Drop the L/R from the names
-        #    self.elec_roi_names[roi] = self.elec_roi_names[roi][:-2]
-
-        # Anat L/Rs - standardize names
-        # ROIs imported from anatomy have left/right words at the
-        #   front of the ROI labels
-        #for roi in range(self.anat_n_rois):
-
-            # Check if left side scout
-        #    if self.anat_roi_names[roi][0] is 'l':
-        #        self.anat_roi_lrs.append('L')
-        #        self.anat_roi_names[roi] = self.anat_roi_names[roi][5:]
-
-            # Check if right side scout
-        #    elif self.anat_roi_names[roi][0] is 'r':
-        #        self.anat_roi_lrs.append('R')
-        #        self.anat_roi_names[roi] = self.anat_roi_names[roi][6:]
-
-            # Drop the underscores
-        #    self.anat_roi_names[roi] = self.anat_roi_names[roi].replace("_", "")
-
-        # Loop through and line up scout names
-        #for i in range(self.anat_n_rois):
-
-            # Grab current roi from anat roi list
-        #    cur_roi = self.anat_roi_names[i]
-        #    cur_lr = self.anat_roi_lrs[i]
-
-            # Loop through elec rois to match up
-        #    for j in range(self.elec_n_rois):
-
-                # Check if current elec roi matches current roi
-        #        if self.elec_roi_names[j] == cur_roi:
-
-                    # Check if L/R is right
-        #            if self.elec_roi_lrs[j] == cur_lr:
-
-                        # Same side - add to overall list
-        #                self.roi_labels.append(cur_roi)
-        #                self.roi_lr.append(cur_lr)
-
-                        # Add vertices to overall roi list
-        #                self.roi_verts.append(self.elec_roi_verts[j])
-
-        # Check how many rois there are
-        #self.n_rois = len(self.roi_labels)
-
-        # Set boolean that rois have been aligned
-        #self.rois_aligned = True
-
 
         # Initialize roi object for aligned object
         rois = ROI()
@@ -423,36 +293,23 @@ class MapCompAnat(MapCompBase):
         """
 
         # Initialize dict for current roi data
-        #roi_meg_dat = _init_meg_map_dict(self.bands.keys(), self.n_rois)
         roi_meg_dat = _init_meg_map_dict(self.bands.keys(), self.rois.n_rois)
 
         # Loop through all rois
-        #for roi in range(0, self.n_rois):
         for ind, cur_verts in enumerate(self.rois.verts):
 
             # Add current roi data to dict
             # Loop through all oscs
-            #for key in self.meg_maps.keys():
             for band in self.meg_maps.keys():
 
-                #
-                #cur_verts = np.squeeze(self.roi_verts[roi] - 1)
-
-                #cur_verts = np.squeeze(cur_verts - 1)
                 n_verts = len(cur_verts)
 
-                #
-                #temp_dat = self.meg_maps[key][cur_verts]
                 temp_dat = self.meg_maps[band][cur_verts]
 
-                #
                 roi_meg_dat[band][ind] = (sum(temp_dat) / n_verts)
 
         # Add the current roi data to object
         self.meg_roi_maps = roi_meg_dat
-
-        # Update boolean that meg data has been converted to rois
-        self.meg_rois = True
 
 
     def comp_meg_anat(self, section='all', print_out=True):
@@ -472,7 +329,6 @@ class MapCompAnat(MapCompBase):
         self.meg_con = _init_meg_map_dict(self.bands.keys())
 
         # Get section indices to run comparisons
-        #ind_st, ind_en, _, _ = get_section(section, self.n_rois, self.roi_lr)
         ind_st, ind_en, _, _ = get_section(section, self.rois.n_rois, self.rois.lrs)
 
         # Calculate the meg connectivity data for each oscillation band
@@ -588,6 +444,7 @@ def _clean_label(label, lr, dat_type):
         label = label.replace("_", "")
 
     return label
+
 
 def _mat_mult(vec):
     """Multiply a vector element by element with itself.
