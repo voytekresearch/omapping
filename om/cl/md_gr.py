@@ -25,6 +25,35 @@ class GroupMegData(MegData):
 
     Holds all oscillations, regardless of spatial location.
     Note: Class derived from MegData()
+
+    Attributes
+    ----------
+    n_subjs : int
+        The number of subjects included in the group data.
+    subjs : list of int
+        List of the subject numbers included in current group data.
+    bands : Osc() object
+        Stores labels and band definitions of oscillation bands.
+    n_oscs_tot : int
+        Total number of oscillations found across all subjects.
+    comment : str
+        A note about the data, label about data that is loaded.
+    gr_oscs : dict
+        All oscillations, in bands, for all subjects [n_verts, n_oscs, n_subjs].
+    osc_probs : dict
+        Oscillation probability for each oscillation band, for each vertex.
+    osc_pow_ratios : dict
+        Oscillation power ratios for each oscillation band, for each vertex.
+    osc_scores : dict
+        Oscillation scores for each oscillation band, for each vertex.
+    vert_slopes : 2d array
+        Slope values for each subject, at each vertex [n_verts, n_subjs].
+    slopes_gr_avg : 1d array
+        Average slope values across subjects for each vertex.
+    osc_prob_done : boolean
+        Whether oscillation probability has been calculated.
+    osc_score_done : boolean
+        Whether oscillation score has been calculated.
     """
 
     def __init__(self, db, osc):
@@ -51,8 +80,8 @@ class GroupMegData(MegData):
         # Initialize count of total oscillations, across all subjects
         self.n_oscs_tot = int()
 
-        # Set title for plots
-        self.title = 'Group'
+        # Set comment for data, can be used for plotting
+        self.comment = 'Group'
 
         # Initialize dictionary for oscillation band data
         self.gr_oscs = dict()
@@ -165,7 +194,7 @@ class GroupMegData(MegData):
 
         # Update subj count and subject number list
         self.n_subjs += 1
-        self.subjs = np.append(self.subjs, new_subj.subnum)
+        self.subjs.append(new_subj.subnum)
 
         # Update booleans about what is loaded
         self.all_osc = add_all_oscs
