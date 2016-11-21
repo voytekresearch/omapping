@@ -3,13 +3,14 @@
 """
 
 from __future__ import print_function, division
+
 import os
 import numpy as np
 import scipy.io as sio
 import scipy.stats.stats as sps
 
 # Import custom om code
-from om.gen import get_section, DataNotComputedError
+from om.gen import get_section, DataNotComputedError, InconsistentDataError
 from om.cl.mc_base import MapCompBase, _init_meg_map_dict
 
 ####################################################################################
@@ -17,20 +18,20 @@ from om.cl.mc_base import MapCompBase, _init_meg_map_dict
 ####################################################################################
 
 class ROI(object):
-    """
+    """Class to hold data about ROIs.
 
     Attributes
     ----------
     n_rois : int
-        xx
+        The number of ROIs.
     labels : list of str
-        xx
+        Label for each ROI.
     verts : list of array
-        xx
+        List of vertices included in the ROI.
     lr : list of str
-        xx
-    type : str
-        xx
+        L/R for each ROI.
+    comment : str
+        Comment about the ROIs.
 
     Notes
     -----
@@ -40,7 +41,7 @@ class ROI(object):
     def __init__(self):
         """   """
 
-        # Initialize field to store ROI data
+        # Initialize fields to store ROI data
         self.n_rois = int()
         self.labels = list()
         self.lrs = list()
@@ -54,8 +55,7 @@ class ROI(object):
 
         # Check labels and lrs are the same size
         if len(labels) != len(lrs):
-            print('AHHHHH')
-
+            raise InconsistentDataError('Input labels and lrs do not match!')
         self.labels = labels
         self.lrs = lrs
         self.n_rois = len(labels)
@@ -81,11 +81,11 @@ class ROI(object):
         """   """
 
         if not (self.n_rois == len(self.labels) == len(self.lrs)):
-            print('AHHH')
+            raise InconsistentDataError('Discrepancy in number of labels and/or L/Rs.')
 
         if self.verts:
             if not (self.n_rois == len(self.verts)):
-                print('AHHH')
+                raise InconsistentDataError('Discrepancy in the number of vertices.')
 
 
 class MapCompAnat(MapCompBase):
@@ -96,21 +96,19 @@ class MapCompAnat(MapCompBase):
     Attributes
     ----------
     rois : ROI() object
-        xx
+        ROI data aligned across anat & elec.
     anat : ROI() object
-        xx
+        ROI information from anatomical data.
     elec : ROI() object
-        xx
-
-    anat_con :
-        xx
-    meg_con :
-        xx
-
-    meg_roi_maps :
-        xx
-    meg_stats :
-        xx
+        ROI information from MEG data
+    anat_con : 2d array
+        Matrix of anatomical connectivity data.
+    meg_con : dict
+        MEG physiological matrices for all oscillation bands.
+    meg_roi_maps : dict
+        MEG data collapsed into ROIs. Average data, in a given band, across the ROI.
+    stats : dict
+        Correlation results from comparing anatomy to electrophysiology.
     """
 
     def __init__(self, db):
@@ -119,7 +117,7 @@ class MapCompAnat(MapCompBase):
         Parameters
         ----------
         db : OMDB() object
-            xx
+            Database object for omegamappin project.
         """
 
         # Inherit from MapComp() class
@@ -140,8 +138,8 @@ class MapCompAnat(MapCompBase):
         # Initialize var to store MEG connectivity data
         self.meg_con = dict()
 
-        # Initialize var to store meg stats data
-        self.meg_stats = dict()
+        # Initialize var to store correlation results
+        self.stats = dict()
 
 
     def load_anat_maps(self, anat_file_name, anat_type):
@@ -336,7 +334,7 @@ class MapCompAnat(MapCompBase):
             self.meg_con[key] = _mat_mult(self.meg_roi_maps[key][ind_st:ind_en])
 
         # Initialize a dictionary to store data
-        meg_stats = _init_meg_map_dict(self.bands.keys(), length=2)
+        stats = _init_meg_map_dict(self.bands.keys(), length=2)
 
         # Get n_rois used in comparison
         n_rois_used = ind_en - ind_st
@@ -345,13 +343,13 @@ class MapCompAnat(MapCompBase):
         anat_comp = self.anat_con[ind_st:ind_en, ind_st:ind_en]
 
         # Calculate the correlations between each oscillation and anat data
-        for key in meg_stats.keys():
-            meg_stats[key][0], meg_stats[key][1] = sps.pearsonr(
+        for key in stats.keys():
+            stats[key][0], stats[key][1] = sps.pearsonr(
                 self.meg_con[key][np.triu_indices(n_rois_used, 1)],
                 anat_comp[np.triu_indices(n_rois_used, 1)])
 
-        # Attach the meg stats dictionary to object
-        self.meg_stats = meg_stats
+        # Attach the stats dictionary to object
+        self.stats = stats
 
         # Print out results, if asked for
         if print_out:
@@ -359,10 +357,10 @@ class MapCompAnat(MapCompBase):
             print('Correlation between MEG and anatomical connectivity: \n')
 
             # Loop through each oscillation, and print out R-val and p-val
-            for key in self.meg_stats.keys():
+            for key in self.stats.keys():
                 print(key)
-                print('    R value: ', format(self.meg_stats[key][0], '1.4'))
-                print('    P value: ', format(self.meg_stats[key][1], '1.4'))
+                print('    R value: ', format(self.stats[key][0], '1.4'))
+                print('    P value: ', format(self.stats[key][1], '1.4'))
 
 
 ############################################################################################
