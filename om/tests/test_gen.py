@@ -2,7 +2,9 @@
 """
 
 import numpy as np
+import os
 from py.test import raises
+
 from om.gen import *
 
 ###############################################################################
@@ -18,6 +20,17 @@ def test_omdb():
     assert OMDB('HCP')
     with raises(UnknownDataSourceError):
         assert OMDB('bad data selection')
+
+def test_omdb_paths():
+    """Test that all defined OMDB paths exist."""
+
+    db = OMDB()
+
+    # Loops through all paths, checking they exist
+    #  Skips vars with '_path' marker, and empty variables
+    for key, val in vars(db).items():
+        if '_path' in key and val:
+            assert os.path.exists(val)
 
 ###############################################################################
 ########################## TESTS - OMEGAMAPPIN - OSC ##########################
