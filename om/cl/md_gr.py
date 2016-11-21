@@ -551,7 +551,7 @@ def _get_all_osc(centers, osc_low, osc_high):
     """
 
     # Get inds of desired oscs and pull out from input data
-    osc_inds = (centers > osc_low) & (centers < osc_high)
+    osc_inds = (centers >= osc_low) & (centers <= osc_high)
     osc_cens = centers[osc_inds]
 
     return osc_cens
