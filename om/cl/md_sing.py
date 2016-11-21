@@ -21,15 +21,65 @@ from om.gen import OMDB, clean_file_list, get_cur_subj, extract_foof_pickle
 ###########################################################################################
 
 class MegData(object):
-    """Class for a single subject of FOOF results for MEG Source PSDs."""
+    """Class for a single subject of FOOF results for MEG Source PSDs.
+
+    Attributes
+    ----------
+    dat_source : {'OMEGA', 'HCP'}
+        Which database the MEG subject comes from.
+    db : OMDB() object
+        Database object of paths for the omegamappin project.
+    subnum : int
+        Subject number of the subject of MEG data that is loaded.
+    n_psds : int
+        Number of PSDs loaded, corresponds to number of vertices.
+    slopes : 1d array
+        Slope value for each vertex.
+    centers : 2d array
+        Oscillation centers, for each vertex [n_verts, n_oscs].
+    powers : 2d array
+        Oscillation powers, for each vertex [n_verts, n_oscs].
+    bws : 2d array
+        Oscillation bandwidths, for each vertex [n_verts, n_oscs].
+    centers_all : 1d array
+        Vector of all oscillation centers, collapsed across vertices.
+    powers_all : 1d array
+        Vector of all oscillation powers, collapsed across vertices.
+    bws_all : 1d array
+        Vector of all oscillation bandwidths, collapsed across vertices.
+    n_oscs : int
+        Number of oscillations extracted for the subject, across all vertices.
+    centers_hist : 1d array
+        Center frequencies binned into histogram format.
+    bands : Osc() object
+        Oscillation band definitions.
+    oscs : dict
+        Oscillations, split up by band, per vertex.
+    peaks : dict
+        Peak frequencies within each oscillation band.
+    comment : str
+        Note on the current data, typically subject number, can be used for plotting.
+    sex : {'M', 'F'}
+        Sex of the current subject.
+    age : int
+        Age of the current subject.
+    osc_count : 1d array
+        Number of oscillations extracted per vertex.
+    has_data : boolean
+        Whether or not data has been loaded to current object.
+    all_osc : boolean
+        Whether data has been flattened into all oscillations.
+    bands_vertex : boolean
+        Whether data has been converted into band specific oscillations, per vertex.
+    """
 
     def __init__(self, db):
-        """
+        """Initialize object with omegamappin database.
 
         Parameters
         ----------
-        db : ?
-            xx
+        db : OMDB() object
+            Database object for omegamappin project.
         """
 
         # Store which db is set
@@ -67,8 +117,8 @@ class MegData(object):
         # Initialize dictionary for peak frequencies - NEW
         self.peaks = dict()
 
-        # Set plot title
-        self.title = ''
+        # Set plot comment
+        self.comment = ''
 
         # Set boolean for what has been run
         self.has_data = False
@@ -88,8 +138,6 @@ class MegData(object):
 
         Parameters
         ----------
-        self : MegData() object
-            Object to store MEG FOOF data.
         subnum : int
             Number of the subject to import.
         get_demo : boolean, optional (default = True)
@@ -105,7 +153,7 @@ class MegData(object):
 
         # Set subject number for current data object
         self.subnum = subnum
-        self.title = 'S-' + str(self.subnum)
+        self.comment = 'S-' + str(self.subnum)
 
         # Set up paths, get list of files for available subjects
         files = os.listdir(os.path.join(self.db.foof_path, load_type))
@@ -144,8 +192,6 @@ class MegData(object):
 
         Parameters
         ----------
-        self : MegData object
-            MegData object.
         osc : Osc object
             An object containing frequency bands to use.
         """
@@ -184,7 +230,8 @@ class MegData(object):
         verbose : boolean
             Whether to print out status as function runs.
 
-        Notes:
+        Notes
+        -----
         - When imported, oscillation data is in matrix form [n_vertex, osc_slots].
             This functions converts these matrices into 1-D vectors.
         - This function loses information about which vertex oscillations occur at.
@@ -232,8 +279,8 @@ class MegData(object):
 
         Parameters
         ----------
-        osc : Osc object
-            Object with oscillation frequency details
+        osc : Osc() object
+            Object with oscillation frequency details.
         avg : {'mean', 'median'}, optional
             Which type of averaging to do.
         """
@@ -307,7 +354,7 @@ class MegData(object):
 ############################################################################################
 
 def print_corrs_mat(rs_mat, ps_mat, labels):
-    """Prints out correlations - from a given matrix.
+    """Prints out correlations, from a given matrix.
 
     Parameters
     ----------
@@ -337,7 +384,7 @@ def print_corrs_mat(rs_mat, ps_mat, labels):
 
 
 def print_corrs_vec(rs_vec, ps_vec, labels, desc):
-    """Prints out correlations - from a given vector.
+    """Prints out correlations, from a given vector.
 
     Parameters
     ----------
@@ -435,8 +482,8 @@ def _get_single_osc(centers, powers, bws, osc_low, osc_high):
 
     Returns
     -------
-    osc_out : tuple
-        Osc data, form: [centers, powers, bws, # oscillations].
+    osc_out : array
+        Osc data, form - (centers, powers, bws, # oscillations).
     """
 
     # Find indices of oscillations in the specified range
@@ -558,7 +605,7 @@ def _osc_peak(centers, osc_low, osc_high, avg='mean'):
     Returns
     -------
     peak : float
-        Peak frequency value - the average frequency within a given range.
+        Peak frequency value, the average frequency within a given range.
     """
 
     # Pull out all center frequencies between given range
