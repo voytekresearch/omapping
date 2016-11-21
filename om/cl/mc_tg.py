@@ -20,15 +20,43 @@ from om.cl.mc_base import MapCompBase
 ######################################################################################
 
 class MapCompTG(MapCompBase):
-    """DOCSTRING"""
+    """Class for storing and comparing topographies for Term & Gene data.
+
+    This class inherits from MapCompBase() and inherits all it's attributes.
+
+    Attributes
+    ----------
+    term_names : list of str
+        Term names for all the term data.
+    gene_names : list of str
+        Gene names for all the gene data.
+    n_terms : int
+        The number of terms loaded.
+    n_genes : int
+        The number of genes loaded.
+    term_maps : 2d array
+        Term data for all genes, across all vertices  [n_verts, n_terms].
+    gene_maps : 2d array
+        Gene data for all genes, across all vertices [n_verts, n_genes].
+    gene_subj : str
+        Label for which gene subject is loaded.
+    corrs : dict
+        Stores R-value results from correlations between bands and other data.
+    p_vals : dict
+        Stores p-value results from correlations between bands and other data.
+    terms_loaded : boolean
+        Whether or not term data is loaded.
+    genes_loaded : boolean
+        Whether of not gene data is loaded.
+    """
 
     def __init__(self, db):
-        """
+        """Initialize object with omegamappin database.
 
         Parameters
         ----------
-        db : xx
-            xx
+        db : OMDB() object
+            Database object for omegamappin project.
         """
 
         # Inherit from MapCompBase() class
@@ -49,10 +77,10 @@ class MapCompTG(MapCompBase):
         self.gene_maps = np.array([])
         self.gene_subj = str()
 
-        # Initialize a dictionary to store all the R-value results from spatial correlations
+        # Initialize a dictionary to store all the R-values from spatial correlations
         self.corrs = dict({'Terms': dict(), 'Genes': dict()})
 
-        # Initialize a dictionary to store all the p-value results from spatial correlations
+        # Initialize a dictionary to store all the p-values from spatial correlations
         self.p_vals = dict({'Terms': dict(), 'Genes': dict()})
 
         # Initialize booleans that keep track of what is loaded
@@ -65,10 +93,8 @@ class MapCompTG(MapCompBase):
 
         Parameters
         ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
         subject : str
-            Which subject of gene data to load. Of the form 'sub#'
+            Which subject of gene data to load, of the form 'sub#'.
         """
 
         # Check if gene data already loaded - if so, unload
@@ -117,8 +143,6 @@ class MapCompTG(MapCompBase):
 
         Parameters
         ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
         term_file_name : str
             File name of term data file.
         """
@@ -143,16 +167,19 @@ class MapCompTG(MapCompBase):
 
         Parameters
         ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
-        dat_type : str
+        dat_type : {'Terms', 'Genes'}
             Type of data to correlate with meg data.
-                Options: {'Terms', 'Genes'}
         meg_dat : str
-            Specific type of meg data to correlate.
-                osc_band or 'Slopes' only
-        method : {'linear', 'parallel'}
+            Specific type of meg data to correlate, osc_band of 'Slopes' only.
+        method : {'linear', 'parallel'}, optional
             Run method (linear or parallel) to use.
+
+        Raises
+        ------
+        UnknownDataTypeError
+            If the requested data can not be interpreted.
+        DataNotComputedError
+            If the requested data has not been computed.
         """
 
         # Check with data type and set data accordingly
@@ -171,6 +198,7 @@ class MapCompTG(MapCompBase):
                 raise DataNotComputedError('Slope data has not been loaded.')
             meg_map = self.slope_map[meg_dat]
 
+        # Otherwise, use the specified oscillation band
         else:
 
             # Check that oscillation data is loaded
@@ -247,16 +275,21 @@ class MapCompTG(MapCompBase):
 
         Parameters
         ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
         dat_type : {'Terms', 'Genes'}
-            Data type (Terms or Genes) of corrs to check.
+            Data type of corrs to check.
         meg_dat : str
             Specific MEG data of corrs to check.
         n_check : int, optional (default = 20)
             Number of correlations to check.
         top : boolean, optional (default = True)
             Get Top (True) or Bottom (False) set of correlations.
+
+        Raises
+        ------
+        UnknownDataTypeError
+            If the requested data can not be interpreted.
+        DataNotComputedError
+            If the requested data has not been computed.
         """
 
         # Check which type of data and set names accordingly
@@ -306,10 +339,15 @@ class MapCompTG(MapCompBase):
 
         Parameters
         ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
         dat_type : {'Terms', 'Genes'}
-            Indicator of which set of data to unload from object.
+            Which set of data to unload from object.
+
+        Raises
+        ------
+        DataNotComputedError
+            If the requested data has not been computed.
+        UnknownDataTypeError
+            If the requested data can not be interpreted.
         """
 
         # Unload Term data
@@ -349,8 +387,6 @@ class MapCompTG(MapCompBase):
 
         Parameters
         ----------
-        self : MapComp() object
-            Object for storing and comparing map data.
         dat_type : {'Terms', 'Genes'}
             Data type to save corrs for.
         meg_dat : str
@@ -361,6 +397,13 @@ class MapCompTG(MapCompBase):
             Whether to save an npz file.
         save_as_csv : boolean, optional (default = True)
             Whether to save a csv file.
+
+        Raises
+        ------
+        DataNotComputedError
+            If the requested data has not been computed.
+        UnknownDataTypeError
+            If the requested data can not be interpreted.
         """
 
         # Check which type of data and set names, filenames & save paths accordingly
@@ -441,9 +484,9 @@ def calc_avg_gene_map(subj_list, file_title):
     Parameters
     ----------
     subj_list : list of str
-        List of subject numbers to average together
-    file_title : xx
-        xx
+        List of subject numbers to average together.
+    file_title : str
+        String to add to front of file to save out.
     """
 
     # Get OMDB object
@@ -490,7 +533,7 @@ def _get_map_names(names_file, path):
     Returns
     -------
     names : list of str
-        A list of the map names
+        A list of the map names.
     """
 
     # Get path to csv file
@@ -512,12 +555,12 @@ def _get_gene_files(subj):
     Parameters
     ----------
     subj : str
-        Which subject to get files for
+        Which subject to get files for.
 
     Outputs
     -------
     file_names_path : list of str
-        A list of full file names for all gene files for given subject
+        A list of full file names for all gene files for given subject.
     """
 
     # Get OMDB object
@@ -542,7 +585,7 @@ def _get_gene_files(subj):
 
 
 def _avg_csv_files(f_in, f_out, avg='mean'):
-    """
+    """Take csv files, average their contents, and save out to a new file.
 
     Note: This function assumes csv files with a constant number of rows
         and columns, the same for all input files. Will fail, perhaps
@@ -550,12 +593,12 @@ def _avg_csv_files(f_in, f_out, avg='mean'):
 
     Parameters
     ----------
-    f_in : ?
-        xx
-    f_out : ?
-        xx
-    avg : {'mean', 'median'}
-        xx
+    f_in : list of str
+        Inputs files to average over.
+    f_out : str
+        Name of the file to save out.
+    avg : {'mean', 'median'}, optional
+        Method to use to average across files.
     """
 
     # Open out file object
@@ -619,8 +662,8 @@ def _init_stat_dict(bands):
 
     Returns
     -------
-    out : ?
-        xx
+    out : dict
+        Dictionary with keys of all oscillation bands and slopes.
     """
 
     # Initialize dictionary to return
@@ -646,7 +689,7 @@ def _make_list(dat_df):
 
     Returns
     -------
-    out_list : ?
+    out_list : list
         xx
     """
 
@@ -705,10 +748,10 @@ def _run_corr(dat):
 
     Returns
     -------
-    xx : xx
-        xx
+    out : tuple
+        Correlation results (corr_vals, p_vals).
 
-    Note:
+    Notes:
     - meg_map has to be projected to workers.
     - numpy and pearsonr have to be imported on workers.
     """
