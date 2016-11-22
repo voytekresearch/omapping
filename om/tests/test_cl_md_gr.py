@@ -2,7 +2,7 @@ from __future__ import print_function, division
 
 import numpy as np
 
-from helper_test_funcs import load_test_meg_subj
+from helper_test_funcs import load_test_meg_subj, load_test_meg_gr
 import om.cl.md_gr as md
 from om.gen import OMDB, Osc
 
@@ -74,19 +74,60 @@ def test_cl_add_subject():
 
     meg_group.add_subject(meg_subj_dat)
 
-    pass
+    # TODO: ADD MORE TESTING OF THIS
+    assert meg_group
 
 def test_cl_group_slope():
-    pass
+
+    meg_group = load_test_meg_gr()
+
+    meg_group.group_slope()
+
+    # TODO: ADD MORE TESTING OF THIS
+    assert meg_group.slopes_gr_avg
 
 def test_cl_osc_prob():
-    pass
+
+    meg_group = load_test_meg_gr(bands_vertex=True)
+
+    meg_group.osc_prob()
+
+    # TODO: ADD MORE TESTING OF THIS
+    assert meg_group.osc_probs
+    assert meg_group.osc_prob_done
 
 def test_cl_osc_score():
-    pass
 
-def test_cl_osc_map_corrs():
-    pass
+    meg_group = load_test_meg_gr(bands_vertex=True)
+
+    meg_group.osc_prob()
+    meg_group.osc_score()
+
+    # TODO: ADD MORE TESTING OF THIS
+    assert meg_group.osc_scores
+    assert meg_group.osc_score_done
+
+def test_cl_osc_map_corrs_prob():
+
+    meg_group = load_test_meg_gr(bands_vertex=True)
+
+    meg_group.osc_prob()
+    r, p, b = meg_group.osc_map_corrs('prob')
+
+    # TODO: ADD TESTING OF THIS
+    assert True
+
+def test_cl_osc_map_corrs_score():
+
+    meg_group = load_test_meg_gr(bands_vertex=True)
+
+    meg_group.osc_prob()
+    meg_group.osc_score()
+
+    r, p, b = meg_group.osc_map_corrs('score')
+
+    # TODO: ADD TESTING OF THIS
+    assert True
 
 def test_cl_calc_osc_peak_age():
     pass
