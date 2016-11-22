@@ -15,9 +15,9 @@ def test_meg_data():
     assert md.MegData(db)
 
 
-##################################################################################
-################## TESTS - OMEGAMAPPIN - CL_MD_SING - FUNCTIONS ##################
-##################################################################################
+##########################################################################################
+################## TESTS - OMEGAMAPPIN - CL_MD_SING - PRIVATE FUNCTIONS ##################
+##########################################################################################
 
 def test_get_single_osc():
     """   """
@@ -27,14 +27,9 @@ def test_get_single_osc_power():
     """   """
     pass
 
-
-
-
-
 def test_get_demo_csv():
     """   """
     pass
-
 
 def test_osc_peak():
     """   """
@@ -51,9 +46,18 @@ def test_osc_peak():
     actual_ans = (2 + 3) / 2
     assert np.isclose(test_ans, actual_ans)
 
+##########################################################################################
+################### TESTS - OMEGAMAPPIN - CL_MD_SING - CLASS FUNCTIONS ###################
+##########################################################################################
 
+def test_cl_osc_bands_vertex():
+    pass
 
+def test_cl_all_oscs():
+    pass
 
+def test_cl_peak_freq():
+    pass
 
-
-
+def test_cl_calc_osc_param_corrs():
+    pass
