@@ -216,9 +216,11 @@ class GroupMegData(MegData):
 
         # Calculate the average slope value per vertex
         if avg is 'mean':
-            self.slopes_gr_avg = np.mean(self.vert_slopes, axis=1)
+            #self.slopes_gr_avg = np.mean(self.vert_slopes, axis=1)
+            self.slopes_gr_avg = np.mean(self.vert_slopes)
         elif avg is 'median':
-            self.slopes_gr_avg = np.median(self.vert_slopes, axis=1)
+            #self.slopes_gr_avg = np.median(self.vert_slopes, axis=1)
+            self.slopes_gr_avg = np.median(self.vert_slopes)
 
 
     def osc_prob(self):
