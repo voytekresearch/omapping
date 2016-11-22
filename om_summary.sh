@@ -9,7 +9,7 @@ find ./om -name "*.py" -type f -exec grep . {} \; | wc -l
 printf "\n\n\n CLOC OUTPUT (EXCLUDING TESTS): \n"
 cloc om --exclude-dir='tests'
 
-printf "\n\n\n TEST FILES: \n"
+printf "\n\n\n CLOC OUTPUT - TEST FILES: \n"
 cloc om/tests --exclude-dir='test_files'
 
 # Run Tests & Check Coverage
