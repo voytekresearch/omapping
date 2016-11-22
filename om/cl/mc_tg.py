@@ -66,14 +66,10 @@ class MapCompTG(MapCompBase):
         # Import the vectors of gene & term names
         self.term_names = list()
         self.gene_names = list()
-        #self.term_names = _get_map_names('00-ns_terms.csv', self.db.maps_terms_path)
-        #self.gene_names = _get_map_names('00-real_gene_names.csv', self.db.maps_genes_path)
 
         # Get number of terms and genes used
         self.n_terms = int()
         self.n_genes = int()
-        #self.n_terms = len(self.term_names)
-        #self.n_genes = len(self.gene_names)
 
         # Initialize variable to store the term maps
         self.term_maps = np.array([])
@@ -142,7 +138,6 @@ class MapCompTG(MapCompBase):
         [n_vert, n_genes] = self.gene_maps.shape
         if n_genes != self.n_genes:
             raise InconsistentDataError('Number of Genes does not match labels.')
-            #print('NUMBER OF GENES DOES NOT MATCH')
 
         # Update boolean that genes are loaded
         self.genes_loaded = True
@@ -171,7 +166,6 @@ class MapCompTG(MapCompBase):
         [n_vert, n_terms] = self.term_maps.shape
         if n_terms != self.n_terms:
             raise InconsistentDataError('Number of Terms does not match labels.')
-            #print('NUMBER OF TERMS DOES NOT MATCH')
 
         # Update boolean that terms are loaded
         self.terms_loaded = True
