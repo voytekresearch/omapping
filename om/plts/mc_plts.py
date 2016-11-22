@@ -83,14 +83,14 @@ def plot_con_mat(dat, section, roi_lr, save_out=False):
     n_rois = len(roi_lr)
 
     # Get indices for section to plot
-    ind_st_a, ind_en_a, ind_st_b, ind_en_b = get_section(section, n_rois, roi_lr)
+    ind_st_x, ind_en_x, ind_st_y, ind_en_y = get_section(section, n_rois, roi_lr)
 
     # Initialize figure
     fig = plt.figure(figsize=(12, 12))
     ax = fig.add_subplot(111)
 
     # Create the figure
-    mat = ax.imshow(dat[ind_st_a:ind_en_a, ind_st_b:ind_en_b],
+    mat = ax.imshow(dat[ind_st_x:ind_en_x, ind_st_y:ind_en_y],
                     interpolation='none')
 
     # Add title
