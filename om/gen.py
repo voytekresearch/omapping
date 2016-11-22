@@ -88,12 +88,12 @@ class OMDB(object):
 
         # Set up which files to look for
         if dat_type is 'PSD':
-            dat_path = self.psd_base_path
+            dat_path = self.psd_path
             word = 'subject_'
             save_type = ''
             f_l = 'last'
         elif dat_type is 'foof':
-            dat_path = self.foof_base_path
+            dat_path = self.foof_path
             word = 'foof'
             f_l = 'first'
 
@@ -181,10 +181,10 @@ class OMDB(object):
         """
 
         # Get lists of files from data directories
-        osc_files = clean_file_list(os.listdir(self.maps_oscs_path), 'osc')
-        slope_files = clean_file_list(os.listdir(self.maps_slopes_path), 'slope')
-        gene_files = clean_file_list(os.listdir(self.maps_genes_path), 'gene')
-        term_files = clean_file_list(os.listdir(self.maps_terms_path), 'terms')
+        osc_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Oscs')), 'osc')
+        slope_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Slopes')), 'slope')
+        gene_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Genes')), 'gene')
+        term_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Terms')), 'terms')
 
         # If asked for, print out lists of files
         if verbose:
