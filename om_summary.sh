@@ -14,7 +14,7 @@ cloc om/tests --exclude-dir='test_files'
 
 # Run Tests & Check Coverage
 printf "\n\n\n RUN TESTS & CHECK COVERAGE: \n"
-coverage run --source om -m py.test
+coverage run --source om --omit="*/plts/*" -m py.test
 coverage report
 
 # Find a way to get summary from pylint?
