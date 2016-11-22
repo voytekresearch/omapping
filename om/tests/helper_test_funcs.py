@@ -24,6 +24,8 @@ class TestDB(object):
 
         self.csvs_path = os.path.join(self.project_path, 'csvs')
 
+        self.maps_path = os.path.join(self.project_path, 'Maps')
+
 ##
 ##
 ##
@@ -31,10 +33,10 @@ class TestDB(object):
 def load_test_meg_subj(sub):
     """Loads a test subject of MD_SING data."""
 
-    db = TestDB()
+    tdb = TestDB()
     osc = Osc(default=True)
 
-    dat = md_sing.MegData(db, osc)
+    dat = md_sing.MegData(tdb, '', osc)
 
     dat.import_foof(sub, get_demo=False, load_type='pickle')
 
@@ -43,10 +45,10 @@ def load_test_meg_subj(sub):
 def load_test_meg_gr(bands_vertex=False):
     """Loads a test group object of MD_GR data."""
 
-    db = TestDB()
+    tdb = TestDB()
     osc = Osc(default=True)
 
-    meg_group = md_gr.GroupMegData(db, osc)
+    meg_group = md_gr.GroupMegData(tdb, osc)
 
     subjs = ['test2', 'test2']
 
