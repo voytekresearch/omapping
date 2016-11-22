@@ -22,67 +22,28 @@ class OMDB(object):
 
     Attributes
     ----------
-    dat_source : {'both', 'OMEGA', 'HCP', 'test'}
-        Data source for the
     project_path : str
         Base path for OMDB project.
     meg_path : str
-        xx
+        Path to MEG data.
     maps_path : str
-        xx
+        Path to Maps data.
     corrs_path : str
-        xx
-    psd_base_path : str
-        xx
-    foof_base_path : str
-        xx
-    viz_path : str
-        xx
-    maps_oscs_path : str
-        xx
-    maps_slopes_path : str
-        xx
-    maps_terms_path : str
-        xx
-    maps_genes_path : str
-        xx
-    maps_anat_path : str
-        xx
-    maps_scouts_path : str
-        xx
+        Path to Corrs data.
     psd_path : str
-        xx
+        Path to PSD data.
     foof_path : str
-        xx
-    processed_path : str
-        xx
+        Path to FOOF data.
+    viz_path : str
+        Path to vizualization data.
     md_save_path : str
-        xx
+        Path to save md data.
     mc_save_path : str
-        xx
+        Path to save mc data.
     """
 
-    def __init__(self, dat_source='both'):
-        """
-
-        Parameters
-        ----------
-        dat_source : {'both', 'OMEGA', 'HCP'}
-            Which MEG database to use.
-
-        Raises
-        ------
-        UnknownDataSourceError
-            xx
-        """
-
-        # Check dat_source is acceptable
-        pos_sources = ['both', 'OMEGA', 'HCP']
-        if dat_source not in pos_sources:
-            raise UnknownDataSourceError('Source to load data not understood.')
-
-        # Save to object which data source is being used
-        self.dat_source = dat_source
+    def __init__(self):
+        """   """
 
         # Set base path for OMEGA data
         self.project_path = ("/Users/thomasdonoghue/Documents/Research/"
@@ -94,37 +55,22 @@ class OMDB(object):
         self.corrs_path = os.path.join(self.project_path, 'Corrs')
 
         # Set paths for MEG data types
-        self.psd_base_path = os.path.join(self.meg_path, '2-PSDs')
-        self.foof_base_path = os.path.join(self.meg_path, '3-FOOF')
+        self.psd_path = os.path.join(self.meg_path, '2-PSDs')
+        self.foof_path = os.path.join(self.meg_path, '3-FOOF')
         self.viz_path = os.path.join(self.meg_path, '4-Viz')
 
-        # Set paths for Maps data types
-        self.maps_oscs_path = os.path.join(self.maps_path, 'Oscs')
-        self.maps_slopes_path = os.path.join(self.maps_path, 'Slopes')
-        self.maps_terms_path = os.path.join(self.maps_path, 'Terms')
-        self.maps_genes_path = os.path.join(self.maps_path, 'Genes')
-        self.maps_anat_path = os.path.join(self.maps_path, 'Anat')
-        self.maps_scouts_path = os.path.join(self.maps_path, 'Scouts')
-
-        # Set path for database specific stuff
-        if dat_source is 'both':
-            self.psd_path = ''
-            self.foof_path = ''
-        else:
-            self.psd_path = os.path.join(self.psd_base_path, dat_source)
-            self.foof_path = os.path.join(self.foof_base_path, dat_source)
-
         # Set paths to save data out to
-        self.processed_path = os.path.join(self.meg_path, '5-Processed')
-        self.md_save_path = os.path.join(self.processed_path, 'md_pickle')
-        self.mc_save_path = os.path.join(self.processed_path, 'mc_pickle')
+        processed_path = os.path.join(self.meg_path, '5-Processed')
+        self.md_save_path = os.path.join(processed_path, 'md_pickle')
+        self.mc_save_path = os.path.join(processed_path, 'mc_pickle')
 
 
-    def check_dat_files(self, dat_type, save_type='pickle', verbose=True):
+    def check_dat_files(self, dat_type, dat_source='both', save_type='pickle', verbose=True):
         """Checks what data files are available.
 
         Parameters
         ----------
+        dat_source : {'OMEGA', 'HCP', 'both'}
         dat_type : {'PSD', 'foof'}
             Which data type to check files for.
         save_type : {'pickle', 'csv'}, optional (default = 'pickle')
@@ -152,9 +98,9 @@ class OMDB(object):
             f_l = 'first'
 
         # If looking for a particular database, find file, get subject numbers and source
-        if self.dat_source is not 'both':
-            sub_nums = _check_files(os.path.join(dat_path, self.dat_source, save_type), word, f_l)
-            source = [self.dat_source] * len(sub_nums)
+        if dat_source is not 'both':
+            sub_nums = _check_files(os.path.join(dat_path, dat_source, save_type), word, f_l)
+            source = [dat_source] * len(sub_nums)
 
         # If looking across both databases, get info from each database and then combine
         else:
@@ -445,7 +391,7 @@ def load_meg_psds(dat_source, meg_path, subj_num):
         mat_file = 'psd_source_median_' + str(subj_num)
     elif dat_source is 'HCP':
         mat_file = 'PSD_Source_Median_' + str(subj_num)
-    file_name = os.path.join(meg_path, ('Subject_' + str(subj_num)), mat_file)
+    file_name = os.path.join(meg_path, dat_source, ('Subject_' + str(subj_num)), mat_file)
 
     # Load MEG PSD data from matfile
     data_mat = sio.loadmat(file_name, appendmat=True, struct_as_record=False, squeeze_me=True)
