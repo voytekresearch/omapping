@@ -18,7 +18,49 @@ from foof.fit import FOOF
 #####################################################################################
 
 class OMDB(object):
-    """Class to hold database information for MEG project."""
+    """Class to hold database information for MEG project.
+
+    Attributes
+    ----------
+    dat_source : {'both', 'OMEGA', 'HCP', 'test'}
+        Data source for the
+    project_path : str
+        Base path for OMDB project.
+    meg_path : str
+        xx
+    maps_path : str
+        xx
+    corrs_path : str
+        xx
+    psd_base_path : str
+        xx
+    foof_base_path : str
+        xx
+    viz_path : str
+        xx
+    maps_oscs_path : str
+        xx
+    maps_slopes_path : str
+        xx
+    maps_terms_path : str
+        xx
+    maps_genes_path : str
+        xx
+    maps_anat_path : str
+        xx
+    maps_scouts_path : str
+        xx
+    psd_path : str
+        xx
+    foof_path : str
+        xx
+    processed_path : str
+        xx
+    md_save_path : str
+        xx
+    mc_save_path : str
+        xx
+    """
 
     def __init__(self, dat_source='both'):
         """
@@ -27,6 +69,11 @@ class OMDB(object):
         ----------
         dat_source : {'both', 'OMEGA', 'HCP'}
             Which MEG database to use.
+
+        Raises
+        ------
+        UnknownDataSourceError
+            xx
         """
 
         # Check dat_source is acceptable
@@ -206,7 +253,13 @@ class OMDB(object):
 
 
 class Osc(object):
-    """Class to hold definition of oscillation bands."""
+    """Class to hold definition of oscillation bands.
+
+    Attributes
+    ----------
+    bands : dict
+        Dictionary of oscillation band definitions.
+    """
 
     def __init__(self, default=False, input_bands=None):
         """Initialize the Osc() object.
@@ -214,7 +267,7 @@ class Osc(object):
         Parameters
         ----------
         default : boolean, optional (default = False)
-            Whether to use the default oscillation bands. Default it False.
+            Whether to use the default oscillation bands.
         input_bands : dict, optional (default = None)
             A dictionary of oscillation bands to use.
 
@@ -247,6 +300,11 @@ class Osc(object):
             The name of the new oscillation band.
         band_lims : tuple(float, float)
             The lower and upper frequency limit of the band.
+
+        Raises
+        ------
+        InconsistentDataError
+            If oscillation band limits given do not work.
         """
 
         # Safety check that limits are in correct order
@@ -271,7 +329,35 @@ class Osc(object):
 
 
 class FigInfo(object):
-    """Object to hold settings to save figures. """
+    """Object to hold settings to save figures.
+
+    Attributes
+    ----------
+    t_fs : int
+        Font size for figure title.
+    sp_fs : int
+        xx
+    ax_fs : int
+        xx
+    ti_fs : int
+        xx
+    ax_lw : float
+        Line width.
+    add_title : boolean
+        Whether to add titles
+    title : str
+        xx
+    vis_opac : float
+        xx
+    save_path : str
+        xx
+    format : {'.svg', '.pdf'}
+        Format to save out figure as.
+    bbox : {'tight'}
+        Setting for ...
+    dpi : int
+        DPI to save out the figure with.
+    """
 
     def __init__(self):
 
@@ -529,7 +615,7 @@ def extract_foof_pickle(results):
     n_psds = len(results)
 
     # Initialize numpy arrays to pull out different result parameters
-    slopes = np.zeros([n_psds, 1])
+    slopes = np.zeros([n_psds])
     centers = np.zeros([n_psds, 8])
     powers = np.zeros([n_psds, 8])
     bws = np.zeros([n_psds, 8])
@@ -664,6 +750,11 @@ def get_section(section, n_ROIs, roi_lr):
         Starting index for the y axis data.
     ind_en_y : int
         Ending index for the y axis data.
+
+    Raises
+    ------
+    InconsistentDataError
+        xx
 
     Notes
     -----
