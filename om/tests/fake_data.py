@@ -16,19 +16,19 @@ from om.tests.helper_test_funcs import TestDB
 def make_fake_foof_dat_1():
     """   """
 
-    db = TestDB()
+    tdb = TestDB()
 
     v1 = (1.0, np.array([5, 10]), np.array([1.0e-22, 1.0e-22]), np.array([1.0, 1.0]))
     v2 = (1.0, np.array([5, 10, 15]), np.array([1.0e-22, 1.0e-22, 1.0e-22]), np.array([1.0, 1.0, 1.0]))
 
     fake_foof_dat = [v1, v2]
 
-    save_foof_pickle(fake_foof_dat, db.foof_path, 'test1')
+    save_foof_pickle(fake_foof_dat, tdb.foof_path, 'test1')
 
 def make_fake_foof_dat_2():
     """   """
 
-    db = TestDB()
+    tdb = TestDB()
 
     v1 = (0.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]), np.array([0.5, 1.0, 1.5]))
     v2 = (0.5, np.array([10, 11, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]), np.array([0.5, 1.0, 1.5]))
@@ -38,13 +38,13 @@ def make_fake_foof_dat_2():
 
     fake_foof_dat = [v1, v2, v3, v4, v5]
 
-    save_foof_pickle(fake_foof_dat, db.foof_path, 'test2')
+    save_foof_pickle(fake_foof_dat, tdb.foof_path, 'test2')
 
 
 def make_test_csvs():
     """   """
 
-    db = TestDB()
+    tdb = TestDB()
 
     f_names = ['test1.csv', 'test2.csv']
     f_dat = [[[1.0, 1.0, 1.0, 1.0], [2.0, 2.0, 2.0, 2.0]],
@@ -52,7 +52,7 @@ def make_test_csvs():
 
     for ind, f in enumerate(f_names):
 
-        out_file = open(os.path.join(db.csvs_path, f), 'wb')
+        out_file = open(os.path.join(tdb.csvs_path, f), 'wb')
         out_writer = csv.writer(out_file)
 
         for dat in f_dat[ind]:
@@ -60,6 +60,50 @@ def make_test_csvs():
             out_writer.writerow(dat)
 
         out_file.close()
+
+def make_fake_gene_data():
+    """   """
+
+    tdb = TestDB()
+
+    gene_names = ['g-a', 'g-b', 'g-c']
+
+    gene_dat = [[1, 1, 1], [2, 2, 2], [3, 3, 3]]
+
+    names_f_name = os.path.join(tdb.maps_path, 'Genes', '00-test_gene_names.csv')
+    dat_f_name = os.path.join(tdb.maps_path, 'Genes', 'test_gene_estimations',
+                              'test_gene_dat_r10.csv')
+
+    _mc_dat(gene_names, gene_dat, names_f_name, dat_f_name)
+
+def make_fake_term_data():
+    """   """
+
+    tdb = TestDB()
+
+    term_names = ['t-a', 't-b']
+
+    term_dat = [[1, 2], [4, 5]]
+
+    names_f_name = os.path.join(tdb.maps_path, 'Terms', '00-test_term_names.csv')
+    dat_f_name = os.path.join(tdb.maps_path, 'Terms', 'test_term_dat.csv')
+
+    _mc_dat(term_names, term_dat, names_f_name, dat_f_name)
+
+def _mc_dat(names, data, name_f_name, dat_f_name):
+
+    names_file = open(name_f_name, 'wb')
+    names_writer = csv.writer(names_file)
+    names_writer.writerow(names)
+    names_file.close()
+
+    dat_file = open(dat_f_name, 'wb')
+    dat_writer = csv.writer(dat_file)
+
+    for dat in data:
+        dat_writer.writerow(dat)
+
+    dat_file.close()
 
 ####################################################################
 
@@ -69,5 +113,8 @@ if __name__ == "__main__":
     make_fake_foof_dat_2()
 
     make_test_csvs()
+
+    make_fake_gene_data()
+    make_fake_term_data()
 
     print("Testing data created.")
