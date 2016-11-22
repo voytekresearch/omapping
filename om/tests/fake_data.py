@@ -11,7 +11,19 @@ from om.gen import save_foof_pickle
 from om.tests.helper_test_funcs import TestDB
 
 
-def make_fake_foof_dat():
+def make_fake_foof_dat_1():
+    """   """
+
+    db = TestDB()
+
+    v1 = (1.0, np.array([5, 10]), np.array([1.0e-22, 1.0e-22]), np.array([1.0, 1.0]))
+    v2 = (1.0, np.array([5, 10, 15]), np.array([1.0e-22, 1.0e-22, 1.0e-22]), np.array([1.0, 1.0, 1.0]))
+
+    fake_foof_dat = [v1, v2]
+
+    save_foof_pickle(fake_foof_dat, db.foof_path, 'test1')
+
+def make_fake_foof_dat_2():
     """   """
 
     db = TestDB()
@@ -24,8 +36,10 @@ def make_fake_foof_dat():
 
     fake_foof_dat = [v1, v2, v3, v4, v5]
 
-    save_foof_pickle(fake_foof_dat, db.foof_path, 'test1')
+    save_foof_pickle(fake_foof_dat, db.foof_path, 'test2')
 
 
 if __name__ == "__main__":
-    make_fake_foof_dat()
+    make_fake_foof_dat_1()
+    make_fake_foof_dat_2()
+    print("Testing data created.")
