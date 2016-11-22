@@ -68,7 +68,7 @@ class GroupMegData(MegData):
         """
 
         # Initialize from MegData() object
-        MegData.__init__(self, db)
+        MegData.__init__(self, db, 'both')
 
         # Initialize groups subject variables
         self.n_subjs = int()
