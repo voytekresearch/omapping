@@ -16,10 +16,6 @@ def test_omdb():
     """Test that OMDB() returns properly."""
 
     assert gen.OMDB()
-    assert gen.OMDB('OMEGA')
-    assert gen.OMDB('HCP')
-    with raises(gen.UnknownDataSourceError):
-        assert gen.OMDB('bad data selection')
 
 def test_omdb_paths():
     """Test that all defined OMDB paths exist."""
