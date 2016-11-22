@@ -72,15 +72,15 @@ with view.sync_imports():
     from foof.fit import FOOF
 
 # Set up database object
-db = OMDB(dat_source)
+db = OMDB()
 
 # Check Availabe Subjects
-files = os.listdir(db.psd_path)
+files = os.listdir(os.path.join(db.psd_path, dat_source))
 files = clean_file_list(files, 'Subject_')
 all_sub_nums = get_sub_nums(files, 'last')
 
 # Get list of subjects who have already been FOOFed
-foofed_subj_files = os.listdir(os.path.join(db.foof_path, 'pickle'))
+foofed_subj_files = os.listdir(os.path.join(db.foof_path, dat_source, 'pickle'))
 foofed_subj_files = clean_file_list(foofed_subj_files, 'foof')
 foofed_subj_nums = get_sub_nums(foofed_subj_files, 'first')
 
@@ -138,7 +138,7 @@ for subj in meg_queue:
     foof_results = foof_map.get()
 
     # Save out results
-    save_foof_pickle(foof_results, db.foof_path, subj)
+    save_foof_pickle(foof_results, os.path.join(db.foof_path, dat_source), subj)
 
     # Print status
     print('FOOF finished and saved for subj ', str(subj))
