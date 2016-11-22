@@ -12,7 +12,8 @@ from ipyparallel import Client
 from ipyparallel.util import interactive
 
 # Import custom om code
-from om.gen import OMDB, DataNotComputedError, UnknownDataTypeError, clean_file_list
+from om.gen import OMDB, clean_file_list
+from om.gen import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
 from om.cl.mc_base import MapCompBase
 
 ######################################################################################
@@ -63,12 +64,16 @@ class MapCompTG(MapCompBase):
         MapCompBase.__init__(self, db)
 
         # Import the vectors of gene & term names
-        self.term_names = _get_map_names('00-ns_terms.csv', self.db.maps_terms_path)
-        self.gene_names = _get_map_names('00-real_gene_names.csv', self.db.maps_genes_path)
+        self.term_names = list()
+        self.gene_names = list()
+        #self.term_names = _get_map_names('00-ns_terms.csv', self.db.maps_terms_path)
+        #self.gene_names = _get_map_names('00-real_gene_names.csv', self.db.maps_genes_path)
 
         # Get number of terms and genes used
-        self.n_terms = len(self.term_names)
-        self.n_genes = len(self.gene_names)
+        self.n_terms = int()
+        self.n_genes = int()
+        #self.n_terms = len(self.term_names)
+        #self.n_genes = len(self.gene_names)
 
         # Initialize variable to store the term maps
         self.term_maps = np.array([])
@@ -88,7 +93,7 @@ class MapCompTG(MapCompBase):
         self.genes_loaded = False
 
 
-    def load_gene_maps(self, subject):
+    def load_gene_maps(self, subject, names_file='00-real_gene_names.csv'):
         """Load the spatial maps of gene data.
 
         Parameters
@@ -96,6 +101,10 @@ class MapCompTG(MapCompBase):
         subject : str
             Which subject of gene data to load, of the form 'sub#'.
         """
+
+        # Load gene names
+        self.gene_names = _get_map_names(names_file, self.db.maps_genes_path)
+        self.n_genes = len(self.gene_names)
 
         # Check if gene data already loaded - if so, unload
         if self.genes_loaded:
@@ -132,23 +141,28 @@ class MapCompTG(MapCompBase):
         # Check that term data loaded matches number of term names
         [n_vert, n_genes] = self.gene_maps.shape
         if n_genes != self.n_genes:
-            print('NUMBER OF GENES DOES NOT MATCH')
+            raise InconsistentDataError('Number of Genes does not match labels.')
+            #print('NUMBER OF GENES DOES NOT MATCH')
 
         # Update boolean that genes are loaded
         self.genes_loaded = True
 
 
-    def load_term_maps(self, term_file_name):
+    def load_term_maps(self, term_data_file, names_file='00-ns_terms.csv'):
         """Load the spatial maps of term data.
 
         Parameters
         ----------
-        term_file_name : str
+        term_data_file : str
             File name of term data file.
         """
 
+        # Load term names
+        self.term_names = _get_map_names(names_file, self.db.maps_terms_path)
+        self.n_terms = len(self.term_names)
+
         # Get full path for the csv file
-        terms_csv = os.path.join(self.db.maps_terms_path, term_file_name)
+        terms_csv = os.path.join(self.db.maps_terms_path, term_data_file)
 
         # Load the terms map
         self.term_maps = pd.read_csv(terms_csv, header=None)
@@ -156,7 +170,8 @@ class MapCompTG(MapCompBase):
         # Check that term data loaded matches number of term names
         [n_vert, n_terms] = self.term_maps.shape
         if n_terms != self.n_terms:
-            print('NUMBER OF TERMS DOES NOT MATCH')
+            raise InconsistentDataError('Number of Terms does not match labels.')
+            #print('NUMBER OF TERMS DOES NOT MATCH')
 
         # Update boolean that terms are loaded
         self.terms_loaded = True
