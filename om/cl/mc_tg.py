@@ -111,7 +111,7 @@ class MapCompTG(MapCompBase):
         self.gene_subj = subject
 
         # Get the list of gene file names for given subject
-        genes_file_names = _get_gene_files(subject)
+        genes_file_names = _get_gene_files(subject, self.db)
 
         # Check how many files there are
         n_files = len(genes_file_names)
@@ -507,7 +507,7 @@ def calc_avg_gene_map(subj_list, file_title):
     #
     in_files_path = []
     for subj in subj_list:
-        in_files_path.append(_get_gene_files(subj))
+        in_files_path.append(_get_gene_files(subj, db))
 
     # Loop through three file parts
     for part in range(3):
@@ -558,22 +558,21 @@ def _get_map_names(names_file, path):
     return names
 
 
-def _get_gene_files(subj):
+def _get_gene_files(subj, db):
     """Returns full file paths for all gene files for a given subject.
 
     Parameters
     ----------
     subj : str
         Which subject to get files for.
+    db : OMDB() object
+        Database object to use for paths.
 
     Outputs
     -------
     file_names_path : list of str
         A list of full file names for all gene files for given subject.
     """
-
-    # Get OMDB object
-    db = OMDB()
 
     # Make var for the name of the folder of gene data
     subj_folder = subj + '_gene_estimations'
