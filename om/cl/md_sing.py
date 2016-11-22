@@ -15,6 +15,7 @@ from scipy.stats.stats import pearsonr
 
 # Import custom om code
 from om.gen import OMDB, clean_file_list, get_cur_subj, extract_foof_pickle
+from om.gen import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
 ###########################################################################################
 ###########################  OMEGAMAPPIN - MD_SINGLE - CLASSES  ###########################
@@ -73,13 +74,14 @@ class MegData(object):
         Whether data has been converted into band specific oscillations, per vertex.
     """
 
-    def __init__(self, db):
+    def __init__(self, db, osc=None):
         """Initialize object with omegamappin database.
 
         Parameters
         ----------
         db : OMDB() object
             Database object for omegamappin project.
+        osc : Osc() object, optional
         """
 
         # Store which db is set
@@ -108,13 +110,16 @@ class MegData(object):
         #  This is used for the subject specific oscillation analysis/plots
         self.centers_hist = []
 
-        # Initialize dictionary to store osc bands - NEW
-        self.bands = dict()
+        # Initialize dictionary to store osc bands
+        if osc:
+            self.bands = osc.bands
+        else:
+            self.bands = dict()
 
-        # Initialize dictionary for oscillation bands - NEW
+        # Initialize dictionary for oscillation bands
         self.oscs = dict()
 
-        # Initialize dictionary for peak frequencies - NEW
+        # Initialize dictionary for peak frequencies
         self.peaks = dict()
 
         # Set plot comment
@@ -131,6 +136,15 @@ class MegData(object):
 
         # Initialize oscillation count
         self.osc_count = int()
+
+
+    def set_bands(self, osc):
+        """   """
+
+        if self.bands and self.bands_vertex or self.peaks:
+            raise InconsistentDataError('Can not change band definitions after they have been used.')
+        else:
+            self.bands = osc.bands
 
 
     def import_foof(self, subnum, get_demo=True, load_type='pickle'):
@@ -186,21 +200,18 @@ class MegData(object):
         self.has_data = True
 
 
-    def osc_bands_vertex(self, osc):
+    def osc_bands_vertex(self):
         """Groups oscillations at each vertex in distinct frequency bands.
-        Stores band specific oscillations in (self.){thetas, alphas, betas, lowgammas}.
 
-        Parameters
-        ----------
-        osc : Osc object
-            An object containing frequency bands to use.
+        Stores band specific oscillations in (self.){thetas, alphas, betas, lowgammas}.
         """
 
-        # Save bands used
-        self.bands = osc.bands
+        # Check that oscillation bands are defined
+        if not self.bands:
+            raise DataNotComputedError('Oscillation bands not specified, can not proceed.')
 
         # Initialize matrices to store oscillations in each band
-        for band in osc.bands:
+        for band in self.bands:
             self.oscs[band] = np.zeros([self.n_psds, 4])
 
         # Loop through each vertex
@@ -212,11 +223,11 @@ class MegData(object):
             bws_temp = self.bws[i, :]
 
             # Loop through each oscillation band
-            for band in osc.bands:
+            for band in self.bands:
 
                 # Get oscillations in specific band
                 self.oscs[band][i, :] = _get_single_osc(centers_temp, powers_temp, bws_temp,
-                                                        osc.bands[band][0], osc.bands[band][1])
+                                                        self.bands[band][0], self.bands[band][1])
 
         # Update boolean to note that current subject has band specific oscs calculated.
         self.bands_vertex = True
@@ -274,21 +285,27 @@ class MegData(object):
         self.all_osc = True
 
 
-    def peak_freq(self, osc, avg='mean'):
+    def peak_freq(self, avg='mean'):
         """Calculates the peak frequency for each oscillatory band.
 
         Parameters
         ----------
-        osc : Osc() object
-            Object with oscillation frequency details.
         avg : {'mean', 'median'}, optional
             Which type of averaging to do.
         """
 
+        # Check all osc data has been computed
+        if not self.all_osc:
+            raise DataNotComputedError('All Osc data has not been computed. Can not continue.')
+
+        # Check that oscillation bands are defined
+        if not self.bands:
+            raise DataNotComputedError('Oscillation bands not specified, can not proceed.')
+
         # Loop through each band, calculating peak frequency
-        for band in osc.bands:
+        for band in self.bands:
             self.peaks[band] = _osc_peak(
-                self.centers_all, osc.bands[band][0], osc.bands[band][1], avg)
+                self.centers_all, self.bands[band][0], self.bands[band][1], avg)
 
 
     def calc_osc_param_corrs(self):
@@ -303,6 +320,10 @@ class MegData(object):
         labels : ?
             xx
         """
+
+        # Check all osc data has been computed
+        if not self.all_osc:
+            raise DataNotComputedError('All Osc data has not been computed. Can not continue.')
 
         # Set labels for the things being correlated
         labels = ['Centers', 'Powers', 'Bandwidths']
