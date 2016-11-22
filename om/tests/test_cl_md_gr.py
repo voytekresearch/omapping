@@ -65,7 +65,14 @@ def test_band_sort():
 
 def test_cl_add_subject():
 
-    meg_dat = load_test_meg_subj('test1')
+    db = OMDB()
+    osc = Osc()
+
+    meg_group = md.GroupMegData(db, osc)
+
+    meg_subj_dat = load_test_meg_subj('test1')
+
+    meg_group.add_subject(meg_subj_dat)
 
     pass
 
