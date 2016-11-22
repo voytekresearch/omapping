@@ -212,7 +212,7 @@ class OMDB(object):
         return files
 
 
-    def check_map_files(self, print_files=True, return_files=False):
+    def check_map_files(self, verbose=True, return_files=False):
         """Gets the list of files in the map directories. Can return and/or print.
 
         Parameters
@@ -241,7 +241,7 @@ class OMDB(object):
         term_files = clean_file_list(os.listdir(self.maps_terms_path), 'terms')
 
         # If asked for, print out lists of files
-        if print_files:
+        if verbose:
             print('Oscillation Files:\n', '\n'.join(osc_files), '\n')
             print('Slope Files:\n', '\n'.join(slope_files), '\n')
             print('Terms Files:\n', '\n'.join(term_files), '\n')
