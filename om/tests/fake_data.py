@@ -13,6 +13,35 @@ from om.gen import save_foof_pickle
 from om.tests.helper_test_funcs import TestDB
 
 
+####
+
+def clear_fake_dat():
+    """   """
+
+    tdb = TestDB()
+
+    for key, val in vars(tdb).items():
+        if '_path' in key and val:
+            _rm_test_files(val)
+
+def _rm_test_files(path):
+
+    if os.path.isdir(path):
+
+        files = os.listdir(path)
+        for f in files:
+
+            # Skip hidden files
+            if f[0] is '.':
+                continue
+
+            _rm_test_files(os.path.join(path, f))
+    else:
+
+        os.remove(path)
+
+####
+
 def make_fake_foof_dat_1():
     """   """
 
@@ -90,6 +119,8 @@ def make_fake_term_data():
 
     _mc_dat(term_names, term_dat, names_f_name, dat_f_name)
 
+################################################################
+
 def _mc_dat(names, data, name_f_name, dat_f_name):
 
     names_file = open(name_f_name, 'wb')
@@ -109,6 +140,9 @@ def _mc_dat(names, data, name_f_name, dat_f_name):
 
 if __name__ == "__main__":
 
+    clear_fake_dat()
+    print('\n\tPrevious test files removed.')
+
     make_fake_foof_dat_1()
     make_fake_foof_dat_2()
 
@@ -117,4 +151,5 @@ if __name__ == "__main__":
     make_fake_gene_data()
     make_fake_term_data()
 
-    print("Testing data created.")
+    print("\tTesting data created.\n")
+
