@@ -174,9 +174,9 @@ class MegData(object):
             = extract_foof_pickle(results)
 
         # Check how many oscillations per vertex
-        self.osc_count = np.zeros([self.n_psds, 1])
+        self.osc_count = np.zeros([self.n_psds])
         for i in range(self.n_psds):
-            self.osc_count[i, 0] = len(np.nonzero(self.centers[i, :])[0])
+            self.osc_count[i] = len(np.nonzero(self.centers[i, :])[0])
 
         # Get demographic data
         if get_demo:
