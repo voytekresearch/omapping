@@ -1,7 +1,11 @@
 from __future__ import print_function, division
+
 import numpy as np
+
+from helper_test_funcs import load_test_meg_subj
+from helper_test_funcs import TestDB as TDB
 import om.cl.md_sing as md
-from om.gen import OMDB
+from om.gen import OMDB, Osc
 
 ##################################################################################
 ################### TESTS - OMEGAMAPPIN - CL_MD_SING - CLASSES ###################
@@ -50,14 +54,58 @@ def test_osc_peak():
 ################### TESTS - OMEGAMAPPIN - CL_MD_SING - CLASS FUNCTIONS ###################
 ##########################################################################################
 
+def test_cl_import_foof():
+
+    db = TDB()
+
+    meg_dat = md.MegData(db)
+
+    meg_dat.import_foof('test1', get_demo=False, load_type='pickle')
+
+    exp_osc_count = np.array([2, 3])
+
+    assert meg_dat.subnum == 'test1'
+    assert meg_dat.n_psds == len(meg_dat.slopes) == 2
+    assert meg_dat.centers.shape == meg_dat.powers.shape == meg_dat.bws.shape == (2, 8)
+    assert np.array_equal(meg_dat.osc_count, exp_osc_count)
+    assert meg_dat.has_data
+
 def test_cl_osc_bands_vertex():
-    pass
+
+    meg_dat = load_test_meg_subj('test1')
+
+    meg_dat.osc_bands_vertex()
+
+    # TODO: ADD MORE PROPER CHECKS HERE!!!
+    assert meg_dat.bands_vertex
 
 def test_cl_all_oscs():
-    pass
+
+    meg_dat = load_test_meg_subj('test1')
+
+    meg_dat.all_oscs(verbose=False)
+
+    # TODO: ADD MORE PROPER CHECKS HERE!!!
+    assert meg_dat.all_osc
 
 def test_cl_peak_freq():
-    pass
+
+    meg_dat = load_test_meg_subj('test1')
+
+    meg_dat.all_oscs()
+
+    meg_dat.peak_freq()
+
+    # TODO: ADD MORE PROPER CHECKS HERE!!! CONSIDER HOW TO USE OSCS FOR PEAKS.
+    assert meg_dat.peaks
 
 def test_cl_calc_osc_param_corrs():
-    pass
+
+    meg_dat = load_test_meg_subj('test1')
+
+    meg_dat.all_oscs()
+
+    a, b, c = meg_dat.calc_osc_param_corrs()
+
+    # TODO: ADD MORE PROPER CHECKS HERE!!! CONSIDER HOW TO USE OSCS FOR PEAKS.
+    assert a.any()
