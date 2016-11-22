@@ -99,7 +99,7 @@ class MapCompTG(MapCompBase):
         """
 
         # Load gene names
-        self.gene_names = _get_map_names(names_file, self.db.maps_genes_path)
+        self.gene_names = _get_map_names(names_file, os.path.join(self.db.maps_path, 'Genes'))
         self.n_genes = len(self.gene_names)
 
         # Check if gene data already loaded - if so, unload
@@ -153,11 +153,11 @@ class MapCompTG(MapCompBase):
         """
 
         # Load term names
-        self.term_names = _get_map_names(names_file, self.db.maps_terms_path)
+        self.term_names = _get_map_names(names_file, os.path.join(self.db.maps_path, 'Terms'))
         self.n_terms = len(self.term_names)
 
         # Get full path for the csv file
-        terms_csv = os.path.join(self.db.maps_terms_path, term_data_file)
+        terms_csv = os.path.join(self.db.maps_path, 'Terms', term_data_file)
 
         # Load the terms map
         self.term_maps = pd.read_csv(terms_csv, header=None)
@@ -514,7 +514,7 @@ def calc_avg_gene_map(subj_list, file_title):
 
         # Set up output file
         out_file = file_title + '_genes_average_r10_' + str(part+1) + 'of3.csv'
-        out_file_path = os.path.join(db.maps_genes_path, 'avg_gene_estimations', out_file)
+        out_file_path = os.path.join(db.maps_path, 'Genes', 'avg_gene_estimations', out_file)
 
         # Get current set of input files
         cur_part_in_files = []
@@ -580,7 +580,7 @@ def _get_gene_files(subj):
 
     # Get a list of all the files in the folder
     file_names = clean_file_list(os.listdir(os.path.join(
-        db.maps_genes_path, subj_folder)), 'r10')
+        db.maps_path, 'Genes', subj_folder)), 'r10')
 
     # Check how many files there are
     n_files = len(file_names)
@@ -588,7 +588,7 @@ def _get_gene_files(subj):
     # Make a list of the full file names, including full path
     file_names_path = []
     for cur_file in range(n_files):
-        file_names_path.append(os.path.join(db.maps_genes_path, subj_folder, file_names[cur_file]))
+        file_names_path.append(os.path.join(db.maps_path, 'Genes', subj_folder, file_names[cur_file]))
 
     return file_names_path
 
