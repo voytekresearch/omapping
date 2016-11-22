@@ -2,7 +2,9 @@
 
 from __future__ import print_function, division
 
+import os
 import sys
+import csv
 import numpy as np
 
 # Import FOOF (use sys to add location to path, then import)
@@ -39,7 +41,34 @@ def make_fake_foof_dat_2():
     save_foof_pickle(fake_foof_dat, db.foof_path, 'test2')
 
 
+def make_test_csvs():
+    """   """
+
+    db = TestDB()
+
+    f_names = ['test1.csv', 'test2.csv']
+    f_dat = [[[1.0, 1.0, 1.0, 1.0], [2.0, 2.0, 2.0, 2.0]],
+             [[2.0, 2.0, 2.0, 2.0], [3.0, 3.0, 3.0, 3.0]]]
+
+    for ind, f in enumerate(f_names):
+
+        out_file = open(os.path.join(db.csvs_path, f), 'wb')
+        out_writer = csv.writer(out_file)
+
+        for dat in f_dat[ind]:
+
+            out_writer.writerow(dat)
+
+        out_file.close()
+
+
+####################################################################
+
 if __name__ == "__main__":
+
     make_fake_foof_dat_1()
     make_fake_foof_dat_2()
+
+    make_test_csvs()
+
     print("Testing data created.")
