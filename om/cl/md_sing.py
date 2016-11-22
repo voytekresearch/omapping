@@ -74,7 +74,7 @@ class MegData(object):
         Whether data has been converted into band specific oscillations, per vertex.
     """
 
-    def __init__(self, db, osc=None):
+    def __init__(self, db, dat_source, osc=None):
         """Initialize object with omegamappin database.
 
         Parameters
@@ -85,7 +85,7 @@ class MegData(object):
         """
 
         # Store which db is set
-        self.dat_source = db.dat_source
+        self.dat_source = dat_source
 
         # Add database object
         self.db = db
@@ -170,12 +170,12 @@ class MegData(object):
         self.comment = 'S-' + str(self.subnum)
 
         # Set up paths, get list of files for available subjects
-        files = os.listdir(os.path.join(self.db.foof_path, load_type))
+        files = os.listdir(os.path.join(self.db.foof_path, self.dat_source, load_type))
         files = clean_file_list(files, 'Foof_Vertex')
 
         # Get specific file path for specific subject
         cur_subj_file = get_cur_subj(subnum, files)
-        cur_subj_path = os.path.join(self.db.foof_path, load_type, cur_subj_file)
+        cur_subj_path = os.path.join(self.db.foof_path, self.dat_source, load_type, cur_subj_file)
 
         # Load data file
         if load_type is 'pickle':
