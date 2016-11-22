@@ -5,6 +5,7 @@ from __future__ import print_function, division
 import os
 
 import om.cl.md_sing as md
+from om.gen import Osc
 
 ##
 ##
@@ -28,8 +29,9 @@ def load_test_meg_subj(sub):
     """Loads a test subject of MD_SING data."""
 
     db = TestDB()
+    osc = Osc(default=True)
 
-    dat = md.MegData(db)
+    dat = md.MegData(db, osc)
 
     dat.import_foof(sub, get_demo=False, load_type='pickle')
 
