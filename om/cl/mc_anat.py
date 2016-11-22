@@ -159,7 +159,7 @@ class MapCompAnat(MapCompBase):
         anat = ROI()
 
         # Set up file for anatomy data, and load
-        anat_mat_file = os.path.join(self.db.maps_anat_path, anat_file_name)
+        anat_mat_file = os.path.join(self.db.maps_path, 'Anat', anat_file_name)
         dat = sio.loadmat(anat_mat_file)
 
         # Pull out data from mat dictionary
@@ -200,7 +200,7 @@ class MapCompAnat(MapCompBase):
             roi_file_name = 'scout_Desikan-Killiany_68.mat'
 
         # Load roi dat from mat file
-        dat = sio.loadmat(os.path.join(self.db.maps_scouts_path, roi_file_name),
+        dat = sio.loadmat(os.path.join(self.db.maps_path, 'Scouts', roi_file_name),
                           struct_as_record=True)
 
         # Pull out data from mat file
