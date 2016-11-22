@@ -451,9 +451,7 @@ def load_md_pickle(file_name):
     dat_path = os.path.join(db.md_save_path, file_name)
 
     # Load file & return pickled object
-    results = pickle.load(open(dat_path, 'rb'))
-
-    return results
+    return pickle.load(open(dat_path, 'rb'))
 
 
 #################################################################################################
@@ -636,9 +634,7 @@ def _load_foof_pickle(file_name):
     """
 
     # Load from pickle file
-    results = pickle.load(open(file_name, 'rb'))
-
-    return results
+    return pickle.load(open(file_name, 'rb'))
 
 
 def _load_foof_csv(file_name):
