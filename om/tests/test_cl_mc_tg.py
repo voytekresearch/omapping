@@ -13,6 +13,7 @@ import om.cl.mc_tg as mc
 ############################################################################
 
 def test_mc_tg():
+
     db = OMDB()
 
     assert mc.MapCompTG(db)
@@ -33,7 +34,7 @@ def test_get_map_names_terms():
     db = OMDB()
 
     names_file = '00-ns_terms.csv'
-    names = mc._get_map_names(names_file, db.maps_terms_path)
+    names = mc._get_map_names(names_file, os.path.join(db.maps_path, 'Terms'))
 
     assert names
     assert type(names) == ListType
@@ -44,7 +45,7 @@ def test_get_map_names_genes():
     db = OMDB()
 
     names_file = '00-real_gene_names.csv'
-    names = mc._get_map_names(names_file, db.maps_genes_path)
+    names = mc._get_map_names(names_file, os.path.join(db.maps_path, 'Genes'))
 
     assert names
     assert type(names) is ListType
@@ -52,7 +53,9 @@ def test_get_map_names_genes():
 
 def test_get_gene_files():
 
-    genes_files_path = mc._get_gene_files('sub1')
+    db = OMDB()
+
+    genes_files_path = mc._get_gene_files('sub1', db)
 
     assert genes_files_path
     assert type(genes_files_path) is ListType
@@ -61,12 +64,12 @@ def test_get_gene_files():
 
 def test_avg_csv_files():
 
-    db = TDB()
+    tdb = TDB()
 
-    f_in = [os.path.join(db.csvs_path, 'test1.csv'),
-            os.path.join(db.csvs_path, 'test2.csv')]
+    f_in = [os.path.join(tdb.csvs_path, 'test1.csv'),
+            os.path.join(tdb.csvs_path, 'test2.csv')]
 
-    f_out = os.path.join(db.csvs_path, 'test_out.csv')
+    f_out = os.path.join(tdb.csvs_path, 'test_out.csv')
 
     mc._avg_csv_files(f_in, f_out)
 
@@ -105,25 +108,34 @@ def test_pull_out_results():
 
 def test_load_gene_maps():
 
-    db = TDB()
+    tdb = TDB()
 
-    pass
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+
+    assert map_comp.genes_loaded
+
 
 def test_load_term_maps():
 
-    db = TDB()
+    tdb = TDB()
 
-    pass
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+
+    assert map_comp.terms_loaded
 
 def calc_corrs_genes():
 
-    db = TDB()
+    tdb = TDB()
 
     pass
 
 def calc_corrs_terms():
 
-    db = TDB()
+    tdb = TDB()
 
     pass
 
@@ -132,8 +144,3 @@ def test_unload_data_genes():
 
 def test_unload_data_terms():
     pass
-
-
-
-
-
