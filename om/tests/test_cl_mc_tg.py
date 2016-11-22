@@ -1,9 +1,11 @@
 from __future__ import print_function, division
 
-from types import StringType, ListType
 import os
+import csv
+from types import StringType, ListType
 
 from om.gen import OMDB
+from helper_test_funcs import TestDB as TDB
 import om.cl.mc_tg as mc
 
 ############################################################################
@@ -58,15 +60,80 @@ def test_get_gene_files():
         assert os.path.exists(path)
 
 def test_avg_csv_files():
-    pass
+
+    db = TDB()
+
+    f_in = [os.path.join(db.csvs_path, 'test1.csv'),
+            os.path.join(db.csvs_path, 'test2.csv')]
+
+    f_out = os.path.join(db.csvs_path, 'test_out.csv')
+
+    mc._avg_csv_files(f_in, f_out)
+
+    assert os.path.exists(f_out)
+
+    exp = [[1.5, 1.5, 1.5, 1.5], [2.5, 2.5, 2.5, 2.5]]
+
+    f = open(f_out)
+    reader = csv.reader(f)
+
+    for ind, row in enumerate(reader):
+        row = [float(i) for i in row]
+        assert row == exp[ind]
+
+    f.close()
+    os.remove(f_out)
 
 def test_init_stat_dict():
 
-    assert mc._init_stat_dict(['a', 'b', 'c'])
+    bands = ['a', 'b', 'c']
+    d = mc._init_stat_dict(bands)
+
+    assert d
+    bands.append('Slopes')
+    assert set(d.keys()) == set(bands)
 
 def test_make_list():
     pass
 
 def test_pull_out_results():
     pass
+
+##############################################################################
+############## TESTS - OMEGAMAPPIN - CL_MC_TG - CLASS FUNCTIONS ##############
+##############################################################################
+
+def test_load_gene_maps():
+
+    db = TDB()
+
+    pass
+
+def test_load_term_maps():
+
+    db = TDB()
+
+    pass
+
+def calc_corrs_genes():
+
+    db = TDB()
+
+    pass
+
+def calc_corrs_terms():
+
+    db = TDB()
+
+    pass
+
+def test_unload_data_genes():
+    pass
+
+def test_unload_data_terms():
+    pass
+
+
+
+
 
