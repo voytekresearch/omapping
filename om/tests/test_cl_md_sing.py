@@ -16,7 +16,7 @@ def test_meg_data():
 
     db = OMDB()
 
-    assert md.MegData(db)
+    assert md.MegData(db, '')
 
 
 ##########################################################################################
@@ -56,9 +56,9 @@ def test_osc_peak():
 
 def test_cl_import_foof():
 
-    db = TDB()
+    tdb = TDB()
 
-    meg_dat = md.MegData(db)
+    meg_dat = md.MegData(tdb, '')
 
     meg_dat.import_foof('test1', get_demo=False, load_type='pickle')
 
