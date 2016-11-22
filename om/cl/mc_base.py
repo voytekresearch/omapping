@@ -48,7 +48,7 @@ class MapCompBase(object):
         """
 
         # Get the full path for the file name
-        osc_maps_file = os.path.join(self.db.maps_oscs_path, osc_file + '.p')
+        osc_maps_file = os.path.join(self.db.maps_path, 'Oscs', osc_file + '.p')
 
         # Load data from pickle file
         dat_in = pickle.load(open(osc_maps_file, 'rb'))
@@ -77,7 +77,7 @@ class MapCompBase(object):
         """
 
         # Get the full path for the file name
-        slopes_map_file = os.path.join(self.db.maps_slopes_path, slope_file + '.p')
+        slopes_map_file = os.path.join(self.db.maps_path, 'Slopes', slope_file + '.p')
 
         # Load data from pickle file
         dat_in = pickle.load(open(slopes_map_file, 'rb'))
