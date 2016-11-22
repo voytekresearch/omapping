@@ -18,13 +18,13 @@ class TestDB(object):
         """    """
 
         self.dat_source = 'test'
-        self.project_path = ("/Users/thomasdonoghue/Documents/GitCode/omegamappin/om/tests/test_files/")
+        self.base = ("/Users/thomasdonoghue/Documents/GitCode/omegamappin/om/tests/test_files/")
 
-        self.foof_path = os.path.join(self.project_path, 'foof')
+        self.foof_path = os.path.join(self.base, 'foof')
 
-        self.csvs_path = os.path.join(self.project_path, 'csvs')
+        self.csvs_path = os.path.join(self.base, 'csvs')
 
-        self.maps_path = os.path.join(self.project_path, 'Maps')
+        self.maps_path = os.path.join(self.base, 'Maps')
 
 ##
 ##
