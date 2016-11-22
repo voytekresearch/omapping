@@ -114,6 +114,7 @@ def test_load_gene_maps():
 
     map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
 
+    # TODO: ADD BETTER TESTING OF THIS
     assert map_comp.genes_loaded
 
 
@@ -125,6 +126,7 @@ def test_load_term_maps():
 
     map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
 
+    # TODO: ADD BETTER TESTING OF THIS
     assert map_comp.terms_loaded
 
 def calc_corrs_genes():
@@ -140,7 +142,23 @@ def calc_corrs_terms():
     pass
 
 def test_unload_data_genes():
-    pass
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+    map_comp.unload_data('Genes')
+
+    assert not map_comp.genes_loaded
 
 def test_unload_data_terms():
-    pass
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+    map_comp.unload_data('Terms')
+
+    assert not map_comp.terms_loaded
