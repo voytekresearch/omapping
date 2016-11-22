@@ -21,6 +21,8 @@ class TestDB(object):
 
         self.foof_path = os.path.join(self.project_path, 'foof')
 
+        self.csvs_path = os.path.join(self.project_path, 'csvs')
+
 ##
 ##
 ##
