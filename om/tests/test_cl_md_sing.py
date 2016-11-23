@@ -60,11 +60,11 @@ def test_cl_import_foof():
 
     meg_dat = md.MegData(tdb, '')
 
-    meg_dat.import_foof('test1', get_demo=False, load_type='pickle')
+    meg_dat.import_foof('test_v2', get_demo=False, load_type='pickle')
 
     exp_osc_count = np.array([2, 3])
 
-    assert meg_dat.subnum == 'test1'
+    assert meg_dat.subnum == 'test_v2'
     assert meg_dat.n_psds == len(meg_dat.slopes) == 2
     assert meg_dat.centers.shape == meg_dat.powers.shape == meg_dat.bws.shape == (2, 8)
     assert np.array_equal(meg_dat.osc_count, exp_osc_count)
@@ -72,7 +72,7 @@ def test_cl_import_foof():
 
 def test_cl_osc_bands_vertex():
 
-    meg_dat = load_test_meg_subj('test1')
+    meg_dat = load_test_meg_subj('test_v2')
 
     meg_dat.osc_bands_vertex()
 
@@ -81,7 +81,7 @@ def test_cl_osc_bands_vertex():
 
 def test_cl_all_oscs():
 
-    meg_dat = load_test_meg_subj('test1')
+    meg_dat = load_test_meg_subj('test_v2')
 
     meg_dat.all_oscs(verbose=False)
 
@@ -90,7 +90,7 @@ def test_cl_all_oscs():
 
 def test_cl_peak_freq():
 
-    meg_dat = load_test_meg_subj('test1')
+    meg_dat = load_test_meg_subj('test_v2')
 
     meg_dat.all_oscs()
 
@@ -101,7 +101,7 @@ def test_cl_peak_freq():
 
 def test_cl_calc_osc_param_corrs():
 
-    meg_dat = load_test_meg_subj('test1')
+    meg_dat = load_test_meg_subj('test_v2')
 
     meg_dat.all_oscs()
 

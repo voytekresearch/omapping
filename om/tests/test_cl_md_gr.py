@@ -70,7 +70,7 @@ def test_cl_add_subject():
 
     meg_group = md.GroupMegData(db, osc)
 
-    meg_subj_dat = load_test_meg_subj('test1')
+    meg_subj_dat = load_test_meg_subj('test_v2')
 
     meg_group.add_subject(meg_subj_dat)
 
