@@ -50,7 +50,7 @@ def load_test_meg_gr(bands_vertex=False):
 
     meg_group = md_gr.GroupMegData(tdb, osc)
 
-    subjs = ['test2', 'test2']
+    subjs = ['test_v5', 'test_v5']
 
     for s in subjs:
 
