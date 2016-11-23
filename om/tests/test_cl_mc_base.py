@@ -1,9 +1,11 @@
 """MODULE DOCSTRING - TO FILL IN
+
 """
 
 from __future__ import print_function, division
 
 from om.gen import OMDB
+from helper_test_funcs import TestDB as TDB
 import om.cl.mc_base as mc
 
 ########################################################################################
@@ -33,7 +35,21 @@ def test_init_meg_map_dict():
 ########################################################################################
 
 def test_cl_load_meg_maps():
-    pass
+
+    tdb = TDB()
+    mc_base = mc.MapCompBase(tdb)
+
+    mc_base.load_meg_maps('test_meg')
+
+    # TODO: ADD FULLER TESTING OF THIS
+    assert mc_base.oscs_loaded
 
 def test_cl_load_sl_map():
-    pass
+
+    tdb = TDB()
+    mc_base = mc.MapCompBase(tdb)
+
+    mc_base.load_slope_map('test_slopes')
+
+    # TODO: ADD FULLER TESTING OF THIS
+    assert mc_base.slopes_loaded
