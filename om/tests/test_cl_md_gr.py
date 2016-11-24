@@ -1,8 +1,11 @@
 from __future__ import print_function, division
 
 import numpy as np
+from py.test import raises
 
+from helper_test_funcs import TestDB as TDB
 from helper_test_funcs import load_test_meg_subj, load_test_meg_gr
+
 import om.cl.md_gr as md
 from om.gen import OMDB, Osc
 
@@ -77,6 +80,8 @@ def test_cl_add_subject():
     # TODO: ADD MORE TESTING OF THIS
     assert meg_group
 
+#TODO: ADD TESTING DIFFERENT ADD SUBJECT SETTINGS
+
 def test_cl_group_slope():
 
     meg_group = load_test_meg_gr()
@@ -119,10 +124,7 @@ def test_cl_osc_map_corrs_prob():
 
 def test_cl_osc_map_corrs_score():
 
-    meg_group = load_test_meg_gr(bands_vertex=True)
-
-    meg_group.osc_prob()
-    meg_group.osc_score()
+    meg_group = load_test_meg_gr(bands_vertex=True, calc_maps=True)
 
     r, p, b = meg_group.osc_map_corrs('score')
 
@@ -130,7 +132,61 @@ def test_cl_osc_map_corrs_score():
     assert True
 
 def test_cl_calc_osc_peak_age():
-    pass
+
+    meg_group = load_test_meg_gr(bands_vertex=True, all_osc=True, peaks=True, calc_maps=True)
+
+    meg_group.age = np.array([20, 20])
+
+    r, p, b = meg_group.calc_osc_peak_age()
+
+    # TODO: ADD TESTING OF THIS
+    assert True
 
 def test_cl_freq_corr():
-    pass
+
+    meg_group = load_test_meg_gr(vertex_osc=True)
+
+    r, p = meg_group.freq_corr(1)
+
+    # TODO: ADD TESTING OF THIS
+    assert True
+
+def test_save_gr_slope():
+
+    meg_group = load_test_meg_gr()
+
+    meg_group.group_slope()
+
+    meg_group.save_gr_slope('test_gr_slope_save')
+
+    assert True
+
+def test_save_map():
+
+    meg_group = load_test_meg_gr(bands_vertex=True, calc_maps=True)
+
+    meg_group.save_map('prob', 'test_prob_save')
+    meg_group.save_map('score', 'test_score_save')
+
+    with raises(md.UnknownDataTypeError):
+        meg_group.save_map('bad', 'bad_save')
+
+def test_set_slope_viz():
+
+    meg_group = load_test_meg_gr()
+
+    meg_group.group_slope()
+
+    meg_group.set_slope_viz()
+
+    assert True
+
+def test_set_map_viz():
+
+    meg_group = load_test_meg_gr(bands_vertex=True, calc_maps=True)
+
+    meg_group.set_map_viz('prob', 'test_prob_viz_save')
+    meg_group.set_map_viz('score', 'test_score_viz_save')
+
+    with raises(md.UnknownDataTypeError):
+        meg_group.save_map('bad', 'bad_save')
