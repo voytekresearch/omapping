@@ -318,6 +318,8 @@ class GroupMegData(MegData):
     def calc_osc_peak_age(self):
         """Compares age and peak frequency within frequency bands.
 
+        NOTE: ADD CHECKS THAT REQUIRED DATA HAS BEEN COMPUTED.
+
         Returns
         -------
         corrs_mat : 1d array
@@ -351,6 +353,8 @@ class GroupMegData(MegData):
 
         Uses oscillation probabilities.
 
+        NOTE: ADD CHECKS THAT REQUIRED DATA HAS BEEN COMPUTED.
+
         Parameters
         ----------
         f_win : float
@@ -372,10 +376,10 @@ class GroupMegData(MegData):
         prob_mat = np.zeros([n_vertex, n_freqs])
 
         # Loop through all vertices
-        for vertex in range(0, n_vertex):
+        for vertex in range(n_vertex):
 
             # Loop through all subjects
-            for subj in range(0, n_subj):
+            for subj in range(n_subj):
 
                 # Store centers for current vertex, current subj in temp vector
                 cens_temp = self.centers[vertex, :, subj]
@@ -401,7 +405,7 @@ class GroupMegData(MegData):
         p_vec = np.zeros([n_freqs-1])
 
         # Compute corr between f and f+f_win start windows
-        for f_ind in range(0, n_freqs-f_win):
+        for f_ind in range(n_freqs-f_win):
             corr_vec[f_ind], p_vec[f_ind] = pearsonr(prob_mat[:, f_ind], prob_mat[:, f_ind+f_win])
 
         return corr_vec, p_vec
@@ -578,7 +582,7 @@ def _osc_prob(osc_mat):
     prob = np.zeros([n_vertex])
 
     # Loop through all vertices, calculating osc prob for each
-    for i in range(0, n_vertex):
+    for i in range(n_vertex):
         prob[i] = (np.count_nonzero(osc_mat[i, 0, :]) / n_subj)
 
     return prob
@@ -609,7 +613,7 @@ def _osc_pow_ratio(osc_mat):
     avg_powers = np.zeros(n_vertex)
 
     # Loop through all vertices
-    for vertex in range(0, n_vertex):
+    for vertex in range(n_vertex):
 
         # Pull out temp vector of all oscillation powers
         temp_pows = osc_mat[vertex, 1, :]
@@ -628,7 +632,7 @@ def _osc_pow_ratio(osc_mat):
     pow_ratio = np.zeros(n_vertex)
 
     # Loop through all vertices, calculating power ratio
-    for vertex in range(0, n_vertex):
+    for vertex in range(n_vertex):
         pow_ratio[vertex] = np.mean(osc_mat[vertex, 1, :]) / max_all
 
     return pow_ratio
