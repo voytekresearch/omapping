@@ -7,6 +7,7 @@ import sys
 import csv
 import pickle
 import numpy as np
+import scipy.io as sio
 
 # Import FOOF (use sys to add location to path, then import)
 sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
@@ -42,6 +43,35 @@ def _rm_test_files(path):
 
         os.remove(path)
 
+def make_test_file_directory(base_path):
+    """   """
+
+    # Corrs Data
+    os.mkdir('Corrs')
+    cor_data = ['Genes', 'Terms']
+    cor_data_type = ['csv', 'npz']
+
+    for cor_dat in cor_data:
+        os.mkdir('Corrs/' + cor_dat)
+
+        for cor_dat_type in cor_data_type:
+            os.mkdir('Corrs' + cor_dat + cor_dat_type)
+
+    # Maps Data
+    os.mkdir('Maps')
+    maps_data = ['Genes', 'Oscs', 'Slopes', 'Terms']
+    for maps_dat in maps_data:
+        os.mkdir('Maps/' + maps_dat)
+
+    # MEG Data
+    os.mkdir('MEG')
+
+    #
+    os.mkdir('csvs')
+    os.mkdir('foof')
+
+####
+####
 ####
 
 def make_fake_foof_dat_1():
@@ -161,7 +191,47 @@ def make_fake_term_data():
 
     _mc_dat(term_names, term_dat, names_f_name, dat_f_name)
 
-################################################################
+def make_fake_anat_data():
+
+    tdb = TestDB()
+
+    roi_labels = np.array([['left_test'], ['right_test']], dtype=np.object)
+    connectivity = np.array([[0.5, 0.5], [0.5, 0.5]])
+
+    sio.savemat(os.path.join(tdb.maps_path, 'Anat', 'test_anat.mat'),
+                dict({'roi_labels': roi_labels,
+                      'connectivity': connectivity}))
+
+def make_fake_scout_data():
+
+    tdb = TestDB()
+
+    dt = [('Vertices', 'O'), ('Seed', 'f4'), ('Color', 'O'), ('Label', 'S10'),
+          ('Function', 'S10'), ('Region', 'S10'), ('Handles', 'S10')]
+    scout_dat = np.zeros((2,), dtype=dt)
+
+    scout_dat[0]['Vertices'] = [1, 2, 5]
+    scout_dat[0]['Seed'] = 1111
+    scout_dat[0]['Color'] = [1, 1, 1]
+    scout_dat[0]['Label'] = 'test L'
+    scout_dat[0]['Function'] = 1111
+    scout_dat[0]['Region'] = 'Mean'
+    scout_dat[0]['Handles'] = ''
+
+    scout_dat[1]['Vertices'] = [3, 4]
+    scout_dat[1]['Seed'] = 1111
+    scout_dat[1]['Color'] = [1, 1, 1]
+    scout_dat[1]['Label'] = 'test R'
+    scout_dat[1]['Function'] = 1111
+    scout_dat[1]['Region'] = 'Mean'
+    scout_dat[1]['Handles'] = ''
+
+    sio.savemat(os.path.join(tdb.maps_path, 'Scouts', 'test_scout.mat'),
+                {'Scouts': scout_dat})
+
+##############################################################
+##############################################################
+##############################################################
 
 def _mc_dat(names, data, name_f_name, dat_f_name):
 
@@ -195,6 +265,9 @@ if __name__ == "__main__":
 
     make_fake_gene_data()
     make_fake_term_data()
+
+    make_fake_anat_data()
+    make_fake_scout_data()
 
     print("\tTesting data created.\n")
 
