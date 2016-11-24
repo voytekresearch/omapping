@@ -2,6 +2,7 @@ from __future__ import print_function, division
 
 import os
 import csv
+import numpy as np
 from types import StringType, ListType
 
 from om.gen import OMDB
@@ -116,6 +117,7 @@ def test_load_gene_maps():
 
     # TODO: ADD BETTER TESTING OF THIS
     assert map_comp.genes_loaded
+    assert map_comp.gene_maps.shape == (5, 3)
 
 
 def test_load_term_maps():
@@ -128,18 +130,67 @@ def test_load_term_maps():
 
     # TODO: ADD BETTER TESTING OF THIS
     assert map_comp.terms_loaded
+    assert map_comp.term_maps.shape == (5, 2)
 
-def calc_corrs_genes():
-
-    tdb = TDB()
-
-    pass
-
-def calc_corrs_terms():
+def test_calc_corrs_genes_meg_l():
 
     tdb = TDB()
 
-    pass
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+    map_comp.load_meg_maps('test_meg')
+
+    for osc in map_comp.bands:
+        map_comp.calc_corrs('Genes', osc, method='linear')
+
+    for osc in map_comp.bands:
+        assert np.all(map_comp.corrs['Genes'][osc])
+        assert np.all(map_comp.p_vals['Genes'][osc])
+
+def test_calc_corrs_genes_slope_l():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+    map_comp.load_slope_map('test_slopes')
+
+    map_comp.calc_corrs('Genes', 'Slopes', method='linear')
+
+    assert np.all(map_comp.corrs['Genes']['Slopes'])
+    assert np.all(map_comp.p_vals['Genes']['Slopes'])
+
+def test_calc_corrs_terms_meg_l():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+    map_comp.load_meg_maps('test_meg')
+
+    for osc in map_comp.bands:
+        map_comp.calc_corrs('Terms', osc, method='linear')
+
+    for osc in map_comp.bands:
+        assert np.all(map_comp.corrs['Terms'][osc])
+        assert np.all(map_comp.p_vals['Terms'][osc])
+
+def test_calc_corrs_terms_slope_l():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+    map_comp.load_slope_map('test_slopes')
+
+    map_comp.calc_corrs('Terms', 'Slopes', method='linear')
+
+    assert np.all(map_comp.corrs['Terms']['Slopes'])
+    assert np.all(map_comp.p_vals['Terms']['Slopes'])
 
 def test_unload_data_genes():
 
