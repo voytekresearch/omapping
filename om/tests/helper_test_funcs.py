@@ -20,11 +20,15 @@ class TestDB(object):
         self.dat_source = 'test'
         self.base = ("/Users/thomasdonoghue/Documents/GitCode/omegamappin/om/tests/test_files/")
 
+        self.meg_path = os.path.join(self.base, 'MEG')
+
         self.foof_path = os.path.join(self.base, 'foof')
 
         self.csvs_path = os.path.join(self.base, 'csvs')
 
         self.maps_path = os.path.join(self.base, 'Maps')
+
+        self.corrs_path = os.path.join(self.base, 'Corrs')
 
 ##
 ##
