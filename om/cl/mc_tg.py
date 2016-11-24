@@ -241,7 +241,7 @@ class MapCompTG(MapCompBase):
             p_vals = np.zeros(n_comps)
 
             # Loop through all comparisons to run
-            for comp in range(0, n_comps):
+            for comp in range(n_comps):
 
                 # Pull out specific data (single term or gene)
                 dat = np.array(dat_df.ix[:, comp])
@@ -341,7 +341,7 @@ class MapCompTG(MapCompBase):
 
         # Print out the bottom group (largest negative correlations)
         else:
-            for i in range(0, n_check):
+            for i in range(n_check):
                 ind = int(inds_max[i])
                 print(str(i), '\t', format(names[ind][:50], la_str), '\t',
                       format(meg_corr[ind], '1.5f'), '\t', format(meg_p[ind], '1.4e'))
@@ -728,9 +728,9 @@ def _pull_out_results(dat_in):
 
     Returns
     -------
-    out_1 : ?
+    out_1 : 1d array
         xx
-    out_2 : ?
+    out_2 : 1d array
         xx
     """
 
@@ -738,8 +738,8 @@ def _pull_out_results(dat_in):
     n_dat = len(dat_in)
 
     # Initializ vectors
-    out_1 = np.zeros([n_dat, 1])
-    out_2 = np.zeros([n_dat, 1])
+    out_1 = np.zeros(n_dat)
+    out_2 = np.zeros(n_dat)
 
     # Loop through and pull out data
     for i in range(n_dat):
