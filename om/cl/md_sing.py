@@ -139,9 +139,15 @@ class MegData(object):
 
 
     def set_bands(self, osc):
-        """   """
+        """
 
-        if self.bands and self.bands_vertex or self.peaks:
+        Parameters
+        ----------
+        osc : ?
+            xx
+        """
+
+        if self.bands and (self.bands_vertex or self.peaks):
             raise InconsistentDataError('Can not change band definitions after they have been used.')
         else:
             self.bands = osc.bands
@@ -162,8 +168,7 @@ class MegData(object):
 
         # Check if object already has data
         if self.has_data:
-            print("Subject object already contains data. Can't add")
-            return
+            raise InconsistentDataError('Subject object already contains data. Can not add')
 
         # Set subject number for current data object
         self.subnum = subnum
@@ -180,8 +185,8 @@ class MegData(object):
         # Load data file
         if load_type is 'pickle':
             results = _load_foof_pickle(cur_subj_path)
-        elif load_type is 'csv': # NOTE: not yet implemented
-            results = _load_foof_csv(cur_subj_path)
+        #elif load_type is 'csv': # NOTE: not yet implemented
+        #    results = _load_foof_csv(cur_subj_path)
 
         # Pull out data from results - NOTE: New version.
         self.centers, self.powers, self.bws, self.slopes, self.n_psds \
@@ -349,13 +354,18 @@ class MegData(object):
 
 
     def set_foof_viz(self):
-        """Saves a matfile of freq info to be loaded with Brainstorm for visualization."""
+        """Saves a matfile of freq info to be loaded with Brainstorm for visualization.
+
+        Notes
+        -----
+        Requires that ... data be
+        """
 
         # Set up paths to save to
         save_name = str(self.subnum) + '_Foof_Viz'
         save_file = os.path.join(self.db.viz_path, save_name)
 
-        # Initialzie dictionary, save basic information and slope data
+        # Initialize dictionary, save basic information and slope data
         save_dict = {}
         save_dict['subnum'] = self.subnum
         save_dict['dat_source'] = self.dat_source
@@ -656,10 +666,11 @@ def _load_foof_pickle(file_name):
     # Load from pickle file
     return pickle.load(open(file_name, 'rb'))
 
-
+"""
 def _load_foof_csv(file_name):
-    """
+    ""
     NOTE: not yet implemented
-    """
+    "
 
     pass
+"""
