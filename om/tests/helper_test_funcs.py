@@ -48,7 +48,7 @@ def load_test_meg_subj(sub):
 
     return dat
 
-def load_test_meg_gr(bands_vertex=False):
+def load_test_meg_gr(bands_vertex=False, all_osc=False, peaks=False, calc_maps=False, vertex_osc=False):
     """Loads a test group object of MD_GR data."""
 
     tdb = TestDB()
@@ -65,6 +65,19 @@ def load_test_meg_gr(bands_vertex=False):
         if bands_vertex:
             meg_subj.osc_bands_vertex()
 
-        meg_group.add_subject(meg_subj, add_vertex_bands=bands_vertex)
+        if all_osc:
+            meg_subj.all_oscs()
+
+        if peaks:
+            meg_subj.peak_freq()
+
+        meg_group.add_subject(meg_subj, add_all_oscs=all_osc,
+                              add_vertex_bands=bands_vertex,
+                              add_peak_freqs=peaks,
+                              add_vertex_oscs=vertex_osc)
+
+    if calc_maps:
+        meg_group.osc_prob()
+        meg_group.osc_score()
 
     return meg_group
