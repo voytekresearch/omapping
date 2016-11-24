@@ -3,6 +3,7 @@ from __future__ import print_function, division
 import os
 import csv
 import numpy as np
+import pandas as pd
 from types import StringType, ListType
 
 from om.gen import OMDB
@@ -98,10 +99,23 @@ def test_init_stat_dict():
     assert set(d.keys()) == set(bands)
 
 def test_make_list():
-    pass
+
+    df = pd.DataFrame(np.array([[1, 2], [1, 2]]))
+
+    l = mc._make_list(df)
+
+    assert len(l) == 2
+    assert np.array_equal(l[0], np.array([1, 1]))
+    assert np.array_equal(l[1], np.array([2, 2]))
 
 def test_pull_out_results():
-    pass
+
+    dat = [(1, 2), (1, 2)]
+
+    out_1, out_2 = mc._pull_out_results(dat)
+
+    assert np.array_equal(out_1, np.array([1, 1]))
+    assert np.array_equal(out_2, np.array([2, 2]))
 
 ##############################################################################
 ############## TESTS - OMEGAMAPPIN - CL_MC_TG - CLASS FUNCTIONS ##############
@@ -235,3 +249,21 @@ def test_unload_data_terms():
     map_comp.unload_data('Terms')
 
     assert not map_comp.terms_loaded
+
+def test_save_corrs():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_meg_maps('test_meg')
+    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+
+    for osc in map_comp.bands:
+        map_comp.calc_corrs('Genes', osc, method='linear')
+        map_comp.calc_corrs('Terms', osc, method='linear')
+
+    for osc in map_comp.bands:
+        map_comp.save_corrs('Genes', osc, 'test')
+        map_comp.save_corrs('Terms', osc, 'test')
