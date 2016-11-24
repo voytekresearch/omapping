@@ -445,10 +445,9 @@ def save_md_pickle(obj, save_name):
 
     # Set save name and path
     save_name = 'Res_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
-    foof_save_path = os.path.join(db.md_save_path, save_name)
 
     # Save out data to pickle file
-    pickle.dump(obj, open(foof_save_path, 'wb'))
+    pickle.dump(obj, open(os.path.join(db.md_save_path, save_name), 'wb'))
 
 
 def load_md_pickle(file_name):
