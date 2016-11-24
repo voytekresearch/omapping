@@ -737,7 +737,7 @@ def _pull_out_results(dat_in):
     # Check length of data
     n_dat = len(dat_in)
 
-    # Initializ vectors
+    # Initialize vectors
     out_1 = np.zeros(n_dat)
     out_2 = np.zeros(n_dat)
 
