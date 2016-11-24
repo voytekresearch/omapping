@@ -7,6 +7,7 @@ from types import ListType
 from py.test import raises
 
 import om.gen as gen
+from helper_test_funcs import TestDB as TDB
 
 #########################################################################################
 ########################## TESTS - OMEGAMAPPIN - CLASSES - OMDB #########################
@@ -32,7 +33,7 @@ def test_check_dat_files_psd():
 
     db = gen.OMDB()
 
-    sub_nums, source = db.check_dat_files('PSD', verbose=False)
+    sub_nums, source = db.check_dat_files('PSD', verbose=True)
 
     assert sub_nums
     assert source
@@ -42,7 +43,7 @@ def test_check_dat_files_foof():
 
     db = gen.OMDB()
 
-    sub_nums, source = db.check_dat_files('foof', verbose=False)
+    sub_nums, source = db.check_dat_files('foof', verbose=True)
 
     assert type(sub_nums) == type(source) == ListType
     assert len(sub_nums) == len(source)
@@ -51,7 +52,7 @@ def test_check_res_files_md():
 
     db = gen.OMDB()
 
-    files = db.check_res_files('md', verbose=False)
+    files = db.check_res_files('md', verbose=True)
 
     assert type(files) == ListType
 
@@ -59,7 +60,7 @@ def test_check_res_files_mc():
 
     db = gen.OMDB()
 
-    files = db.check_res_files('mc', verbose=False)
+    files = db.check_res_files('mc', verbose=True)
 
     assert type(files) == ListType
 
@@ -67,7 +68,7 @@ def test_check_map_files():
 
     db = gen.OMDB()
 
-    osc, sl, gene, term = db.check_map_files(verbose=False, return_files=True)
+    osc, sl, gene, term = db.check_map_files(verbose=True, return_files=True)
 
     assert type(osc) == type(sl) == type(gene) == type(term) == ListType
 
@@ -116,9 +117,9 @@ def test_rm_band():
     with raises(KeyError):
         assert osc.bands['test']
 
-#########################################################################################
-######################### TESTS - OMEGAMAPPIN - CLASSES - FIGINFO ########################
-#########################################################################################
+###########################################################################################
+######################### TESTS - OMEGAMAPPIN - CLASSES - FIGINFO #########################
+###########################################################################################
 
 def test_fig_info():
     """Test that FigInfo() returns properly."""
@@ -144,6 +145,11 @@ def test_clean_file_list():
     assert len(out) == 1
     assert out[0] is files[2]
 
+def test_load_meg_psds():
+
+    tdb = TDB()
+    pass
+
 def test_extract_psd():
     """Test that extract_psd() works properly."""
 
@@ -158,6 +164,18 @@ def test_extract_psd():
     assert freqs_out.min() == f_low
     assert freqs_out.max() == f_high
     assert (n_row == 5) & (n_col == len(freqs_out))
+
+def test_save_foof_pickle():
+    pass
+
+def test_save_foof_csv():
+    pass
+
+def test_load_foof_pickle():
+    pass
+
+def test_extract_foof_pickle():
+    pass
 
 def test_get_sub_nums_first():
     """Test that get_sub_num() works properly with numbers first."""
@@ -204,9 +222,15 @@ def test_get_section():
     """   """
     pass
 
+def test_meg_foof():
+    pass
+
 ###########################################################################################
 ###################### TESTS - OMEGAMAPPIN - GEN - PRIVATE FUNCTIONS ######################
 ###########################################################################################
+
+def test_run_foof_l():
+    pass
 
 def test_check_files():
     pass
