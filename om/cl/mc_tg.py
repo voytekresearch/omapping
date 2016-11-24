@@ -35,9 +35,9 @@ class MapCompTG(MapCompBase):
         The number of terms loaded.
     n_genes : int
         The number of genes loaded.
-    term_maps : 2d array
+    term_maps : DataFrame()
         Term data for all genes, across all vertices  [n_verts, n_terms].
-    gene_maps : 2d array
+    gene_maps : DataFrame()
         Gene data for all genes, across all vertices [n_verts, n_genes].
     gene_subj : str
         Label for which gene subject is loaded.
@@ -72,10 +72,10 @@ class MapCompTG(MapCompBase):
         self.n_genes = int()
 
         # Initialize variable to store the term maps
-        self.term_maps = np.array([])
+        self.term_maps = pd.DataFrame()
 
         # Initialize variable to store the gene maps
-        self.gene_maps = np.array([])
+        self.gene_maps = pd.DataFrame()
         self.gene_subj = str()
 
         # Initialize a dictionary to store all the R-values from spatial correlations
@@ -193,8 +193,12 @@ class MapCompTG(MapCompBase):
 
         # Check with data type and set data accordingly
         if dat_type is 'Terms':
+            if not self.terms_loaded:
+                raise DataNotComputedError('Term data has not been loaded.')
             dat_df = self.term_maps
         elif dat_type is 'Genes':
+            if not self.genes_loaded:
+                raise DataNotComputedError('Gene data has not been loaded.')
             dat_df = self.gene_maps
         else:
             raise UnknownDataTypeError('Data Type not understood.')
@@ -233,8 +237,8 @@ class MapCompTG(MapCompBase):
             [n_verts, n_comps] = dat_df.shape
 
             # Initialize vectors to store correlation results
-            corr_vals = np.zeros([n_comps, 1])
-            p_vals = np.zeros([n_comps, 1])
+            corr_vals = np.zeros(n_comps)
+            p_vals = np.zeros(n_comps)
 
             # Loop through all comparisons to run
             for comp in range(0, n_comps):
