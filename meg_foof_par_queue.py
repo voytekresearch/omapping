@@ -18,9 +18,8 @@ from om.gen import OMDB
 from om.gen import clean_file_list, get_sub_nums, load_meg_psds, save_foof_pickle, extract_psd
 
 ## TODO:
-# - Add a report to save out
 # - Figure out ipyparallel to launch from within script
-# - Turn into proper python script with main() function
+# - Add a report to save out?
 
 ############################################################################
 ################################# SETTINGS #################################
@@ -39,7 +38,18 @@ MEG_QUEUE = [358144, 433839, 512835, 555348, 559053, 568963, 581450, 599671]
 # Define function to run foof
 @interactive
 def run_foof(psd_in):
-    """DOCSTRING"""
+    """DOCSTRING
+
+    Parameters
+    ----------
+    psd_in : ?
+        xx
+
+    Notes
+    -----
+    - FOOF has to be imported on workers.
+    - min_p, freq_res, fmin, fmax have to be sent to workers.
+    """
 
     # Initialize foof object
     foof = FOOF(min_p=min_p, res=freq_res, fmin=fmin, fmax=fmax)
@@ -55,6 +65,7 @@ def run_foof(psd_in):
 ############################################################################
 
 def main():
+    """DOCSTRING"""
 
     # Print out beginning status
     print('\n\nSTARTING FOOF ON MEG DATA: \n')
@@ -115,10 +126,10 @@ def main():
         print('Starting at ', time.strftime('%H:%M:%S', time.localtime()))
 
         # Load MEG Data
-        psd, freqs = load_meg_psds(db.DAT_SOURCE, db.psd_path, subj)
+        psd, freqs = load_meg_psds(db.dat_source, db.psd_path, subj)
 
         # Check data - get number of PSDs and frequency resolution
-        [nPSDs, nFreqs] = np.shape(psd)
+        [n_psds, n_freqs] = np.shape(psd)
         freq_res = np.mean(np.diff(freqs))
 
         # Extract PSD range of interest
@@ -126,7 +137,7 @@ def main():
 
         # Set up PSD as a list of 2-D np arrays
         psd_list = list(psd_ext)
-        for i in range(nPSDs):
+        for i in range(n_psds):
             psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
 
         # Send required vars to workers
