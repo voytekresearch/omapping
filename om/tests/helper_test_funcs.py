@@ -30,6 +30,8 @@ class TestDB(object):
 
         self.corrs_path = os.path.join(self.base, 'Corrs')
 
+        self.viz_path = os.path.join(self.base, 'Viz')
+
 ##
 ##
 ##
