@@ -192,6 +192,28 @@ def test_calc_corrs_terms_slope_l():
     assert np.all(map_comp.corrs['Terms']['Slopes'])
     assert np.all(map_comp.p_vals['Terms']['Slopes'])
 
+def test_check_corrs():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_meg_maps('test_meg')
+    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+
+    for osc in map_comp.bands:
+        map_comp.calc_corrs('Genes', osc, method='linear')
+        map_comp.calc_corrs('Terms', osc, method='linear')
+
+    for osc in map_comp.bands:
+        map_comp.check_corrs('Genes', osc, n_check=2)
+        map_comp.check_corrs('Terms', osc, n_check=2)
+        map_comp.check_corrs('Genes', osc, n_check=2, top=False)
+        map_comp.check_corrs('Terms', osc, n_check=2, top=False)
+
+    assert True
+
 def test_unload_data_genes():
 
     tdb = TDB()
