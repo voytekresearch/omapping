@@ -322,11 +322,11 @@ class MapCompTG(MapCompBase):
             raise DataNotComputedError('Requested meg data correlation not calculated.')
 
         # Get R and p values of specified correlations
-        meg_corr = np.squeeze(self.corrs[dat_type][meg_dat])
-        meg_p = np.squeeze(self.p_vals[dat_type][meg_dat])
+        meg_corr = self.corrs[dat_type][meg_dat]
+        meg_p = self.p_vals[dat_type][meg_dat]
 
         # Sort the corr vector
-        inds_max = np.argsort(meg_corr, axis=0)
+        inds_max = np.argsort(meg_corr)
 
         # Print Header Rows
         print("\n\nCorrelations for ", str(dat_type), " &  ", str(meg_dat), ': \n')
