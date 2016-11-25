@@ -5,10 +5,11 @@ import csv
 import numpy as np
 import pandas as pd
 from types import StringType, ListType
+from py.test import raises
 
 from om.gen import OMDB
-from helper_test_funcs import TestDB as TDB
 import om.cl.mc_tg as mc
+from helper_test_funcs import TestDB as TDB
 
 ####################################################################################
 ##################### TESTS - OMEGAMAPPIN - CL_MC_TG - CLASSES #####################
@@ -26,6 +27,11 @@ def test_mc_tg():
 
 def test_calc_avg_gene_map():
     pass
+    #tdb = TDB()
+
+    #subj_list = []
+
+    #mc.calc_avg_gene_map(subj_list, 'test_avg')
 
 ####################################################################################
 ################ TESTS - OMEGAMAPPIN - CL_MC_TG - PRIVATE FUNCTIONS ################
@@ -89,6 +95,10 @@ def test_avg_csv_files():
     f.close()
     os.remove(f_out)
 
+    mc._avg_csv_files(f_in, f_out, 'median')
+    assert os.path.exists(f_out)
+    os.remove(f_out)
+
 def test_init_stat_dict():
 
     bands = ['a', 'b', 'c']
@@ -133,6 +143,18 @@ def test_load_gene_maps():
     assert map_comp.genes_loaded
     assert map_comp.gene_maps.shape == (5, 3)
 
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+
+    assert map_comp.genes_loaded
+
+def test_gene_bad_data():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    with raises(mc.InconsistentDataError):
+        map_comp.load_gene_maps('bad_test', names_file='00-test_gene_names.csv')
 
 def test_load_term_maps():
 
@@ -145,6 +167,15 @@ def test_load_term_maps():
     # TODO: ADD BETTER TESTING OF THIS
     assert map_comp.terms_loaded
     assert map_comp.term_maps.shape == (5, 2)
+
+def test_term_bad_data():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    with raises(mc.InconsistentDataError):
+        map_comp.load_term_maps('bad_test_term_dat.csv', names_file='00-test_term_names.csv')
 
 def test_calc_corrs_genes_meg_l():
 
