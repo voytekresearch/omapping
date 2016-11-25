@@ -1,4 +1,6 @@
-"""   """
+"""MODULE DOC STRING
+
+"""
 
 from __future__ import print_function, division
 
@@ -8,33 +10,41 @@ import om.cl.md_sing as md_sing
 import om.cl.md_gr as md_gr
 from om.gen import Osc
 
-##
-##
-##
+#############################################################################################
+#############################################################################################
+#############################################################################################
 
 class TestDB(object):
+    """   """
 
     def __init__(self):
         """    """
 
+        #
         self.dat_source = 'test'
-        self.base = ("/Users/thomasdonoghue/Documents/GitCode/omegamappin/om/tests/test_files/")
 
-        self.meg_path = os.path.join(self.base, 'MEG')
+        #
+        base_path = ("/Users/thomasdonoghue/Documents/GitCode/omegamappin/om/tests/data/")
+        self.external_path = os.path.join(base_path, 'External')
+        self.internal_path = os.path.join(base_path, 'Internal')
+        self.other_path = os.path.join(base_path, 'Other')
 
-        self.foof_path = os.path.join(self.base, 'foof')
+        # Set up external test data links
+        self.meg_path = os.path.join(self.external_path, 'MEG')
+        self.foof_path = os.path.join(self.meg_path, 'FOOF')
+        self.psd_path = os.path.join(self.meg_path, 'PSDs')
+        self.viz_path = os.path.join(self.meg_path, 'Viz')
 
-        self.csvs_path = os.path.join(self.base, 'csvs')
+        # Set up internal test data links
+        self.maps_path = os.path.join(self.internal_path, 'Maps')
+        self.corrs_path = os.path.join(self.internal_path, 'Corrs')
 
-        self.maps_path = os.path.join(self.base, 'Maps')
+        # Set
+        self.csvs_path = os.path.join(self.other_path, 'csvs')
 
-        self.corrs_path = os.path.join(self.base, 'Corrs')
-
-        self.viz_path = os.path.join(self.base, 'Viz')
-
-##
-##
-##
+#############################################################################################
+#############################################################################################
+#############################################################################################
 
 def load_test_meg_subj(sub):
     """Loads a test subject of MD_SING data."""
