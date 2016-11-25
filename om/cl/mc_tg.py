@@ -528,7 +528,6 @@ def calc_avg_gene_map(subj_list, file_title):
         # Save out an average csv file from input files
         _avg_csv_files(cur_part_in_files, out_file_path)
 
-
 ################################################################################################
 ######################### OMEGAMAPPIN - CL_MC_TG - FUNCTIONS (PRIVATE) #########################
 ################################################################################################
