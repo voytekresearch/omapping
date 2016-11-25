@@ -14,8 +14,9 @@ sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
 from om.gen import Osc, save_foof_pickle
 from om.tests.helper_test_funcs import TestDB
 
-
-####
+####################
+####################
+####################
 
 def clear_fake_dat():
     """   """
@@ -70,9 +71,9 @@ def make_test_file_directory(base_path):
     os.mkdir('csvs')
     os.mkdir('foof')
 
-####
-####
-####
+################################
+################################
+################################
 
 def make_fake_foof_dat_1():
     """   """
@@ -91,11 +92,16 @@ def make_fake_foof_dat_2():
 
     tdb = TestDB()
 
-    v1 = (0.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]), np.array([0.5, 1.0, 1.5]))
-    v2 = (0.5, np.array([10, 11, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]), np.array([0.5, 1.0, 1.5]))
-    v3 = (1.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]), np.array([0.5, 1.0, 1.5]))
-    v4 = (1.5, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]), np.array([0.5, 1.0, 1.5]))
-    v5 = (2.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]), np.array([0.5, 1.0, 1.5]))
+    v1 = (0.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
+          np.array([0.5, 1.0, 1.5]))
+    v2 = (0.5, np.array([10, 11, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
+          np.array([0.5, 1.0, 1.5]))
+    v3 = (1.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
+          np.array([0.5, 1.0, 1.5]))
+    v4 = (1.5, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
+          np.array([0.5, 1.0, 1.5]))
+    v5 = (2.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
+          np.array([0.5, 1.0, 1.5]))
 
     fake_foof_dat = [v1, v2, v3, v4, v5]
 
@@ -172,7 +178,18 @@ def make_fake_gene_data():
     dat_f_name = os.path.join(tdb.maps_path, 'Genes', 'test_gene_estimations',
                               'test_gene_dat_r10.csv')
 
-    _mc_dat(gene_names, gene_dat, names_f_name, dat_f_name)
+    _mc_dat(gene_dat, dat_f_name, gene_names, names_f_name)
+
+def make_bad_gene_data():
+
+    tdb = TestDB()
+
+    bad_gene_dat = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5]]
+
+    bad_dat_f_name = os.path.join(tdb.maps_path, 'Genes', 'bad_test_gene_estimations',
+                              'bad_test_gene_dat_r10.csv')
+
+    _mc_dat(bad_gene_dat, bad_dat_f_name)
 
 def make_fake_term_data():
     """Create fake term data for testing.
@@ -189,7 +206,17 @@ def make_fake_term_data():
     names_f_name = os.path.join(tdb.maps_path, 'Terms', '00-test_term_names.csv')
     dat_f_name = os.path.join(tdb.maps_path, 'Terms', 'test_term_dat.csv')
 
-    _mc_dat(term_names, term_dat, names_f_name, dat_f_name)
+    _mc_dat(term_dat, dat_f_name, term_names, names_f_name)
+
+def make_bad_term_data():
+
+    tdb = TestDB()
+
+    bad_term_dat = [[1], [2], [3], [4], [5]]
+
+    bad_dat_f_name = os.path.join(tdb.maps_path, 'Terms', 'bad_test_term_dat.csv')
+
+    _mc_dat(bad_term_dat, bad_dat_f_name)
 
 def make_fake_anat_data():
 
@@ -233,12 +260,13 @@ def make_fake_scout_data():
 ##############################################################
 ##############################################################
 
-def _mc_dat(names, data, name_f_name, dat_f_name):
+def _mc_dat(data, dat_f_name, names=None, name_f_name=None):
 
-    names_file = open(name_f_name, 'wb')
-    names_writer = csv.writer(names_file)
-    names_writer.writerow(names)
-    names_file.close()
+    if names:
+        names_file = open(name_f_name, 'wb')
+        names_writer = csv.writer(names_file)
+        names_writer.writerow(names)
+        names_file.close()
 
     dat_file = open(dat_f_name, 'wb')
     dat_writer = csv.writer(dat_file)
@@ -265,6 +293,9 @@ if __name__ == "__main__":
 
     make_fake_gene_data()
     make_fake_term_data()
+
+    make_bad_gene_data()
+    make_bad_term_data()
 
     make_fake_anat_data()
     make_fake_scout_data()
