@@ -45,22 +45,24 @@ class OMDB(object):
     def __init__(self):
         """   """
 
-        # Set base path for OMEGA data
-        self.project_path = ("/Users/thomasdonoghue/Documents/Research/"
-                             "1-Projects/OMEGA/2-Data/")
+        # Set base paths for OMEGA internal and external data
+        base_path = ("/Users/thomasdonoghue/Documents/Research/"
+                     "1-Projects/OMEGA/2-Data/")
+        self.project_path = os.path.join(base_path, 'OMData')
+        self.external_dat_path = os.path.join(base_path, 'ExternalData')
 
         # Set paths for different data types
-        self.meg_path = os.path.join(self.project_path, 'MEG')
+        self.meg_path = os.path.join(self.external_dat_path, 'MEG')
         self.maps_path = os.path.join(self.project_path, 'Maps')
         self.corrs_path = os.path.join(self.project_path, 'Corrs')
 
         # Set paths for MEG data types
-        self.psd_path = os.path.join(self.meg_path, '2-PSDs')
-        self.foof_path = os.path.join(self.meg_path, '3-FOOF')
-        self.viz_path = os.path.join(self.meg_path, '4-Viz')
+        self.psd_path = os.path.join(self.meg_path, 'PSDs')
+        self.foof_path = os.path.join(self.meg_path, 'FOOF')
+        self.viz_path = os.path.join(self.meg_path, 'Viz')
 
         # Set paths to save data out to
-        processed_path = os.path.join(self.meg_path, '5-Processed')
+        processed_path = os.path.join(self.project_path, 'Processed')
         self.md_save_path = os.path.join(processed_path, 'md_pickle')
         self.mc_save_path = os.path.join(processed_path, 'mc_pickle')
 
