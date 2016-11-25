@@ -14,12 +14,12 @@ sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
 from om.gen import Osc, save_foof_pickle
 from om.tests.helper_test_funcs import TestDB
 
-####################
-####################
-####################
+############################################################################
+############################################################################
+############################################################################
 
 def clear_fake_dat():
-    """   """
+    """Loops throught the test database directory, deleting all data files."""
 
     tdb = TestDB()
 
@@ -28,7 +28,7 @@ def clear_fake_dat():
             _rm_test_files(val)
 
 def _rm_test_files(path):
-    """   """
+    """Recursive function to walk through folders, deleting files."""
 
     if os.path.isdir(path):
 
@@ -45,7 +45,7 @@ def _rm_test_files(path):
         os.remove(path)
 
 def make_test_file_directory(base_path):
-    """   """
+    """Generates the database folder structure."""
 
     # Corrs Data
     os.mkdir('Corrs')
@@ -71,24 +71,25 @@ def make_test_file_directory(base_path):
     os.mkdir('csvs')
     os.mkdir('foof')
 
-################################
-################################
-################################
+##################################################################################################
+########################## OMEGAMAPPIN - GENERATE FAKE DATA FOR TESTING ##########################
+##################################################################################################
 
-def make_fake_foof_dat_1():
-    """   """
+def make_fake_foof_dat_v2():
+    """Creates a file with 2 vertices of FOOF MEG data."""
 
     tdb = TestDB()
 
     v1 = (1.0, np.array([5, 10]), np.array([1.0e-22, 1.0e-22]), np.array([1.0, 1.0]))
-    v2 = (1.0, np.array([5, 10, 15]), np.array([1.0e-22, 1.0e-22, 1.0e-22]), np.array([1.0, 1.0, 1.0]))
+    v2 = (1.0, np.array([5, 10, 15]), np.array([1.0e-22, 1.0e-22, 1.0e-22]),
+          np.array([1.0, 1.0, 1.0]))
 
     fake_foof_dat = [v1, v2]
 
     save_foof_pickle(fake_foof_dat, tdb.foof_path, 'test_v2')
 
-def make_fake_foof_dat_2():
-    """   """
+def make_fake_foof_dat_v5():
+    """Creates a file with 5 vertices of FOOF MEG data."""
 
     tdb = TestDB()
 
@@ -107,8 +108,8 @@ def make_fake_foof_dat_2():
 
     save_foof_pickle(fake_foof_dat, tdb.foof_path, 'test_v5')
 
-def make_test_csvs():
-    """   """
+def make_fake_csvs():
+    """Creates two test csv files, with 4 lines of data. Both files are the same."""
 
     tdb = TestDB()
 
@@ -128,16 +129,13 @@ def make_test_csvs():
         out_file.close()
 
 def make_fake_meg_map_data():
-    """Create fake MEG map data for testing.
-
-    Test data has MEG aggregate data (prob or score) for 2 bands at 5 vertices.
-    """
+    """Creates MEG map data, (prob or score) for 2 bands at 5 vertices."""
 
     tdb = TestDB()
 
     pickle_name = os.path.join(tdb.maps_path, 'Oscs', 'test_meg.p')
 
-    osc = Osc(input_bands=dict({'a': (3,10), 'b': (10, 40)}))
+    osc = Osc(input_bands=dict({'a': (3, 10), 'b': (10, 40)}))
     test_meg_dat = dict({'a': np.array([1, 1, 1, 1, 1]),
                          'b': np.array([1, 1, 1, 1, 1])})
 
@@ -147,10 +145,7 @@ def make_fake_meg_map_data():
     pickle.dump(dat_out, open(pickle_name, 'wb'))
 
 def make_fake_slope_map_data():
-    """Create fake group average slope data for testing.
-
-    Test data has slope data for 5 vertices.
-    """
+    """Creates group average slope data, for 5 vertices."""
 
     tdb = TestDB()
 
@@ -163,10 +158,7 @@ def make_fake_slope_map_data():
     pickle.dump(dat_out, open(pickle_name, 'wb'))
 
 def make_fake_gene_data():
-    """Creates fake genetic data for testing.
-
-    Test data has 5 vertices with 3 genes.
-    """
+    """Creates fake genetic data for testing, for 3 genes at 5 vertices."""
 
     tdb = TestDB()
 
@@ -180,22 +172,20 @@ def make_fake_gene_data():
 
     _mc_dat(gene_dat, dat_f_name, gene_names, names_f_name)
 
-def make_bad_gene_data():
+def make_fake_bad_gene_data():
+    """Creates 'bad' gene data, with 2 genes, that mis-matches the 3 defined in the names file."""
 
     tdb = TestDB()
 
     bad_gene_dat = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5]]
 
     bad_dat_f_name = os.path.join(tdb.maps_path, 'Genes', 'bad_test_gene_estimations',
-                              'bad_test_gene_dat_r10.csv')
+                                  'bad_test_gene_dat_r10.csv')
 
     _mc_dat(bad_gene_dat, bad_dat_f_name)
 
 def make_fake_term_data():
-    """Create fake term data for testing.
-
-    Test data has 5 vertices with 2 terms.
-    """
+    """Create fake term data for testing, for 2 terms at 5 vertices."""
 
     tdb = TestDB()
 
@@ -208,7 +198,8 @@ def make_fake_term_data():
 
     _mc_dat(term_dat, dat_f_name, term_names, names_f_name)
 
-def make_bad_term_data():
+def make_fake_bad_term_data():
+    """Creates 'bad' term data, with 1 term, that mis-matches the 2 defined in the names file."""
 
     tdb = TestDB()
 
@@ -219,6 +210,7 @@ def make_bad_term_data():
     _mc_dat(bad_term_dat, bad_dat_f_name)
 
 def make_fake_anat_data():
+    """Create anatomical connectivity data, for two ROIs."""
 
     tdb = TestDB()
 
@@ -230,6 +222,7 @@ def make_fake_anat_data():
                       'connectivity': connectivity}))
 
 def make_fake_scout_data():
+    """Creates a test scout definition file, for two ROIs (matching above)."""
 
     tdb = TestDB()
 
@@ -256,9 +249,45 @@ def make_fake_scout_data():
     sio.savemat(os.path.join(tdb.maps_path, 'Scouts', 'test_scout.mat'),
                 {'Scouts': scout_dat})
 
-##############################################################
-##############################################################
-##############################################################
+############################################################################
+############################################################################
+############################################################################
+
+def create_foof_data():
+    """Creates FOOF data for testing."""
+
+    make_fake_foof_dat_v2()
+    make_fake_foof_dat_v5()
+
+def create_meg_data():
+    """Creates MEG data for testing."""
+
+    make_fake_meg_map_data()
+    make_fake_slope_map_data()
+
+def create_gene_term_data():
+    """Creates gene and term data for testing."""
+
+    make_fake_gene_data()
+    make_fake_term_data()
+
+    make_fake_bad_gene_data()
+    make_fake_bad_term_data()
+
+def create_anat_data():
+    """Creates anat data for testing."""
+
+    make_fake_anat_data()
+    make_fake_scout_data()
+
+def create_other():
+    """Creates other data files for testing."""
+
+    make_fake_csvs()
+
+############################################################################
+############################################################################
+############################################################################
 
 def _mc_dat(data, dat_f_name, names=None, name_f_name=None):
 
@@ -276,29 +305,20 @@ def _mc_dat(data, dat_f_name, names=None, name_f_name=None):
 
     dat_file.close()
 
-####################################################################
+############################################################################
+############################################################################
+############################################################################
 
 if __name__ == "__main__":
 
     clear_fake_dat()
     print('\n\tPrevious test files removed.')
 
-    make_fake_foof_dat_1()
-    make_fake_foof_dat_2()
-
-    make_test_csvs()
-
-    make_fake_meg_map_data()
-    make_fake_slope_map_data()
-
-    make_fake_gene_data()
-    make_fake_term_data()
-
-    make_bad_gene_data()
-    make_bad_term_data()
-
-    make_fake_anat_data()
-    make_fake_scout_data()
+    create_foof_data()
+    create_meg_data()
+    create_gene_term_data()
+    create_anat_data()
+    create_other()
 
     print("\tTesting data created.\n")
 
