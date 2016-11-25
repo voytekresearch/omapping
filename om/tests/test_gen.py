@@ -39,6 +39,9 @@ def test_check_dat_files_psd():
     assert source
     assert len(sub_nums) == len(source)
 
+    sub_nums, source = db.check_dat_files('PSD', 'OMEGA', verbose=True)
+    sub_nums, source = db.check_dat_files('PSD', 'HCP', verbose=True)
+
 def test_check_dat_files_foof():
 
     db = gen.OMDB()
@@ -47,6 +50,9 @@ def test_check_dat_files_foof():
 
     assert type(sub_nums) == type(source) == ListType
     assert len(sub_nums) == len(source)
+
+    sub_nums, source = db.check_dat_files('foof', 'OMEGA', verbose=True)
+    sub_nums, source = db.check_dat_files('foof', 'HCP', verbose=True)
 
 def test_check_res_files_md():
 
@@ -146,6 +152,7 @@ def test_clean_file_list():
     assert out[0] is files[2]
 
 def test_load_meg_psds():
+    """   """
 
     tdb = TDB()
     pass
@@ -166,10 +173,28 @@ def test_extract_psd():
     assert (n_row == 5) & (n_col == len(freqs_out))
 
 def test_save_foof_pickle():
-    pass
+    """   """
+
+    tdb = TDB()
+
+    foof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
+                (1.5, np.array([10., 15.]), np.array([1., 2.]), np.array([1., 1.]))]
+
+    gen.save_foof_pickle(foof_dat, tdb.foof_path, 999)
+
+    assert os.path.exists(os.path.join(tdb.foof_path, 'pickle', '999_Foof_Vertex.p'))
 
 def test_save_foof_csv():
-    pass
+
+    tdb = TDB()
+
+    foof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
+                (1.5, np.array([10., 15.]), np.array([1., 2.]), np.array([1., 1.]))]
+
+    gen.save_foof_csv(foof_dat, tdb.foof_path, 999)
+
+    assert os.path.exists(os.path.join(tdb.foof_path, 'csv', '999_Slopes.csv'))
+    assert os.path.exists(os.path.join(tdb.foof_path, 'csv', '999_Oscs.csv'))
 
 def test_load_foof_pickle():
     pass
@@ -220,7 +245,32 @@ def test_rm_files_ext():
 
 def test_get_section():
     """   """
-    pass
+
+    n_rois = 6
+    roi_lr = ['L', 'L', 'L', 'R', 'R', 'R']
+
+    st_x, en_x, st_y, en_y = gen.get_section('all', n_rois, roi_lr)
+    assert st_x == st_y == 0
+    assert en_x == en_y == n_rois
+
+    st_x, en_x, st_y, en_y = gen.get_section('left', n_rois, roi_lr)
+    assert st_x == st_y == 0
+    assert en_x == en_y == 2
+
+    st_x, en_x, st_y, en_y = gen.get_section('right', n_rois, roi_lr)
+    assert st_x == st_y == 3
+    assert en_x == en_y == 5
+
+    st_x, en_x, st_y, en_y = gen.get_section('lr', n_rois, roi_lr)
+    assert st_x == 0; assert st_y == 3
+    assert en_x == 2; assert en_y == 5
+
+    st_x, en_x, st_y, en_y = gen.get_section('rl', n_rois, roi_lr)
+    assert st_x == 3; assert st_y == 0
+    assert en_x == 5; assert en_y == 2
+
+    with raises(gen.InconsistentDataError):
+        gen.get_section('bad', n_rois, roi_lr)
 
 def test_meg_foof():
     pass
