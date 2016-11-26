@@ -16,6 +16,7 @@ from helper_test_funcs import TestDB as TDB
 ####################################################################################
 
 def test_mc_tg():
+    """   """
 
     db = OMDB()
 
@@ -26,6 +27,8 @@ def test_mc_tg():
 ###################################################################################
 
 def test_calc_avg_gene_map():
+    """   """
+
     pass
     #tdb = TDB()
 
@@ -38,6 +41,7 @@ def test_calc_avg_gene_map():
 ####################################################################################
 
 def test_get_map_names_terms():
+    """   """
 
     db = OMDB()
 
@@ -49,6 +53,7 @@ def test_get_map_names_terms():
     assert type(names[0]) == StringType
 
 def test_get_map_names_genes():
+    """   """
 
     db = OMDB()
 
@@ -60,6 +65,7 @@ def test_get_map_names_genes():
     assert type(names[0]) is StringType
 
 def test_get_gene_files():
+    """   """
 
     db = OMDB()
 
@@ -71,6 +77,7 @@ def test_get_gene_files():
         assert os.path.exists(path)
 
 def test_avg_csv_files():
+    """   """
 
     tdb = TDB()
 
@@ -100,6 +107,7 @@ def test_avg_csv_files():
     os.remove(f_out)
 
 def test_init_stat_dict():
+    """   """
 
     bands = ['a', 'b', 'c']
     d = mc._init_stat_dict(bands)
@@ -109,6 +117,7 @@ def test_init_stat_dict():
     assert set(d.keys()) == set(bands)
 
 def test_make_list():
+    """   """
 
     df = pd.DataFrame(np.array([[1, 2], [1, 2]]))
 
@@ -119,6 +128,7 @@ def test_make_list():
     assert np.array_equal(l[1], np.array([2, 2]))
 
 def test_pull_out_results():
+    """   """
 
     dat = [(1, 2), (1, 2)]
 
@@ -132,6 +142,7 @@ def test_pull_out_results():
 ##############################################################################
 
 def test_load_gene_maps():
+    """   """
 
     tdb = TDB()
 
@@ -148,6 +159,7 @@ def test_load_gene_maps():
     assert map_comp.genes_loaded
 
 def test_gene_bad_data():
+    """   """
 
     tdb = TDB()
 
@@ -157,6 +169,7 @@ def test_gene_bad_data():
         map_comp.load_gene_maps('bad_test', names_file='00-test_gene_names.csv')
 
 def test_load_term_maps():
+    """   """
 
     tdb = TDB()
 
@@ -169,6 +182,7 @@ def test_load_term_maps():
     assert map_comp.term_maps.shape == (5, 2)
 
 def test_term_bad_data():
+    """   """
 
     tdb = TDB()
 
@@ -178,6 +192,7 @@ def test_term_bad_data():
         map_comp.load_term_maps('bad_test_term_dat.csv', names_file='00-test_term_names.csv')
 
 def test_calc_corrs_errors():
+    """   """
 
     tdb = TDB()
 
@@ -206,6 +221,7 @@ def test_calc_corrs_errors():
         map_comp.calc_corrs('Genes', 'BAD')
 
 def test_calc_corrs_genes_meg_l():
+    """   """
 
     tdb = TDB()
 
@@ -222,6 +238,7 @@ def test_calc_corrs_genes_meg_l():
         assert np.all(map_comp.p_vals['Genes'][osc])
 
 def test_calc_corrs_genes_slope_l():
+    """   """
 
     tdb = TDB()
 
@@ -236,6 +253,7 @@ def test_calc_corrs_genes_slope_l():
     assert np.all(map_comp.p_vals['Genes']['Slopes'])
 
 def test_calc_corrs_terms_meg_l():
+    """   """
 
     tdb = TDB()
 
@@ -252,6 +270,7 @@ def test_calc_corrs_terms_meg_l():
         assert np.all(map_comp.p_vals['Terms'][osc])
 
 def test_calc_corrs_terms_slope_l():
+    """   """
 
     tdb = TDB()
 
@@ -266,6 +285,7 @@ def test_calc_corrs_terms_slope_l():
     assert np.all(map_comp.p_vals['Terms']['Slopes'])
 
 def test_calc_corrs_par():
+    """   """
 
     tdb = TDB()
 
@@ -288,6 +308,7 @@ def test_calc_corrs_par():
     assert np.all(map_comp.corrs['Genes']['Slopes'])
 
 def test_check_corrs():
+    """   """
 
     tdb = TDB()
 
@@ -310,6 +331,7 @@ def test_check_corrs():
     assert True
 
 def test_check_corrs_errors():
+    """   """
 
     tdb = TDB()
 
@@ -330,6 +352,7 @@ def test_check_corrs_errors():
         map_comp.check_corrs('Terms', 'b')
 
 def test_unload_data_genes():
+    """   """
 
     tdb = TDB()
 
@@ -341,6 +364,7 @@ def test_unload_data_genes():
     assert not map_comp.genes_loaded
 
 def test_unload_data_terms():
+    """   """
 
     tdb = TDB()
 
@@ -352,6 +376,7 @@ def test_unload_data_terms():
     assert not map_comp.terms_loaded
 
 def test_save_corrs():
+    """   """
 
     tdb = TDB()
 
