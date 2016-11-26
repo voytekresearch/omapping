@@ -50,23 +50,23 @@ class OMDB(object):
         # Set base paths for OMEGA internal and external data
         base_path = ("/Users/thomasdonoghue/Documents/Research/"
                      "1-Projects/OMEGA/2-Data/")
-        self.project_path = os.path.join(base_path, 'OMData')
-        self.external_dat_path = os.path.join(base_path, 'ExternalData')
+        self.external_path = os.path.join(base_path, 'ExternalData')
+        self.internal_path = os.path.join(base_path, 'OMData')
 
-        # Set paths for different data types
-        self.meg_path = os.path.join(self.external_dat_path, 'MEG')
-        self.maps_path = os.path.join(self.project_path, 'Maps')
-        self.corrs_path = os.path.join(self.project_path, 'Corrs')
+        # Set up internal data paths for Maps & Corrs
+        self.maps_path = os.path.join(self.internal_path, 'Maps')
+        self.corrs_path = os.path.join(self.internal_path, 'Corrs')
 
-        # Set paths for MEG data types
+        # Set up internal paths to save data out to
+        processed_path = os.path.join(self.internal_path, 'Processed')
+        self.md_save_path = os.path.join(processed_path, 'md_pickle')
+        self.mc_save_path = os.path.join(processed_path, 'mc_pickle')
+
+        # Set up external data paths
+        self.meg_path = os.path.join(self.external_path, 'MEG')
         self.psd_path = os.path.join(self.meg_path, 'PSDs')
         self.foof_path = os.path.join(self.meg_path, 'FOOF')
         self.viz_path = os.path.join(self.meg_path, 'Viz')
-
-        # Set paths to save data out to
-        processed_path = os.path.join(self.project_path, 'Processed')
-        self.md_save_path = os.path.join(processed_path, 'md_pickle')
-        self.mc_save_path = os.path.join(processed_path, 'mc_pickle')
 
 
     def check_dat_files(self, dat_type, dat_source='both', save_type='pickle', verbose=True):
@@ -209,7 +209,7 @@ class Par(object):
         """   """
 
         self.active = False
-        self.f_name = 'par.txt'
+        self.f_name = 'cluster.txt'
         self.verbose = True
 
         self.client = None
