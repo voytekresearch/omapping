@@ -12,7 +12,7 @@ from ipyparallel import Client
 from ipyparallel.util import interactive
 
 # Import custom om code
-from om.gen import OMDB, clean_file_list
+from om.gen import OMDB, Par, clean_file_list
 from om.gen import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
 from om.cl.mc_base import MapCompBase
 
@@ -62,6 +62,9 @@ class MapCompTG(MapCompBase):
 
         # Inherit from MapCompBase() class
         MapCompBase.__init__(self, db)
+
+        #
+        self.par = Par()
 
         # Import the vectors of gene & term names
         self.term_names = list()
@@ -256,27 +259,33 @@ class MapCompTG(MapCompBase):
         # Run in parallel
         elif method is 'parallel':
 
+            if not self.par.active:
+                self.par.launch()
+
             # Initialize client & gather workers
-            client = Client()
-            view = client[:]
+            #client = Client()
+            #print(len(client))
+            #view = client[:]
 
             # Import required libraries for each worker
-            with view.sync_imports():
+            with self.par.workers.sync_imports():
                 import numpy
                 from scipy.stats.stats import pearsonr
 
             # Send data to workers
-            view['meg_map'] = meg_map
+            self.par.workers['meg_map'] = meg_map
 
             # Turn data into a list
             dat_list = _make_list(dat_df)
 
             # Map and get results
-            corr_map = view.map(_run_corr, dat_list)
+            corr_map = self.par.workers.map(_run_corr, dat_list)
             results = corr_map.get()
 
             # Pull out results
             [corr_vals, p_vals] = _pull_out_results(results)
+
+            self.par.stop()
 
         # Save correlations results to MapComp object
         self.corrs[dat_type][meg_dat] = corr_vals
