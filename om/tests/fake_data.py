@@ -33,6 +33,7 @@ def _rm_test_files(path):
     if os.path.isdir(path):
 
         files = os.listdir(path)
+
         for f in files:
 
             # Skip hidden files
