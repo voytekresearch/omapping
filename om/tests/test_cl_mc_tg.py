@@ -177,6 +177,34 @@ def test_term_bad_data():
     with raises(mc.InconsistentDataError):
         map_comp.load_term_maps('bad_test_term_dat.csv', names_file='00-test_term_names.csv')
 
+def test_calc_corrs_errors():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    with raises(mc.DataNotComputedError):
+        map_comp.calc_corrs('Terms', 'a')
+
+    with raises(mc.DataNotComputedError):
+        map_comp.calc_corrs('Genes', 'a')
+
+    with raises(mc.UnknownDataTypeError):
+        map_comp.calc_corrs('BAD', 'a')
+
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+
+    with raises(mc.DataNotComputedError):
+        map_comp.calc_corrs('Genes', 'Slopes')
+
+    with raises(mc.DataNotComputedError):
+        map_comp.calc_corrs('Genes', 'a')
+
+    map_comp.load_meg_maps('test_meg')
+
+    with raises(mc.UnknownDataTypeError):
+        map_comp.calc_corrs('Genes', 'BAD')
+
 def test_calc_corrs_genes_meg_l():
 
     tdb = TDB()
@@ -237,6 +265,28 @@ def test_calc_corrs_terms_slope_l():
     assert np.all(map_comp.corrs['Terms']['Slopes'])
     assert np.all(map_comp.p_vals['Terms']['Slopes'])
 
+def test_calc_corrs_par():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    map_comp.load_meg_maps('test_meg')
+    map_comp.load_slope_map('test_slopes')
+
+    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+
+    for osc in map_comp.bands:
+        map_comp.calc_corrs('Genes', osc, method='parallel', stop_par=False)
+
+    map_comp.calc_corrs('Terms', 'Slopes', method='parallel', stop_par=True)
+
+    for osc in map_comp.bands:
+        assert np.all(map_comp.corrs['Terms'][osc])
+
+    assert np.all(map_comp.corrs['Genes']['Slopes'])
+
 def test_check_corrs():
 
     tdb = TDB()
@@ -258,6 +308,26 @@ def test_check_corrs():
         map_comp.check_corrs('Terms', osc, n_check=2, top=False)
 
     assert True
+
+def test_check_corrs_errors():
+
+    tdb = TDB()
+
+    map_comp = mc.MapCompTG(tdb)
+
+    with raises(mc.UnknownDataTypeError):
+        map_comp.check_corrs('BAD', 'a')
+
+    with raises(mc.DataNotComputedError):
+        map_comp.check_corrs('Genes', 'a')
+
+    map_comp.load_meg_maps('test_meg')
+    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+
+    map_comp.calc_corrs('Terms', 'a')
+
+    with raises(mc.DataNotComputedError):
+        map_comp.check_corrs('Terms', 'b')
 
 def test_unload_data_genes():
 
@@ -298,3 +368,6 @@ def test_save_corrs():
     for osc in map_comp.bands:
         map_comp.save_corrs('Genes', osc, 'test')
         map_comp.save_corrs('Terms', osc, 'test')
+
+    with raises(mc.UnknownDataTypeError):
+        map_comp.save_corrs('BAD', 'a', 'test')
