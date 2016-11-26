@@ -174,7 +174,7 @@ class MapCompTG(MapCompBase):
         self.terms_loaded = True
 
 
-    def calc_corrs(self, dat_type, meg_dat, method='linear'):
+    def calc_corrs(self, dat_type, meg_dat, method='linear', stop_par=True):
         """Calculate correlations between spatial maps.
 
         Parameters
@@ -185,6 +185,8 @@ class MapCompTG(MapCompBase):
             Specific type of meg data to correlate, osc_band of 'Slopes' only.
         method : {'linear', 'parallel'}, optional
             Run method (linear or parallel) to use.
+        stop_par : boolean, optional (default: True)
+            Whether the shut down cluster after parallel run.
 
         Raises
         ------
@@ -259,13 +261,9 @@ class MapCompTG(MapCompBase):
         # Run in parallel
         elif method is 'parallel':
 
+            # Check if cluster is running, launch if not
             if not self.par.active:
                 self.par.launch()
-
-            # Initialize client & gather workers
-            #client = Client()
-            #print(len(client))
-            #view = client[:]
 
             # Import required libraries for each worker
             with self.par.workers.sync_imports():
@@ -285,7 +283,9 @@ class MapCompTG(MapCompBase):
             # Pull out results
             [corr_vals, p_vals] = _pull_out_results(results)
 
-            self.par.stop()
+            # Shut down cluster, if requested
+            if stop_par:
+                self.par.stop()
 
         # Save correlations results to MapComp object
         self.corrs[dat_type][meg_dat] = corr_vals
