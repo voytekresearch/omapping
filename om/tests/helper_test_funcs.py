@@ -20,10 +20,7 @@ class TestDB(object):
     def __init__(self):
         """    """
 
-        #
-        self.dat_source = 'test'
-
-        #
+        # Set up base paths for TestDB internal and external data
         base_path = ("/Users/thomasdonoghue/Documents/GitCode/omegamappin/om/tests/data/")
         self.external_path = os.path.join(base_path, 'External')
         self.internal_path = os.path.join(base_path, 'Internal')
@@ -39,7 +36,12 @@ class TestDB(object):
         self.maps_path = os.path.join(self.internal_path, 'Maps')
         self.corrs_path = os.path.join(self.internal_path, 'Corrs')
 
-        # Set
+        # Set up internal paths to save data out to
+        processed_path = os.path.join(self.internal_path, 'Processed')
+        self.md_save_path = os.path.join(processed_path, 'md_pickle')
+        self.mc_save_path = os.path.join(processed_path, 'mc_pickle')
+
+        # Set up paths to other data
         self.csvs_path = os.path.join(self.other_path, 'csvs')
 
 #############################################################################################
