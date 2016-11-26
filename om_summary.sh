@@ -10,11 +10,15 @@ printf "\n\n\n CLOC OUTPUT (EXCLUDING TESTS): \n"
 cloc om --exclude-dir='tests'
 
 printf "\n\n\n CLOC OUTPUT - TEST FILES: \n"
-cloc om/tests --exclude-dir='test_files'
+cloc om/tests --exclude-dir='data'
+
+# Prepare test data
+printf "\n\n\n PREPARING TEST DATA: \n"
+python om/tests/fake_data.py
 
 # Run Tests & Check Coverage
 printf "\n\n\n RUN TESTS & CHECK COVERAGE: \n"
-coverage run --source om --omit="*/plts/*" -m py.test
+coverage run --source om --omit="*/plts/*","*/fake_data.py" -m py.test
 coverage report
 
 # Find a way to get summary from pylint?
