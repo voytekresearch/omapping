@@ -27,6 +27,7 @@ def clear_fake_dat():
         if '_path' in key and val:
             _rm_test_files(val)
 
+
 def _rm_test_files(path):
     """Recursive function to walk through folders, deleting files."""
 
@@ -44,6 +45,7 @@ def _rm_test_files(path):
     else:
 
         os.remove(path)
+
 
 def make_test_file_directory_internal(base_path):
     """Generates the database folder structure."""
@@ -65,6 +67,12 @@ def make_test_file_directory_internal(base_path):
     for maps_dat in maps_data:
         os.mkdir('Maps/' + maps_dat)
 
+    # Processed Data
+    os.mkdir('Processed')
+    proc_data = ['mc_pickle', 'md_pickle']
+    for proc_dat in proc_data:
+        os.mkdir('Processed/' + proc_dat)
+
 
 def make_test_file_directory_external(base_path):
     """   """
@@ -75,6 +83,7 @@ def make_test_file_directory_external(base_path):
     meg_data = ['FOOF', 'PSDs', 'Viz']
     for meg_dat in meg_data:
         os.mkdir('MEG/' + meg_dat)
+
 
 def make_test_file_directory_other(base_path):
     """   """
