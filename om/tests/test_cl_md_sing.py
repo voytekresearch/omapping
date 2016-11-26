@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 
+import os
 import numpy as np
 from py.test import raises
 
@@ -58,9 +59,11 @@ def test_save_md_pickle():
 
 def test_load_md_pickle():
 
-    pass
-    #dat = md.load_md_pickle('test.p')
-    #assert True
+    tdb = TDB()
+
+    f_name = os.path.join(tdb.md_save_path, 'test.p')
+
+    assert md.load_md_pickle(f_name)
 
 ##########################################################################################
 ################## TESTS - OMEGAMAPPIN - CL_MD_SING - PRIVATE FUNCTIONS ##################
@@ -146,17 +149,16 @@ def test_get_demo_csv_hcp():
 def test_osc_peak():
     """   """
 
-    # Initialize data
-    centers = np.array([1, 2, 3, 4])
-    osc_low = 1.5
-    osc_high = 3.5
+    centers = np.array([6, 9, 10, 12, 15])
+    osc_low = 8
+    osc_high = 13
 
-    # Run function
     test_ans = md._osc_peak(centers, osc_low, osc_high)
 
-    # Check the returned answer is close to the actual answer
-    actual_ans = (2 + 3) / 2
-    assert np.isclose(test_ans, actual_ans)
+    assert np.isclose(test_ans, 10.33, rtol=0.01)
+
+    test_ans = md._osc_peak(centers, osc_low, osc_high, 'median')
+    assert np.isclose(test_ans, 10.00, rtol=0.01)
 
 ##########################################################################################
 ################### TESTS - OMEGAMAPPIN - CL_MD_SING - CLASS FUNCTIONS ###################
@@ -220,6 +222,15 @@ def test_cl_osc_bands_vertex():
     # TODO: ADD MORE PROPER CHECKS HERE!!!
     assert meg_dat.bands_vertex
 
+def tests_cl_osc_bands_vertex_error():
+
+    tdb = TDB()
+
+    meg_dat = md.MegData(tdb, '')
+
+    with raises(md.DataNotComputedError):
+        meg_dat.osc_bands_vertex()
+
 def test_cl_all_oscs():
 
     meg_dat = load_test_meg_subj('test_v2')
@@ -275,6 +286,13 @@ def test_cl_calc_osc_param_corrs():
 
     # TODO: ADD MORE PROPER CHECKS HERE!!! CONSIDER HOW TO USE OSCS FOR PEAKS.
     assert a.any()
+
+def test_cl_calc_osc_param_corrs_error():
+
+    meg_dat = load_test_meg_subj('test_v2')
+
+    with raises(md.DataNotComputedError):
+        meg_dat.calc_osc_param_corrs()
 
 def test_cl_set_foof_viz():
 
