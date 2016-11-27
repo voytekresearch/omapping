@@ -6,9 +6,9 @@ import numpy as np
 
 from om.core.errors import InconsistentDataError
 
-##
-##
-##
+####################################################################################
+############################ OMEGAMAPPIN - CORE - UTILS ############################
+####################################################################################
 
 def clean_file_list(files_in, string):
     """"Takes a list of files and returns only a specified set of files.
@@ -30,9 +30,9 @@ def clean_file_list(files_in, string):
     files_out = []
 
     # Loop through given files, keeping those that contain string
-    for i in range(len(files_in)):
-        if string.lower() in files_in[i].lower():
-            files_out.append(files_in[i])
+    for cur_file in files_in:
+        if string.lower() in cur_file.lower():
+            files_out.append(cur_file)
 
     # Check if list is empty
     if not files_out:
@@ -94,9 +94,10 @@ def get_cur_subj(cur_subj, files):
     cur_subj_str = str(cur_subj)
 
     # Loop through files, looking for one which contains #
-    for i in range(0, len(files)):
-        if cur_subj_str in files[i]:
-            return files[i]
+    for cur_file in files:
+        if cur_subj_str in cur_file:
+            return cur_file
+
 
 def rm_files_ext(files_in):
     """Removes file extensions for list of files given.
@@ -130,14 +131,14 @@ def rm_files_ext(files_in):
     return files_out
 
 
-def get_section(section, n_ROIs, roi_lr):
+def get_section(section, n_rois, roi_lr):
     """Get indices for desired section of connectivity matrix.
 
     Parameters
     ----------
     section : {'all', 'left', 'right', 'lr', 'rl'}
         Which section to get indices for.
-    n_ROIs : int
+    n_rois : int
         The number of ROIs.
     roi_lr : list of str
         List of L/R for each ROI.
@@ -167,7 +168,7 @@ def get_section(section, n_ROIs, roi_lr):
     # Set section indices
     if section is 'all':
         ind_st_x = ind_st_y = 0
-        ind_en_x = ind_en_y = n_ROIs
+        ind_en_x = ind_en_y = n_rois
     elif section is 'left':
         ind_st_x = ind_st_y = roi_lr.index('L')
         ind_en_x = ind_en_y = _find_last(roi_lr, 'L')
@@ -224,6 +225,7 @@ def extract_psd(psd, freqs, f_low, f_high):
 
     return psd_ext, freqs_ext
 
+
 def extract_foof_pickle(results):
     """Pull out the foof data from list.
 
@@ -264,9 +266,9 @@ def extract_foof_pickle(results):
 
     return centers, powers, bws, slopes, n_psds
 
-##
-##
-##
+####################################################################################
+################## OMEGAMAPPIN - CORE - UTILS - PRIVATE FUNCTIONS ##################
+####################################################################################
 
 def _find_last(input_list, wanted):
     """Find the index of the last instance of a wanted element.
