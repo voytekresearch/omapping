@@ -104,12 +104,12 @@ def test_cl_osc_prob():
     assert meg_group.osc_probs
     assert meg_group.osc_prob_done
 
-#def test_osc_prob_error():
+def test_osc_prob_error():
 
-#    meg_group = load_test_meg_gr(bands_vertex=False)
+    meg_group = load_test_meg_gr(bands_vertex=False)
 
-#    with raises(md.DataNotComputedError):
-#        meg_group.osc_prob()
+    with raises(md.DataNotComputedError):
+        meg_group.osc_prob()
 
 def test_cl_osc_score():
 
