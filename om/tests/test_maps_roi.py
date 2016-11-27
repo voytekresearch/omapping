@@ -1,6 +1,7 @@
 """   """
 
 import numpy as np
+from py.test import raises
 
 from om.maps.roi import *
 
