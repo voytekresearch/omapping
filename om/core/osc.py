@@ -2,9 +2,9 @@
 
 from om.core.errors import InconsistentDataError
 
-##
-##
-##
+####################################################################################
+############################# OMEGAMAPPIN - CORE - OSC #############################
+####################################################################################
 
 class Osc(object):
     """Class to hold definition of oscillation bands.

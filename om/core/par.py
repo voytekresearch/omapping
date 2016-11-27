@@ -1,15 +1,35 @@
+"""   """
+
 from __future__ import print_function, division
 
 import os
 import time
 from ipyparallel import Client
 
-##
-##
-##
+import sys
+
+# TODO: Add check for 'cluster already started' in file, otherwise can hang there'
+
+####################################################################################
+############################# OMEGAMAPPIN - CORE - PAR #############################
+####################################################################################
 
 class Par(object):
-    """   """
+    """
+
+    Attributes
+    ----------
+    active : boolean
+        xx
+    f_name : str
+        xx
+    verbose : True
+        xx
+    client : xx
+        xx
+    workers : xx
+        xx
+    """
 
     def __init__(self):
         """   """
@@ -21,8 +41,15 @@ class Par(object):
         self.client = None
         self.workers = None
 
+
     def launch(self, n_core=4):
-        """   """
+        """
+
+        Parameters
+        ----------
+        n_core : int
+            Number of cores to run in parallel.
+        """
 
         command = "ipcluster start --n=" + str(n_core) + " &> " + self.f_name + " &"
 
@@ -56,12 +83,23 @@ class Par(object):
 
 
     def wait(self, n_lines, n_wait):
-        """   """
+        """
+
+        Parameters
+        ----------
+        n_lines : int
+            Number of lines to wait to be in the parallel log file.
+        n_wait : float
+            Number of seconds to wait each iteration if status is not ready yet.
+        """
 
         while True:
+
             with open(self.f_name) as f:
                 num_lines = sum(1 for line in f)
+
             if num_lines == n_lines:
                 break
+
             else:
                 time.sleep(n_wait)
