@@ -10,7 +10,8 @@ from om.core.db import OMDB
 #from helper_test_funcs import TestDB as TDB
 from om.tests.utils import TestDB as TDB
 
-import om.cl.mc_base as mc
+#import om.cl.mc_base as mc
+import om.maps.base as mc
 
 ########################################################################################
 ###################### TESTS - OMEGAMAPPIN - CL_MC_BASE - CLASSES ######################

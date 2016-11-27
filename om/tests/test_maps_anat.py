@@ -6,7 +6,8 @@ from py.test import raises
 #from om.gen import OMDB
 from om.core.db import OMDB
 
-import om.cl.mc_anat as mc
+#import om.cl.mc_anat as mc
+import om.maps.anat as mc
 
 #from helper_test_funcs import TestDB as TDB
 from om.tests.utils import TestDB as TDB

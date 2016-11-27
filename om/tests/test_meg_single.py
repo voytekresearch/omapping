@@ -9,7 +9,8 @@ from py.test import raises
 from om.tests.utils import TestDB as TDB
 from om.tests.utils import load_test_meg_subj
 
-import om.cl.md_sing as md
+#import om.cl.md_sing as md
+import om.meg.single as md
 
 #from om.gen import OMDB, Osc
 from om.core.db import OMDB
