@@ -1,12 +1,14 @@
-"""MODULE DOCSTING - TO FILL IN
-"""
+"""MODULE DOCSTING - TO FILL IN"""
 
 # Import required libraries/functions
 from __future__ import print_function
 
 import numpy as np
 import matplotlib.pyplot as plt
-from om.gen import FigInfo, UnknownDataTypeError
+
+#from om.gen import FigInfo, UnknownDataTypeError
+from om.plts.fig_info import FigInfo
+from om.core.errors import UnknownDataTypeError
 
 #######################################################################################
 ############################## OM - PLTS - MEGDATA PLOTS ##############################

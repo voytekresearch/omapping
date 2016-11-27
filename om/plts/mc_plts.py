@@ -1,11 +1,13 @@
-""" MODULE DOCSTRING - TO FILL IN
-"""
+""" MODULE DOCSTRING - TO FILL IN"""
 
 from __future__ import print_function, division
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-from om.gen import FigInfo, get_section
+#from om.gen import FigInfo, get_section
+from om.plots.fig_info import FigInfo
+from om.core.utils import get_section
 
 ##############################################################################################
 ############################## OM - PLTS - MAP COMPARISON PLOTS ##############################
