@@ -8,40 +8,32 @@ import os
 
 import om.cl.md_sing as md_sing
 import om.cl.md_gr as md_gr
-from om.gen import Osc
+from om.gen import OMDB, Osc
 
 #############################################################################################
 #############################################################################################
 #############################################################################################
 
-class TestDB(object):
+class TestDB(OMDB):
     """   """
 
     def __init__(self):
-        """    """
 
-        # Set up base paths for TestDB internal and external data
-        base_path = ("/Users/thomasdonoghue/Documents/GitCode/omegamappin/om/tests/data/")
-        self.external_path = os.path.join(base_path, 'External')
-        self.internal_path = os.path.join(base_path, 'Internal')
-        self.other_path = os.path.join(base_path, 'Other')
+        # Initialize from OMDB object
+        OMDB.__init__(self)
 
-        # Set up external test data links
-        self.meg_path = os.path.join(self.external_path, 'MEG')
-        self.foof_path = os.path.join(self.meg_path, 'FOOF')
-        self.psd_path = os.path.join(self.meg_path, 'PSDs')
-        self.viz_path = os.path.join(self.meg_path, 'Viz')
+        # Reset base paths
+        self.internal_path = ("/Users/thomasdonoghue/Documents/GitCode/"
+                              "omegamappin/om/tests/data/Internal/")
+        self.external_path = ("/Users/thomasdonoghue/Documents/GitCode/"
+                              "omegamappin/om/tests/data/External/")
 
-        # Set up internal test data links
-        self.maps_path = os.path.join(self.internal_path, 'Maps')
-        self.corrs_path = os.path.join(self.internal_path, 'Corrs')
+        # Generate test paths
+        self.gen_paths()
 
-        # Set up internal paths to save data out to
-        processed_path = os.path.join(self.internal_path, 'Processed')
-        self.md_save_path = os.path.join(processed_path, 'md_pickle')
-        self.mc_save_path = os.path.join(processed_path, 'mc_pickle')
-
-        # Set up paths to other data
+        # Add other paths specific to testing
+        self.other_path = ("/Users/thomasdonoghue/Documents/GitCode/"
+                           "omegamappin/om/tests/data/Other/")
         self.csvs_path = os.path.join(self.other_path, 'csvs')
 
 #############################################################################################
