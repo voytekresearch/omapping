@@ -1,12 +1,13 @@
-"""   """
+"""DOCSTRING"""
 
 import os
 import pickle
 import datetime
-import numpy as np
 import scipy.io as sio
 
-from om.core.utils import clean_file_list
+from om.core.db import OMDB
+from om.core.utils import clean_file_list, get_cur_subj
+from om.core.errors import UnknownDataSourceError
 
 #####################################################################################
 ############################## OMEGAMAPPIN - CORE - IO ##############################
