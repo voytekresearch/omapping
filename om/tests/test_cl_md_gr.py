@@ -91,6 +91,9 @@ def test_cl_group_slope():
     # TODO: ADD MORE TESTING OF THIS
     assert meg_group.slopes_gr_avg
 
+    meg_group.group_slope('median')
+    assert meg_group.slopes_gr_avg
+
 def test_cl_osc_prob():
 
     meg_group = load_test_meg_gr(bands_vertex=True)
@@ -100,6 +103,13 @@ def test_cl_osc_prob():
     # TODO: ADD MORE TESTING OF THIS
     assert meg_group.osc_probs
     assert meg_group.osc_prob_done
+
+#def test_osc_prob_error():
+
+#    meg_group = load_test_meg_gr(bands_vertex=False)
+
+#    with raises(md.DataNotComputedError):
+#        meg_group.osc_prob()
 
 def test_cl_osc_score():
 
@@ -168,9 +178,6 @@ def test_save_map():
     meg_group.save_map('prob', 'test_prob_save')
     meg_group.save_map('score', 'test_score_save')
 
-    with raises(md.UnknownDataTypeError):
-        meg_group.save_map('bad', 'bad_save')
-
 def test_set_slope_viz():
 
     meg_group = load_test_meg_gr()
@@ -187,6 +194,3 @@ def test_set_map_viz():
 
     meg_group.set_map_viz('prob', 'test_prob_viz_save')
     meg_group.set_map_viz('score', 'test_score_viz_save')
-
-    with raises(md.UnknownDataTypeError):
-        meg_group.save_map('bad', 'bad_save')
