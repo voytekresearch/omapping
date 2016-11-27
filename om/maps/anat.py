@@ -10,13 +10,10 @@ import scipy.io as sio
 import scipy.stats.stats as sps
 
 # Import custom om code
-#from om.gen import get_section, DataNotComputedError, InconsistentDataError
-from om.core.errors import DataNotComputedError, InconsistentDataError
-from om.core.utils import get_section
-
-#from om.cl.mc_base import MapCompBase, _init_meg_map_dict
 from om.maps.base import MapCompBase, _init_meg_map_dict
 from om.maps.roi import ROI
+from om.core.utils import get_section
+from om.core.errors import DataNotComputedError, InconsistentDataError
 
 ####################################################################################
 #################### OMEGAMAPPIN - MAP COMPARE - ANAT - CLASSES ####################

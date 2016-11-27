@@ -14,12 +14,8 @@ import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
 # Import custom om code
-#from om.gen import OMDB, clean_file_list, get_cur_subj, extract_foof_pickle
 from om.core.db import OMDB
 from om.core.utils import clean_file_list, get_cur_subj, extract_foof_pickle
-#from om.core.io import extract_foof_pickle
-
-#from om.gen import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
 ###########################################################################################

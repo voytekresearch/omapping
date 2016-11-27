@@ -12,16 +12,11 @@ from ipyparallel import Client
 from ipyparallel.util import interactive
 
 # Import custom om code
-#from om.gen import OMDB, Par, clean_file_list
+from om.maps.base import MapCompBase
 from om.core.db import OMDB
 from om.core.par import Par
 from om.core.utils import clean_file_list
-
-#from om.gen import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
 from om.core.errors import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
-
-#from om.cl.mc_base import MapCompBase
-from om.maps.base import MapCompBase
 
 ######################################################################################
 ########################## OMEGAMAPPIN - CL_MC_TG - CLASSES ##########################
