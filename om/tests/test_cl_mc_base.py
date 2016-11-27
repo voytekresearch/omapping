@@ -4,8 +4,12 @@
 
 from __future__ import print_function, division
 
-from om.gen import OMDB
-from helper_test_funcs import TestDB as TDB
+#from om.gen import OMDB
+from om.core.db import OMDB
+
+#from helper_test_funcs import TestDB as TDB
+from om.tests.utils import TestDB as TDB
+
 import om.cl.mc_base as mc
 
 ########################################################################################

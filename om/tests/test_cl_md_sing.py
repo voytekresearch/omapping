@@ -4,11 +4,17 @@ import os
 import numpy as np
 from py.test import raises
 
-from helper_test_funcs import load_test_meg_subj
-from helper_test_funcs import TestDB as TDB
+#from helper_test_funcs import load_test_meg_subj
+#from helper_test_funcs import TestDB as TDB
+from om.tests.utils import TestDB as TDB
+from om.tests.utils import load_test_meg_subj
 
 import om.cl.md_sing as md
-from om.gen import OMDB, Osc
+
+#from om.gen import OMDB, Osc
+from om.core.db import OMDB
+from om.core.osc import Osc
+
 
 ######################################################################################
 ##################### TESTS - OMEGAMAPPIN - CL_MD_SING - CLASSES #####################
@@ -46,24 +52,6 @@ def test_print_corrs_vec():
     md.print_corrs_vec(rs_dat, ps_dat, labels, desc)
 
     assert True
-
-def test_save_md_pickle():
-
-    tdb = TDB()
-
-    dat = md.MegData(tdb, '')
-
-    md.save_md_pickle(dat, 'test.p')
-
-    assert True
-
-def test_load_md_pickle():
-
-    tdb = TDB()
-
-    f_name = os.path.join(tdb.md_save_path, 'test.p')
-
-    assert md.load_md_pickle(f_name)
 
 ##########################################################################################
 ################## TESTS - OMEGAMAPPIN - CL_MD_SING - PRIVATE FUNCTIONS ##################

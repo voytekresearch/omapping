@@ -7,9 +7,13 @@ import pandas as pd
 from types import StringType, ListType
 from py.test import raises
 
-from om.gen import OMDB
+#from om.gen import OMDB
+from om.core.db import OMDB
+
 import om.cl.mc_tg as mc
-from helper_test_funcs import TestDB as TDB
+
+#from helper_test_funcs import TestDB as TDB
+from om.tests.utils import TestDB as TDB
 
 ####################################################################################
 ##################### TESTS - OMEGAMAPPIN - CL_MC_TG - CLASSES #####################
@@ -284,6 +288,7 @@ def test_calc_corrs_terms_slope_l():
     assert np.all(map_comp.corrs['Terms']['Slopes'])
     assert np.all(map_comp.p_vals['Terms']['Slopes'])
 
+"""
 def test_calc_corrs_par():
     """   """
 
@@ -306,6 +311,7 @@ def test_calc_corrs_par():
         assert np.all(map_comp.corrs['Terms'][osc])
 
     assert np.all(map_comp.corrs['Genes']['Slopes'])
+"""
 
 def test_check_corrs():
     """   """

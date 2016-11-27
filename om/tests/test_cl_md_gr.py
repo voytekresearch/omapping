@@ -3,11 +3,16 @@ from __future__ import print_function, division
 import numpy as np
 from py.test import raises
 
-from helper_test_funcs import TestDB as TDB
-from helper_test_funcs import load_test_meg_subj, load_test_meg_gr
+#from helper_test_funcs import TestDB as TDB
+#from helper_test_funcs import load_test_meg_subj, load_test_meg_gr
+from om.tests.utils import TestDB as TDB
+from om.tests.utils import load_test_meg_subj, load_test_meg_gr
 
 import om.cl.md_gr as md
-from om.gen import OMDB, Osc
+
+#from om.gen import OMDB, Osc
+from om.core.db import OMDB
+from om.core.osc import Osc
 
 #########################################################################################
 ###################### TESTS - OMEGAMAPPIN - CL_MD_GROUP - CLASSES ######################
