@@ -1,14 +1,13 @@
-"""MODULE DOC STRING
-
-"""
-
-from __future__ import print_function, division
+"""Utility and helper functions for the testing of OM."""
 
 import os
 
 import om.cl.md_sing as md_sing
 import om.cl.md_gr as md_gr
-from om.gen import OMDB, Osc
+
+#from om.gen import OMDB, Osc
+from om.core.db import OMDB
+from om.core.osc import Osc
 
 #############################################################################################
 #############################################################################################
