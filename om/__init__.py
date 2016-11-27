@@ -1,5 +1,6 @@
-__all__ = ["gen", "cl", "plts"]
+__all__ = ["gen", "core", "cl", "plts"]
 
 import gen
+import core
 import cl
 import plts
