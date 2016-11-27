@@ -5,7 +5,8 @@ from om.tests.utils import TestDB as TDB
 
 from om.core.io import *
 
-import om.cl.md_sing as md
+#import om.cl.md_sing as md
+from om.meg.single import MegData
 
 ##
 ##
@@ -48,7 +49,7 @@ def test_save_md_pickle():
 
     tdb = TDB()
 
-    dat = md.MegData(tdb, '')
+    dat = MegData(tdb, '')
 
     save_md_pickle(dat, 'test', db=tdb)
 
