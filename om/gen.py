@@ -24,34 +24,56 @@ class OMDB(object):
 
     Attributes
     ----------
-    project_path : str
-        Base path for OMDB project.
-    meg_path : str
-        Path to MEG data.
+    internal_path : str
+        xx
+    external_path : str
+        xx
     maps_path : str
         Path to Maps data.
     corrs_path : str
         Path to Corrs data.
+    md_save_path : str
+        Path to save md data.
+    mc_save_path : str
+        Path to save mc data.
+    meg_path : str
+        Path to MEG data.
     psd_path : str
         Path to PSD data.
     foof_path : str
         Path to FOOF data.
     viz_path : str
         Path to vizualization data.
-    md_save_path : str
-        Path to save md data.
-    mc_save_path : str
-        Path to save mc data.
     """
 
-    def __init__(self):
+    def __init__(self, auto_gen=True):
         """   """
 
-        # Set base paths for OMEGA internal and external data
-        base_path = ("/Users/thomasdonoghue/Documents/Research/"
-                     "1-Projects/OMEGA/2-Data/")
-        self.external_path = os.path.join(base_path, 'ExternalData')
-        self.internal_path = os.path.join(base_path, 'OMData')
+        # Initialize base paths
+        self.internal_path = ("/Users/thomasdonoghue/Documents/Research/"
+                              "1-Projects/OMEGA/2-Data/OMData/")
+        self.external_path = ("/Users/thomasdonoghue/Documents/Research/"
+                              "1-Projects/OMEGA/2-Data/ExternalData/")
+
+        # Initialize all internal paths
+        self.maps_path = str()
+        self.corrs_path = str()
+        self.md_save_path = str()
+        self.mc_save_path = str()
+
+        # Initialize all external paths
+        self.meg_path = str()
+        self.psd_path = str()
+        self.foof_path = str()
+        self.viz_path = str()
+
+        # Generate project paths
+        if auto_gen:
+            self.gen_paths()
+
+
+    def gen_paths(self):
+        """   """
 
         # Set up internal data paths for Maps & Corrs
         self.maps_path = os.path.join(self.internal_path, 'Maps')
