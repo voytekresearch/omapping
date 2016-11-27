@@ -13,7 +13,9 @@ import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
 # Import custom om code
-from om.gen import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
+#from om.gen import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
+from om.core.errors import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
+
 from om.cl.md_sing import MegData
 
 ##########################################################################################

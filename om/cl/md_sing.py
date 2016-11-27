@@ -14,8 +14,13 @@ import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
 # Import custom om code
-from om.gen import OMDB, clean_file_list, get_cur_subj, extract_foof_pickle
-from om.gen import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
+#from om.gen import OMDB, clean_file_list, get_cur_subj, extract_foof_pickle
+from om.core.db import OMDB
+from om.core.utils import clean_file_list, get_cur_subj, extract_foof_pickle
+#from om.core.io import extract_foof_pickle
+
+#from om.gen import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
+from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
 ###########################################################################################
 ###########################  OMEGAMAPPIN - MD_SINGLE - CLASSES  ###########################
@@ -438,56 +443,9 @@ def print_corrs_vec(rs_vec, ps_vec, labels, desc):
               '{:+1.4f}'.format(rs_vec[cur_label]), '    with p-val of ',
               '{:1.5f}'.format(ps_vec[cur_label]))
 
-
-def save_md_pickle(obj, save_name):
-    """Save current meg data object as a pickled object.
-
-    Parameters
-    ----------
-    obj : MegData() or GroupMegData()
-        Object to save to pickle
-    save_name : str
-        String to be included in the name of the file.
-    """
-
-    # Get database object
-    db = OMDB()
-
-    # Set save name and path
-    save_name = 'Res_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
-
-    # Save out data to pickle file
-    pickle.dump(obj, open(os.path.join(db.md_save_path, save_name), 'wb'))
-
-
-def load_md_pickle(file_name):
-    """Load a pickled file.
-
-    Parameters
-    ----------
-    file_name : str
-        File name of the pickle file to be loaded.
-
-    Returns
-    -------
-    results : ?
-        xx
-    """
-
-    # Get database object
-    db = OMDB()
-
-    # Set up path to load file
-    dat_path = os.path.join(db.md_save_path, file_name)
-
-    # Load file & return pickled object
-    return pickle.load(open(dat_path, 'rb'))
-
-
 #################################################################################################
 ############################ OMEGAMAPPIN - OM_MD - PRIVATE FUNCTIONS ############################
 #################################################################################################
-
 
 def _get_single_osc(centers, powers, bws, osc_low, osc_high):
     """ Searches for an oscillations of specified frequency band.
@@ -589,16 +547,19 @@ def _get_demo_csv(subnum, meg_path, dat_source):
 
     # Set up paths for demographic info csv file
     if dat_source is 'OMEGA':
-        csv_file_name = '00-OMEGA_Subjects.csv'
+        #csv_file_name = '00-OMEGA_Subjects.csv'
         num_ind = 1
         sex_ind = 4
         age_ind = 7
     elif dat_source is 'HCP':
-        csv_file_name = '00-HCP_Subjects.csv'
+        #csv_file_name = '00-HCP_Subjects.csv'
         num_ind = 0
         sex_ind = 3
         age_ind = 4
-    csv_file = os.path.join(meg_path, csv_file_name)
+    else:
+        raise UnknownDataSourceError('Unrecognized database source to load from.')
+    #csv_file = os.path.join(meg_path, csv_file_name)
+    csv_file = os.path.join(meg_path, '00-' + dat_source + '_Subjects.csv')
 
     # Open csv file, loop through looking for right row, grab age & sex information
     with open(csv_file, 'rb') as f_name:
