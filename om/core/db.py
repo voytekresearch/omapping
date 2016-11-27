@@ -1,4 +1,5 @@
 """DOCSTRING"""
+from __future__ import print_function, division
 
 import os
 
@@ -62,7 +63,7 @@ class OMDB(object):
 
 
     def gen_paths(self):
-        """   """
+        """Generate all the full paths for the OM project."""
 
         # Set up internal data paths for Maps & Corrs
         self.maps_path = os.path.join(self.internal_path, 'Maps')
@@ -85,9 +86,10 @@ class OMDB(object):
 
         Parameters
         ----------
-        dat_source : {'OMEGA', 'HCP', 'both'}
         dat_type : {'PSD', 'foof'}
             Which data type to check files for.
+        dat_source : {'OMEGA', 'HCP', 'both'}
+            Which database to check files for.
         save_type : {'pickle', 'csv'}, optional (default = 'pickle')
             Which file type to check files for. Only used for foof files.
         verbose : boolean, optional (default = True)
@@ -178,7 +180,7 @@ class OMDB(object):
 
         Parameters
         ----------
-        print_files : boolean, optional (default = True)
+        verbose : boolean, optional (default = True)
             Whether or not to print out available file names.
         return_files : boolean, optional (default = False)
             Whether or not to return lists of filenames.
@@ -212,52 +214,53 @@ class OMDB(object):
         if return_files:
             return osc_files, slope_files, term_files, gene_files
 
-#################################################################################
-###################### OMEGAMAPPIN - CORE - DB - FUNCTIONS ######################
-#################################################################################
+#################################################################################################
+############################## OMEGAMAPPIN - CORE - DB - FUNCTIONS ##############################
+#################################################################################################
 
 def make_file_directory_internal(base_path):
-    """Generates the database folder structure."""
+    """Generates the database folder structure for internal data."""
 
     # Corrs Data
-    os.mkdir('Corrs')
+    os.mkdir(os.path.join(base_path, 'Corrs'))
     cor_data = ['Genes', 'Terms']
     cor_data_type = ['csv', 'npz']
+
     for cor_dat in cor_data:
-        os.mkdir('Corrs/' + cor_dat)
+        os.mkdir(os.path.join(base_path, 'Corrs', cor_dat))
 
         for cor_dat_type in cor_data_type:
-            os.mkdir('Corrs' + cor_dat + cor_dat_type)
+            os.mkdir(os.path.join(base_path, 'Corrs', cor_dat, cor_dat_type))
 
     # Maps Data
-    os.mkdir('Maps')
-    maps_data = ['Genes', 'Oscs', 'Slopes', 'Terms']
+    os.mkdir(os.path.join(base_path, 'Maps'))
+    maps_data = ['Genes', 'Oscs', 'Slopes', 'Terms', 'Anat', 'Scouts']
     for maps_dat in maps_data:
-        os.mkdir('Maps/' + maps_dat)
+        os.mkdir(os.path.join(base_path, 'Maps', maps_dat))
 
     # Processed Data
-    os.mkdir('Processed')
+    os.mkdir(os.path.join(base_path, 'Processed'))
     proc_data = ['mc_pickle', 'md_pickle']
     for proc_dat in proc_data:
-        os.mkdir('Processed/' + proc_dat)
+        os.mkdir(os.path.join(base_path, 'Processed', proc_dat))
 
 
 def make_file_directory_external(base_path):
-    """   """
+    """Generates the database folder structure for external data."""
 
     # MEG Data
-    os.mkdir('MEG')
+    os.mkdir(os.path.join(base_path, 'MEG'))
 
     meg_data = ['FOOF', 'PSDs', 'Viz']
     for meg_dat in meg_data:
-        os.mkdir('MEG/' + meg_dat)
+        os.mkdir(os.path.join(base_path, 'MEG', meg_dat))
 
 
 def make_test_file_directory_other(base_path):
-    """   """
+    """Generates the other folder for a test directory."""
 
     # Other directory
-    os.mkdir('csvs')
+    os.mkdir(os.path.join(base_path, 'csvs'))
 
 #################################################################################
 ################## OMEGAMAPPIN - CORE - DB - PRIVATE FUNCTIONS ##################
