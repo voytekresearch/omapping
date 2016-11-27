@@ -14,7 +14,8 @@ import scipy.stats.stats as sps
 from om.core.errors import DataNotComputedError, InconsistentDataError
 from om.core.utils import get_section
 
-from om.cl.mc_base import MapCompBase, _init_meg_map_dict
+#from om.cl.mc_base import MapCompBase, _init_meg_map_dict
+from om.maps.base import MapCompBase, _init_meg_map_dict
 
 ####################################################################################
 #################### OMEGAMAPPIN - MAP COMPARE - ANAT - CLASSES ####################

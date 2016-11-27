@@ -20,7 +20,8 @@ from om.core.utils import clean_file_list
 #from om.gen import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
 from om.core.errors import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
 
-from om.cl.mc_base import MapCompBase
+#from om.cl.mc_base import MapCompBase
+from om.maps.base import MapCompBase
 
 ######################################################################################
 ########################## OMEGAMAPPIN - CL_MC_TG - CLASSES ##########################
