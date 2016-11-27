@@ -1,8 +1,7 @@
-"""DOCSTRING - TO FILL IN
-
-"""
+"""DOCSTRING - TO FILL IN"""
 
 from __future__ import print_function, division
+
 import os
 import sys
 import time
@@ -13,13 +12,10 @@ from ipyparallel import Client
 from ipyparallel.util import interactive
 
 # Import general code from custom module om
-sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
-from om.gen import OMDB
-from om.gen import clean_file_list, get_sub_nums, load_meg_psds, save_foof_pickle, extract_psd
-
-## TODO:
-# - Figure out ipyparallel to launch from within script
-# - Add a report to save out?
+from om.core.par import Par
+from om.core.db import OMDB
+from om.core.io import load_meg_psds, save_foof_pickle
+from om.core.utils import clean_file_list, get_sub_nums, extract_psd
 
 ############################################################################
 ################################# SETTINGS #################################
@@ -35,7 +31,7 @@ MEG_QUEUE = [358144, 433839, 512835, 555348, 559053, 568963, 581450, 599671]
 ################################ FUNCTIONS ################################
 ###########################################################################
 
-# Define function to run foof
+# Define function to run foof in parallel
 @interactive
 def run_foof(psd_in):
     """DOCSTRING
@@ -72,17 +68,12 @@ def main():
     time.sleep(2)
 
     ## Set up parallel workers
-    # Initialize client
-    c = Client()
-    # Gather
-    view = c[:]
-    print('Workers Connected... \n')
+    par = Par()
+    par.launch()
 
     # Import required libraries to each worker
     print('Doing engine imports...')
-    with view.sync_imports():
-        import sys
-        sys.path.append('/Users/thomasdonoghue/Documents/GitCode/')
+    with par.workers.sync_imports():
         from foof.fit import FOOF
 
     # Set up database object
@@ -126,7 +117,7 @@ def main():
         print('Starting at ', time.strftime('%H:%M:%S', time.localtime()))
 
         # Load MEG Data
-        psd, freqs = load_meg_psds(db.dat_source, db.psd_path, subj)
+        psd, freqs = load_meg_psds(DAT_SOURCE, db.psd_path, subj)
 
         # Check data - get number of PSDs and frequency resolution
         [n_psds, n_freqs] = np.shape(psd)
@@ -141,14 +132,14 @@ def main():
             psd_list[i] = np.reshape(psd_list[i], [len(freqs_ext), 1])
 
         # Send required vars to workers
-        view['min_p'] = 0.1
-        view['freq_res'] = freq_res
-        view['fmin'] = freqs_ext.min()
-        view['fmax'] = freqs_ext.max()
-        view['freqs_ext'] = freqs_ext
+        par.workers['min_p'] = 0.1
+        par.workers['freq_res'] = freq_res
+        par.workers['fmin'] = freqs_ext.min()
+        par.workers['fmax'] = freqs_ext.max()
+        par.workers['freqs_ext'] = freqs_ext
 
         # Set up and run foof parallel
-        foof_map = view.map(run_foof, psd_list)
+        foof_map = par.workers.map(run_foof, psd_list)
         foof_results = foof_map.get()
 
         # Save out results
@@ -162,6 +153,7 @@ def main():
         time.sleep(200)
 
     # Print out end status
+    par.stop()
     print('\nFINISHED FOOF ON MEG DATA\n\n')
 
 
