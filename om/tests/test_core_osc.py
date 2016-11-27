@@ -2,8 +2,7 @@
 
 from py.test import raises
 
-from om.core.osc import Osc
-from om.core.errors import InconsistentDataError
+from om.core.osc import *
 
 #########################################################################################
 ########################## TESTS - OMEGAMAPPIN - CLASSES - OSC ##########################
