@@ -1,12 +1,10 @@
-"""   """
+"""DOCSTRING"""
 
 from __future__ import print_function, division
 
 import os
 import time
 from ipyparallel import Client
-
-import sys
 
 # TODO: Add check for 'cluster already started' in file, otherwise can hang there'
 
@@ -15,24 +13,24 @@ import sys
 ####################################################################################
 
 class Par(object):
-    """
+    """Object to control and support parallel computations.
 
     Attributes
     ----------
     active : boolean
-        xx
+        Whether or not the parallel cluster is active.
     f_name : str
-        xx
+        Name of the log file.
     verbose : True
-        xx
-    client : xx
-        xx
+        Whether to print out status reports.
+    client : Client()
+        Parallel client.
     workers : xx
-        xx
+        Parallel worker engines.
     """
 
     def __init__(self):
-        """   """
+        """Intialize parallel object."""
 
         self.active = False
         self.f_name = 'cluster.txt'
@@ -43,7 +41,7 @@ class Par(object):
 
 
     def launch(self, n_core=4):
-        """
+        """Initiate parallel workers.
 
         Parameters
         ----------
@@ -51,39 +49,42 @@ class Par(object):
             Number of cores to run in parallel.
         """
 
+        # Send command to start cluster
         command = "ipcluster start --n=" + str(n_core) + " &> " + self.f_name + " &"
-
         os.system(command)
-
-        self.active = True
         time.sleep(0.25)
 
+        # Set as active, wait for it to finish
+        self.active = True
         self.wait(5, 0.25)
 
+        # Collect worker engines
         self.client = Client()
         self.workers = self.client[:]
 
+        # Print status
         if self.verbose:
             print('Cluster opened')
 
 
     def stop(self):
-        """   """
+        """Stop parallel workers."""
 
+        # Send command to stop cluster, wait for it to finish
         os.system("ipcluster stop")
-
         self.wait(8, 0.1)
 
+        # Remove the log file, and set status
+        os.remove(self.f_name)
         self.active = False
 
-        os.remove(self.f_name)
-
+        # Print status
         if self.verbose:
             print('Cluster shut down.')
 
 
     def wait(self, n_lines, n_wait):
-        """
+        """Wait for log file.
 
         Parameters
         ----------
@@ -95,11 +96,14 @@ class Par(object):
 
         while True:
 
-            with open(self.f_name) as f:
-                num_lines = sum(1 for line in f)
+            # Check status of log file
+            with open(self.f_name) as cur_file:
+                num_lines = sum(1 for line in cur_file)
 
+            # Check if log has required number of lines
             if num_lines == n_lines:
                 break
 
+            # Otherwise, wait and re-try
             else:
                 time.sleep(n_wait)
