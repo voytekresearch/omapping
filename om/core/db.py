@@ -4,9 +4,9 @@ import os
 
 from om.core.utils import clean_file_list, get_sub_nums
 
-####################################################################################
-################################ OMEGAMAPPIN - OMDB ################################
-####################################################################################
+#####################################################################################
+############################## OMEGAMAPPIN - CORE - DB ##############################
+#####################################################################################
 
 class OMDB(object):
     """Class to hold database information for MEG project.
@@ -212,9 +212,56 @@ class OMDB(object):
         if return_files:
             return osc_files, slope_files, term_files, gene_files
 
-##
-##
-##
+#################################################################################
+###################### OMEGAMAPPIN - CORE - DB - FUNCTIONS ######################
+#################################################################################
+
+def make_file_directory_internal(base_path):
+    """Generates the database folder structure."""
+
+    # Corrs Data
+    os.mkdir('Corrs')
+    cor_data = ['Genes', 'Terms']
+    cor_data_type = ['csv', 'npz']
+    for cor_dat in cor_data:
+        os.mkdir('Corrs/' + cor_dat)
+
+        for cor_dat_type in cor_data_type:
+            os.mkdir('Corrs' + cor_dat + cor_dat_type)
+
+    # Maps Data
+    os.mkdir('Maps')
+    maps_data = ['Genes', 'Oscs', 'Slopes', 'Terms']
+    for maps_dat in maps_data:
+        os.mkdir('Maps/' + maps_dat)
+
+    # Processed Data
+    os.mkdir('Processed')
+    proc_data = ['mc_pickle', 'md_pickle']
+    for proc_dat in proc_data:
+        os.mkdir('Processed/' + proc_dat)
+
+
+def make_file_directory_external(base_path):
+    """   """
+
+    # MEG Data
+    os.mkdir('MEG')
+
+    meg_data = ['FOOF', 'PSDs', 'Viz']
+    for meg_dat in meg_data:
+        os.mkdir('MEG/' + meg_dat)
+
+
+def make_test_file_directory_other(base_path):
+    """   """
+
+    # Other directory
+    os.mkdir('csvs')
+
+#################################################################################
+################## OMEGAMAPPIN - CORE - DB - PRIVATE FUNCTIONS ##################
+#################################################################################
 
 def _check_files(path, word, f_l):
     """Checks a directory, getting desired files and returning subject numbers.
