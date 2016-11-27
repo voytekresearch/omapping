@@ -246,8 +246,7 @@ class GroupMegData(MegData):
         """
 
         # Check if oscillation probability is calculated. Can't proceed if it isnt.
-        if not self.osc_prob_done:
-            raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
+        _ = self._get_map_type('prob')
 
         # Compute power ratio for each oscillation band - NEW
         for band in self.bands:
