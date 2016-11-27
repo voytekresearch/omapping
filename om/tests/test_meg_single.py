@@ -3,18 +3,11 @@
 import numpy as np
 from py.test import raises
 
-#from helper_test_funcs import load_test_meg_subj
-#from helper_test_funcs import TestDB as TDB
-from om.tests.utils import TestDB as TDB
-from om.tests.utils import load_test_meg_subj
-
-#import om.cl.md_sing as md
-#import om.meg.single as md
 from om.meg.single import *
-
-#from om.gen import OMDB, Osc
 from om.core.db import OMDB
 from om.core.osc import Osc
+from om.tests.utils import TestDB as TDB
+from om.tests.utils import load_test_meg_subj
 
 ########################################################################################
 #################### TESTS - OMEGAMAPPIN - MEG - SINGLE - FUNCTIONS ####################

@@ -1,11 +1,9 @@
+"""   """
 
 import numpy as np
 
-from om.tests.utils import TestDB as TDB
-
 from om.core.io import *
-
-#import om.cl.md_sing as md
+from om.tests.utils import TestDB as TDB
 from om.meg.single import MegData
 
 ##

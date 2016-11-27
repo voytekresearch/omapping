@@ -12,12 +12,9 @@ import scipy.io as sio
 # Import FOOF (use sys to add location to path, then import)
 sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
 
-#from om.gen import Osc, save_foof_pickle
+from om.tests.utils import TestDB
 from om.core.osc import Osc
 from om.core.io import save_foof_pickle
-
-#from om.tests.helper_test_funcs import TestDB
-from om.tests.utils import TestDB
 
 #####################################################################################
 #####################################################################################

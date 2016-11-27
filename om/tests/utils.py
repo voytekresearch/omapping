@@ -2,12 +2,8 @@
 
 import os
 
-#import om.cl.md_sing as md_sing
 from om.meg.single import MegData
-#import om.cl.md_gr as md_gr
 from om.meg.group import GroupMegData
-
-#from om.gen import OMDB, Osc
 from om.core.db import OMDB
 from om.core.osc import Osc
 

@@ -1,4 +1,4 @@
-from __future__ import print_function, division
+"""   """
 
 import os
 import csv
@@ -7,19 +7,13 @@ import pandas as pd
 from types import StringType, ListType
 from py.test import raises
 
-#from om.gen import OMDB
-from om.core.db import OMDB
-
-#import om.cl.mc_tg as mc
-#import om.maps.tg as mc
 from om.maps.tg import *
-
-#from helper_test_funcs import TestDB as TDB
+from om.core.db import OMDB
 from om.tests.utils import TestDB as TDB
 
-###################################################################################
-################ TESTS - OMEGAMAPPIN - CL_MC_TG - PUBLIC FUNCTIONS ################
-###################################################################################
+#####################################################################################
+#################### TESTS - OMEGAMAPPIN - MAPS - TG - FUNCTIONS ####################
+#####################################################################################
 
 def test_calc_avg_gene_map():
     """   """
@@ -31,9 +25,9 @@ def test_calc_avg_gene_map():
 
     #calc_avg_gene_map(subj_list, 'test_avg')
 
-####################################################################################
-##################### TESTS - OMEGAMAPPIN - MAPS - TG #####################
-####################################################################################
+###################################################################################
+######################### TESTS - OMEGAMAPPIN - MAPS - TG #########################
+###################################################################################
 
 def test_mc_tg():
     """   """

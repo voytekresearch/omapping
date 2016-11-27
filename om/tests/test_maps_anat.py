@@ -3,13 +3,8 @@
 import numpy as np
 from py.test import raises
 
-#from om.gen import OMDB
-from om.core.db import OMDB
-
-#import om.cl.mc_anat as mc
 from om.maps.anat import *
-
-#from helper_test_funcs import TestDB as TDB
+from om.core.db import OMDB
 from om.tests.utils import TestDB as TDB
 
 #####################################################################################

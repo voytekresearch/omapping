@@ -6,8 +6,6 @@ from types import ListType
 from py.test import raises
 
 import om.gen as gen
-
-#from helper_test_funcs import TestDB as TDB
 from om.tests.utils import TestDB as TDB
 
 ##########################################################################################

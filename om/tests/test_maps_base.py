@@ -1,29 +1,9 @@
-"""MODULE DOCSTRING - TO FILL IN
+"""MODULE DOCSTRING - TO FILL IN"""
 
-"""
-
-from __future__ import print_function, division
-
-#from om.gen import OMDB
-from om.core.db import OMDB
-
-#from helper_test_funcs import TestDB as TDB
-from om.tests.utils import TestDB as TDB
-
-#import om.cl.mc_base as mc
-#import om.maps.base as mc
 from om.maps.base import *
 from om.maps.base import _init_meg_map_dict
-
-########################################################################################
-###################### TESTS - OMEGAMAPPIN - CL_MC_BASE - CLASSES ######################
-########################################################################################
-
-def test_mc_base():
-    """   """
-
-    db = OMDB()
-    assert MapCompBase(db)
+from om.core.db import OMDB
+from om.tests.utils import TestDB as TDB
 
 ########################################################################################
 ################# TESTS - OMEGAMAPPIN - CL_MC_BASE - PRIVATE FUNCTIONS #################
@@ -37,9 +17,15 @@ def test_init_meg_map_dict():
     assert _init_meg_map_dict(bands)
     assert _init_meg_map_dict(bands, 100)
 
-########################################################################################
-################## TESTS - OMEGAMAPPIN - CL_MC_BASE - CLASS FUNCTIONS ##################
-########################################################################################
+#######################################################################################
+########################## TESTS - OMEGAMAPPIN - MAPS - BASE ##########################
+#######################################################################################
+
+def test_mc_base():
+    """   """
+
+    db = OMDB()
+    assert MapCompBase(db)
 
 def test_cl_load_meg_maps():
 
