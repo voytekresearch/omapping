@@ -16,7 +16,8 @@ from scipy.stats.stats import pearsonr
 #from om.gen import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
 from om.core.errors import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
 
-from om.cl.md_sing import MegData
+#from om.cl.md_sing import MegData
+from om.meg.single import MegData
 
 ##########################################################################################
 ############################  OMEGAMAPPIN - MD_GROUP CLASSES  ############################
