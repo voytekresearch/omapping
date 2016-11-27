@@ -279,10 +279,6 @@ class GroupMegData(MegData):
             Oscillation band labels, sorted into order.
         """
 
-        # Check if oscillation probabilities have been calculated.
-        if not self.osc_prob_done:
-            raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
-
         # Check how many oscillation bands are defined
         n_bands = len(self.bands)
 
@@ -294,12 +290,7 @@ class GroupMegData(MegData):
         sorted_bands, sort_inds = _band_sort(self.bands)
 
         # Set which map to run
-        if map_type is 'prob':
-            dat = self.osc_probs
-        elif map_type is 'score':
-            dat = self.osc_scores
-        else:
-            raise UnknownDataTypeError('Map type not understood.')
+        dat = self._get_map_type(map_type)
 
         # Loop through all bands, computing correlations between them
         for i in range(n_bands):
@@ -448,13 +439,8 @@ class GroupMegData(MegData):
             String to add to the file name.
         """
 
-        # Set data type
-        if map_type is 'prob':
-            dat = self.osc_probs
-        elif map_type is 'score':
-            dat = self.osc_scores
-        else:
-            raise UnknownDataTypeError('Map type not understood.')
+        # Set which map to run
+        dat = self._get_map_type(map_type)
 
         # Check current time for when file is saved
         cur_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -504,15 +490,11 @@ class GroupMegData(MegData):
             Label to attach to file name to be saved out.
         """
 
-        # Set data type
-        if map_type is 'prob':
-            save_name = file_name + '_Group_Osc_Prob_Viz'
-            dat = self.osc_probs
-        elif map_type is 'score':
-            dat = self.osc_scores
-            save_name = file_name + '_Group_Osc_Score_Viz'
-        else:
-            raise UnknownDataTypeError('Map type not understood.')
+        # Set which map to run
+        dat = self._get_map_type(map_type)
+
+        # Set up the save name
+        save_name = file_name + '_group_osc_' + map_type + '_viz'
 
         # Set up paths to save to
         save_file = os.path.join(self.db.viz_path, save_name)
@@ -531,6 +513,38 @@ class GroupMegData(MegData):
         # Save out the dictionary to a mat file
         sio.savemat(save_file, save_dict)
 
+    def _get_map_type(self, map_type):
+        """Pull out specific MEG map type.
+
+        Parameters
+        ----------
+        map_type : {'prob', 'score'}
+            Oscillation map type to pull out.
+        """
+
+        # Check if requested map is prob, and if it is calculated
+        if map_type is 'prob':
+
+            # Check if oscillation probabilities have been calculated.
+            if not self.osc_prob_done:
+                raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
+
+            dat = self.osc_probs
+
+        # Check if requested map is score, and if it is calculated
+        elif map_type is 'score':
+
+            # Check if oscillation score has been calculated.
+            if not self.osc_score_done:
+                raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
+
+            dat = self.osc_scores
+
+        # Raise an error if requested type doensn't match a known map type
+        else:
+            raise UnknownDataTypeError('Map type not understood.')
+
+        return dat
 
 #################################################################################################
 ############################ OMEGAMAPPIN - OM_MD - PRIVATE FUNCTIONS ############################
