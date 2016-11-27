@@ -2,8 +2,10 @@
 
 import os
 
-import om.cl.md_sing as md_sing
-import om.cl.md_gr as md_gr
+#import om.cl.md_sing as md_sing
+from om.meg.single import MegData
+#import om.cl.md_gr as md_gr
+from om.meg.group import GroupMegData
 
 #from om.gen import OMDB, Osc
 from om.core.db import OMDB
@@ -45,7 +47,7 @@ def load_test_meg_subj(sub):
     tdb = TestDB()
     osc = Osc(default=True)
 
-    dat = md_sing.MegData(tdb, '', osc)
+    dat = MegData(tdb, '', osc)
 
     dat.import_foof(sub, get_demo=False, load_type='pickle')
 
@@ -57,7 +59,7 @@ def load_test_meg_gr(bands_vertex=False, all_osc=False, peaks=False, calc_maps=F
     tdb = TestDB()
     osc = Osc(default=True)
 
-    meg_group = md_gr.GroupMegData(tdb, osc)
+    meg_group = GroupMegData(tdb, osc)
 
     subjs = ['test_v5', 'test_v5']
 
