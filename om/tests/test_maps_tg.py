@@ -29,7 +29,7 @@ def test_calc_avg_gene_map():
 
     #subj_list = []
 
-    #mc.calc_avg_gene_map(subj_list, 'test_avg')
+    #calc_avg_gene_map(subj_list, 'test_avg')
 
 ####################################################################################
 ##################### TESTS - OMEGAMAPPIN - MAPS - TG #####################
@@ -66,7 +66,7 @@ def test_gene_bad_data():
 
     map_comp = MapCompTG(tdb)
 
-    with raises(mc.InconsistentDataError):
+    with raises(InconsistentDataError):
         map_comp.load_gene_maps('bad_test', names_file='00-test_gene_names.csv')
 
 def test_load_term_maps():
@@ -89,7 +89,7 @@ def test_term_bad_data():
 
     map_comp = MapCompTG(tdb)
 
-    with raises(mc.InconsistentDataError):
+    with raises(InconsistentDataError):
         map_comp.load_term_maps('bad_test_term_dat.csv', names_file='00-test_term_names.csv')
 
 def test_calc_corrs_errors():
@@ -191,7 +191,7 @@ def test_calc_corrs_par():
 
     tdb = TDB()
 
-    map_comp = mc.MapCompTG(tdb)
+    map_comp = MapCompTG(tdb)
 
     map_comp.load_meg_maps('test_meg')
     map_comp.load_slope_map('test_slopes')
@@ -240,10 +240,10 @@ def test_check_corrs_errors():
 
     map_comp = MapCompTG(tdb)
 
-    with raises(mc.UnknownDataTypeError):
+    with raises(UnknownDataTypeError):
         map_comp.check_corrs('BAD', 'a')
 
-    with raises(mc.DataNotComputedError):
+    with raises(DataNotComputedError):
         map_comp.check_corrs('Genes', 'a')
 
     map_comp.load_meg_maps('test_meg')
@@ -251,7 +251,7 @@ def test_check_corrs_errors():
 
     map_comp.calc_corrs('Terms', 'a')
 
-    with raises(mc.DataNotComputedError):
+    with raises(DataNotComputedError):
         map_comp.check_corrs('Terms', 'b')
 
 def test_unload_data_genes():
