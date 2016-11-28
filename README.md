@@ -5,9 +5,11 @@ This project has two main objectives:
 - Compare the electrophysiology maps with other data types. 
 
 Code:
-- preprocessing: Scripts to process MEG data. Main Developer: Priya
-- om: Custom python code to run and analyze MEG-FOOF, and compare to other datasets. Main Developer: Tom
-- Torben: Some notebooks developed by Torben to look at MEG-FOOF data. Main Developer: Torben
+- om: Custom python code to run and analyze MEG-FOOF, and compare to other datasets.
+- scripts: Standalone scripts, for example to launch FOOF, or set visualizations.
+- preprocessing: Scripts to process MEG data.
+- notebooks: IPython notebooks demonstrating the code and results.
+- Torben: Some notebooks developed by Torben to look at MEG-FOOF data.
 
 Data:
 - Electrophysiology (MEG from OMEGA & HCP)
