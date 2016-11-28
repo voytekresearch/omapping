@@ -1,6 +1,7 @@
 """DOCSTRING"""
 
 import os
+import csv
 import pickle
 import datetime
 import scipy.io as sio
@@ -12,7 +13,6 @@ from om.core.errors import UnknownDataSourceError
 #####################################################################################
 ############################## OMEGAMAPPIN - CORE - IO ##############################
 #####################################################################################
-
 
 def load_meg_psds(dat_source, meg_path, subj_num):
     """Loads a requested subject's PSD-MEG data.
@@ -99,15 +99,18 @@ def save_foof_csv(results, save_path, sub_num):
     csv_sl_fname = save_path + '/csv/' + str(sub_num) + '_Slopes.csv'
     csv_osc_fname = save_path + '/csv/' + str(sub_num) + '_Oscs.csv'
 
-    # Open files to write to
-    sl_csv = open(csv_sl_fname, 'w')
-    osc_csv = open(csv_osc_fname, 'w')
+    # Open files to write to, and initialize csv writers
+    sl_file = open(csv_sl_fname, 'w')
+    sl_writer = csv.writer(sl_file)
+    osc_file = open(csv_osc_fname, 'w')
+    osc_writer = csv.writer(osc_file)
 
     # Loop through each vertex
     for vert in range(n_verts):
 
         # Save out slope value to csv file
-        sl_csv.write(str(results[vert][0]) + '\n')
+        #sl_file.write(str(results[vert][0]) + '\n')
+        sl_writer.writerow([results[vert][0]])
 
         # Check how oscillations at current vertex
         n_oscs = len(results[vert][1])
@@ -117,7 +120,12 @@ def save_foof_csv(results, save_path, sub_num):
 
             cur_osc_dat = list([vert + 1, results[vert][i_cen][osc],
                                 results[vert][i_amp][osc], results[vert][i_bw][osc]])
-            osc_csv.write((", ".join(repr(el) for el in cur_osc_dat)) + '\n')
+            osc_writer.writerow(cur_osc_dat)
+            #osc_file.write((", ".join(repr(el) for el in cur_osc_dat)) + '\n')
+
+    # Close the files
+    sl_file.close()
+    osc_file.close()
 
 
 def load_foof_pickle(dat_path, sub_num):
@@ -157,6 +165,7 @@ def load_foof_csv():
 
     pass
 
+
 def save_md_pickle(obj, save_name, db=None):
     """Save current meg data object as a pickled object.
 
@@ -177,6 +186,7 @@ def save_md_pickle(obj, save_name, db=None):
 
     # Save out data to pickle file
     pickle.dump(obj, open(os.path.join(db.md_save_path, save_name), 'wb'))
+
 
 def load_md_pickle(file_name, db=None):
     """Load a pickled file.
