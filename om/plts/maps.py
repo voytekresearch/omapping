@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #from om.gen import FigInfo, get_section
-from om.plots.fig_info import FigInfo
+from om.plts.fig_info import FigInfo
 from om.core.utils import get_section
 
 ##############################################################################################
