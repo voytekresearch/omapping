@@ -48,51 +48,6 @@ def _rm_test_files(path):
 
         os.remove(path)
 
-
-def make_test_file_directory_internal(base_path):
-    """Generates the database folder structure."""
-
-    # Corrs Data
-    os.mkdir('Corrs')
-    cor_data = ['Genes', 'Terms']
-    cor_data_type = ['csv', 'npz']
-
-    for cor_dat in cor_data:
-        os.mkdir('Corrs/' + cor_dat)
-
-        for cor_dat_type in cor_data_type:
-            os.mkdir('Corrs' + cor_dat + cor_dat_type)
-
-    # Maps Data
-    os.mkdir('Maps')
-    maps_data = ['Genes', 'Oscs', 'Slopes', 'Terms']
-    for maps_dat in maps_data:
-        os.mkdir('Maps/' + maps_dat)
-
-    # Processed Data
-    os.mkdir('Processed')
-    proc_data = ['mc_pickle', 'md_pickle']
-    for proc_dat in proc_data:
-        os.mkdir('Processed/' + proc_dat)
-
-
-def make_test_file_directory_external(base_path):
-    """   """
-
-    # MEG Data
-    os.mkdir('MEG')
-
-    meg_data = ['FOOF', 'PSDs', 'Viz']
-    for meg_dat in meg_data:
-        os.mkdir('MEG/' + meg_dat)
-
-
-def make_test_file_directory_other(base_path):
-    """   """
-
-    # Other directory
-    os.mkdir('csvs')
-
 ##################################################################################################
 ########################## OMEGAMAPPIN - GENERATE FAKE DATA FOR TESTING ##########################
 ##################################################################################################
