@@ -49,6 +49,9 @@ class Par(object):
             Number of cores to run in parallel.
         """
 
+        if self.verbose:
+            print('\n Starting Cluster...')
+
         # Send command to start cluster
         command = "ipcluster start --n=" + str(n_core) + " &> " + self.f_name + " &"
         os.system(command)
@@ -62,13 +65,15 @@ class Par(object):
         self.client = Client()
         self.workers = self.client[:]
 
-        # Print status
         if self.verbose:
-            print('Cluster opened')
+            print('Cluster Started. \n')
 
 
     def stop(self):
         """Stop parallel workers."""
+
+        if self.verbose:
+            print('\n Shutting down Cluster...')
 
         # Send command to stop cluster, wait for it to finish
         os.system("ipcluster stop")
@@ -78,9 +83,8 @@ class Par(object):
         os.remove(self.f_name)
         self.active = False
 
-        # Print status
         if self.verbose:
-            print('Cluster shut down.')
+            print('Cluster shut down. \n')
 
 
     def wait(self, n_lines, n_wait):
