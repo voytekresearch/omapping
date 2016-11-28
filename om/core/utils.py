@@ -1,7 +1,7 @@
 """DOCSTRING"""
 
 from __future__ import print_function, division
-
+import csv
 import numpy as np
 
 from om.core.errors import InconsistentDataError
@@ -265,6 +265,74 @@ def extract_foof_pickle(results):
         bws[i, 0:len(results[i][3])] = results[i][3]
 
     return centers, powers, bws, slopes, n_psds
+
+
+def avg_csv_files(f_in, f_out, avg='mean'):
+    """Take csv files, average their contents, and save out to a new file.
+
+    Note: This function assumes csv files with a constant number of rows
+        and columns, the same for all input files. Will fail, perhaps
+        silently if this is not the case.
+
+    Parameters
+    ----------
+    f_in : list of str
+        Inputs files to average over.
+    f_out : str
+        Name of the file to save out.
+    avg : {'mean', 'median'}, optional
+        Method to use to average across files.
+    """
+
+    # Open out file object
+    out_file = open(f_out, 'wb')
+    out_writer = csv.writer(out_file)
+
+    # Check how many input files there are
+    n_in = len(f_in)
+
+    # Create input file objects
+    in_files = []
+    in_readers = []
+    for i in range(n_in):
+        in_files.append(open(f_in[i]))
+        in_readers.append(csv.reader(in_files[i]))
+
+    # Initialize number of columns as false
+    n_col = False
+
+    # Loop through each line of
+    for row in in_readers[0]:
+
+        # If unknown, check the number of columns
+        if not n_col:
+            n_col = len(row)
+
+        # Initialize a temporary array to store
+        temp = np.zeros([n_in, n_col])
+
+        # Add first row to
+        temp[0, :] = np.array([float(i) for i in row])
+
+        #
+        for f_ind in range(1, n_in):
+
+            # Load row of data into the temporary array
+            temp[f_ind, :] = np.array([float(i) for i in in_readers[f_ind].next()])
+
+        # Take average
+        if avg is 'mean':
+            avg_dat = np.nanmean(temp, 0)
+        elif avg is 'median':
+            avg_dat = np.nanmedian(temp, 0)
+
+        # Write out line to average csv file
+        out_writer.writerow(avg_dat.tolist())
+
+    # Close out all files
+    for i in range(n_in):
+        in_files[i].close()
+    out_file.close()
 
 ####################################################################################
 ################## OMEGAMAPPIN - CORE - UTILS - PRIVATE FUNCTIONS ##################
