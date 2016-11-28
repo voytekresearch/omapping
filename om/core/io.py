@@ -109,7 +109,6 @@ def save_foof_csv(results, save_path, sub_num):
     for vert in range(n_verts):
 
         # Save out slope value to csv file
-        #sl_file.write(str(results[vert][0]) + '\n')
         sl_writer.writerow([results[vert][0]])
 
         # Check how oscillations at current vertex
@@ -121,7 +120,6 @@ def save_foof_csv(results, save_path, sub_num):
             cur_osc_dat = list([vert + 1, results[vert][i_cen][osc],
                                 results[vert][i_amp][osc], results[vert][i_bw][osc]])
             osc_writer.writerow(cur_osc_dat)
-            #osc_file.write((", ".join(repr(el) for el in cur_osc_dat)) + '\n')
 
     # Close the files
     sl_file.close()
