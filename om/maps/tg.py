@@ -1,6 +1,4 @@
-"""MODULE DOCSTRING - TO FILL IN
-
-"""
+"""MODULE DOCSTRING - TO FILL IN"""
 
 from __future__ import print_function, division
 import os
@@ -8,7 +6,6 @@ import csv
 import numpy as np
 import pandas as pd
 import scipy.stats.stats as sps
-from ipyparallel import Client
 from ipyparallel.util import interactive
 
 # Import custom om code
@@ -601,7 +598,8 @@ def _get_gene_files(subj, db):
     # Make a list of the full file names, including full path
     file_names_path = []
     for cur_file in range(n_files):
-        file_names_path.append(os.path.join(db.maps_path, 'Genes', subj_folder, file_names[cur_file]))
+        file_names_path.append(os.path.join(db.maps_path, 'Genes', subj_folder,
+                                            file_names[cur_file]))
 
     return file_names_path
 

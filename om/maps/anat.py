@@ -13,7 +13,7 @@ import scipy.stats.stats as sps
 from om.maps.base import MapCompBase, _init_meg_map_dict
 from om.maps.roi import ROI
 from om.core.utils import get_section
-from om.core.errors import DataNotComputedError, InconsistentDataError
+from om.core.errors import DataNotComputedError
 
 ####################################################################################
 #################### OMEGAMAPPIN - MAP COMPARE - ANAT - CLASSES ####################
@@ -142,15 +142,13 @@ class MapCompAnat(MapCompBase):
         sc_verts = list()
 
         # Loop through, pull out names and verts into lists
-        for i in range(len(scouts)):
+        for ind, scout in enumerate(scouts):
 
-            #
-            scout = scouts[i]
             sc_verts.append(scout[0])
             sc_names.append(str(scout[3]))
 
             # Drop brackets in scout name
-            sc_names[i] = sc_names[i][3:-2]
+            sc_names[ind] = sc_names[ind][3:-2]
 
         # Extract L/R data from names
         labels, lrs = _extract_lr(sc_names, 'elec')
