@@ -1,7 +1,6 @@
 """MEG-DATA (MD) Analysis Module - Single Subject
 
 This code...
-
 """
 
 from __future__ import print_function, division
@@ -14,7 +13,6 @@ import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
 # Import custom om code
-from om.core.db import OMDB
 from om.core.utils import clean_file_list, get_cur_subj, extract_foof_pickle
 from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
@@ -149,7 +147,7 @@ class MegData(object):
         """
 
         if self.bands and (self.bands_vertex or self.peaks):
-            raise InconsistentDataError('Can not change band definitions after they have been used.')
+            raise InconsistentDataError("Can't change band definitions after they have been used.")
         else:
             self.bands = osc.bands
 

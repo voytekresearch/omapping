@@ -1,7 +1,6 @@
 """MEG-DATA (MD) Analysis Module - Group
 
 This code...
-
 """
 
 from __future__ import print_function, division
@@ -526,7 +525,7 @@ class GroupMegData(MegData):
 
             # Check if oscillation probabilities have been calculated.
             if not self.osc_prob_done:
-                raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
+                raise DataNotComputedError("Oscillation probability not computed - can't proceed.")
 
             dat = self.osc_probs
 
@@ -535,7 +534,7 @@ class GroupMegData(MegData):
 
             # Check if oscillation score has been calculated.
             if not self.osc_score_done:
-                raise DataNotComputedError('Oscillation probability not computed - can not proceed.')
+                raise DataNotComputedError("Oscillation probability not computed - can't proceed.")
 
             dat = self.osc_scores
 
