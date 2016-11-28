@@ -5,6 +5,7 @@ from __future__ import print_function, division
 import os
 import time
 from ipyparallel import Client
+from ipyparallel.util import interactive
 
 # TODO: Add check for 'cluster already started' in file, otherwise can hang there'
 
@@ -111,3 +112,59 @@ class Par(object):
             # Otherwise, wait and re-try
             else:
                 time.sleep(n_wait)
+
+###################################################################################
+########################## OMEGAMAPPIN - PAR - FUNCTIONS ##########################
+###################################################################################
+
+@interactive
+def run_foof_par(psd_in):
+    """DOCSTRING
+
+    Parameters
+    ----------
+    psd_in : ?
+        xx
+
+    Notes
+    -----
+    - FOOF has to be imported on workers.
+    - min_p, freq_res, fmin, fmax have to be sent to workers.
+    """
+
+    # Initialize foof object
+    foof = FOOF(min_p=min_p, res=freq_res, fmin=fmin, fmax=fmax)
+
+    # Model foof
+    foof.model(freqs_ext, psd_in)
+
+    # Store vals in tuple and return
+    return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
+
+
+@interactive
+def run_corr_par(dat):
+    """Run correlation between maps. Used for parallel runs.
+
+    Parameters
+    ----------
+    dat : 1d array
+        An array of map data to be compared to projected meg map.
+
+    Returns
+    -------
+    out : tuple
+        Correlation results (corr_vals, p_vals).
+
+    Notes:
+    - meg_map has to be projected to workers.
+    - numpy and pearsonr have to be imported on workers.
+    """
+
+    # Get inds of data that contains numbers
+    inds_non_nan = [i for i in range(len(dat)) if not numpy.isnan(dat[i])]
+
+    # Calculate corr between data and MEG map
+    [corr_vals, p_vals] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
+
+    return (corr_vals, p_vals)

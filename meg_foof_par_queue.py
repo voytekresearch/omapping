@@ -12,7 +12,7 @@ from ipyparallel import Client
 from ipyparallel.util import interactive
 
 # Import general code from custom module om
-from om.core.par import Par
+from om.core.par import Par, run_foof_par
 from om.core.db import OMDB
 from om.core.io import load_meg_psds, save_foof_pickle
 from om.core.utils import clean_file_list, get_sub_nums, extract_psd
@@ -26,35 +26,6 @@ DAT_SOURCE = 'HCP'
 
 # Initiate queue of subjects to process
 MEG_QUEUE = [358144, 433839, 512835, 555348, 559053, 568963, 581450, 599671]
-
-###########################################################################
-################################ FUNCTIONS ################################
-###########################################################################
-
-# Define function to run foof in parallel
-@interactive
-def run_foof(psd_in):
-    """DOCSTRING
-
-    Parameters
-    ----------
-    psd_in : ?
-        xx
-
-    Notes
-    -----
-    - FOOF has to be imported on workers.
-    - min_p, freq_res, fmin, fmax have to be sent to workers.
-    """
-
-    # Initialize foof object
-    foof = FOOF(min_p=min_p, res=freq_res, fmin=fmin, fmax=fmax)
-
-    # Model foof
-    foof.model(freqs_ext, psd_in)
-
-    # Store vals in tuple and return
-    return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
 
 ############################################################################
 ################################# RUN CODE #################################
@@ -139,7 +110,7 @@ def main():
         par.workers['freqs_ext'] = freqs_ext
 
         # Set up and run foof parallel
-        foof_map = par.workers.map(run_foof, psd_list)
+        foof_map = par.workers.map(run_foof_par, psd_list)
         foof_results = foof_map.get()
 
         # Save out results

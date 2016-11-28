@@ -6,12 +6,11 @@ import csv
 import numpy as np
 import pandas as pd
 import scipy.stats.stats as sps
-from ipyparallel.util import interactive
 
 # Import custom om code
 from om.maps.base import MapCompBase
 from om.core.db import OMDB
-from om.core.par import Par
+from om.core.par import Par, run_corr_par
 from om.core.utils import clean_file_list
 from om.core.errors import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
 
@@ -281,7 +280,7 @@ class MapCompTG(MapCompBase):
             dat_list = _make_list(dat_df)
 
             # Map and get results
-            corr_map = self.par.workers.map(_run_corr, dat_list)
+            corr_map = self.par.workers.map(run_corr_par, dat_list)
             results = corr_map.get()
 
             # Pull out results
@@ -760,31 +759,3 @@ def _pull_out_results(dat_in):
         out_2[i] = dat_in[i][1]
 
     return out_1, out_2
-
-
-@interactive
-def _run_corr(dat):
-    """Run correlation between maps. Used for parallel runs.
-
-    Parameters
-    ----------
-    dat : 1d array
-        An array of map data to be compared to projected meg map.
-
-    Returns
-    -------
-    out : tuple
-        Correlation results (corr_vals, p_vals).
-
-    Notes:
-    - meg_map has to be projected to workers.
-    - numpy and pearsonr have to be imported on workers.
-    """
-
-    # Get inds of data that contains numbers
-    inds_non_nan = [i for i in range(len(dat)) if not numpy.isnan(dat[i])]
-
-    # Calculate corr between data and MEG map
-    [corr_vals, p_vals] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
-
-    return (corr_vals, p_vals)
