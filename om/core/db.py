@@ -71,8 +71,8 @@ class OMDB(object):
 
         # Set up internal paths to save data out to
         processed_path = os.path.join(self.internal_path, 'Processed')
-        self.md_save_path = os.path.join(processed_path, 'md_pickle')
-        self.mc_save_path = os.path.join(processed_path, 'mc_pickle')
+        self.md_save_path = os.path.join(processed_path, 'meg')
+        self.mc_save_path = os.path.join(processed_path, 'maps')
 
         # Set up external data paths
         self.meg_path = os.path.join(self.external_path, 'MEG')
@@ -240,7 +240,7 @@ def make_file_directory_internal(base_path):
 
     # Processed Data
     os.mkdir(os.path.join(base_path, 'Processed'))
-    proc_data = ['mc_pickle', 'md_pickle']
+    proc_data = ['meg', 'maps']
     for proc_dat in proc_data:
         os.mkdir(os.path.join(base_path, 'Processed', proc_dat))
 
