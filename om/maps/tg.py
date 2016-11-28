@@ -231,11 +231,12 @@ class MapCompTG(MapCompBase):
             self.corrs[dat_type] = _init_stat_dict(self.bands)
             self.p_vals[dat_type] = _init_stat_dict(self.bands)
 
-        # Print out status
-        print('Calculating corrs between', str(dat_type), 'and', str(meg_dat))
-
         # Run linearly
         if method is 'linear':
+
+            # Print out status
+            print('Running Linearly')
+            print('Calculating corrs between', str(dat_type), 'and', str(meg_dat))
 
             # Check how many comparisons there are to make
             [n_verts, n_comps] = dat_df.shape
@@ -260,14 +261,20 @@ class MapCompTG(MapCompBase):
         # Run in parallel
         elif method is 'parallel':
 
+            # Print out status
+            print('Running in Parallel')
+
             # Check if cluster is running, launch if not
             if not self.par.active:
                 self.par.launch()
 
             # Import required libraries for each worker
-            with self.par.workers.sync_imports():
+            with self.par.workers.sync_imports(quiet=True):
                 import numpy
                 from scipy.stats.stats import pearsonr
+
+            # Print out status
+            print('Calculating corrs between', str(dat_type), 'and', str(meg_dat))
 
             # Send data to workers
             self.par.workers['meg_map'] = meg_map
