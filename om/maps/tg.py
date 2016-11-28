@@ -261,9 +261,6 @@ class MapCompTG(MapCompBase):
         # Run in parallel
         elif method is 'parallel':
 
-            # Print out status
-            print('Running in Parallel')
-
             # Check if cluster is running, launch if not
             if not self.par.active:
                 self.par.launch()
@@ -274,6 +271,7 @@ class MapCompTG(MapCompBase):
                 from scipy.stats.stats import pearsonr
 
             # Print out status
+            print('Running in Parallel')
             print('Calculating corrs between', str(dat_type), 'and', str(meg_dat))
 
             # Send data to workers
