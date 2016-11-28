@@ -22,9 +22,9 @@ class OMDB(object):
         Path to Maps data.
     corrs_path : str
         Path to Corrs data.
-    md_save_path : str
+    meg_save_path : str
         Path to save md data.
-    mc_save_path : str
+    maps_save_path : str
         Path to save mc data.
     meg_path : str
         Path to MEG data.
@@ -48,8 +48,8 @@ class OMDB(object):
         # Initialize all internal paths
         self.maps_path = str()
         self.corrs_path = str()
-        self.md_save_path = str()
-        self.mc_save_path = str()
+        self.meg_save_path = str()
+        self.maps_save_path = str()
 
         # Initialize all external paths
         self.meg_path = str()
@@ -71,8 +71,8 @@ class OMDB(object):
 
         # Set up internal paths to save data out to
         processed_path = os.path.join(self.internal_path, 'Processed')
-        self.md_save_path = os.path.join(processed_path, 'meg')
-        self.mc_save_path = os.path.join(processed_path, 'maps')
+        self.meg_save_path = os.path.join(processed_path, 'meg')
+        self.maps_save_path = os.path.join(processed_path, 'maps')
 
         # Set up external data paths
         self.meg_path = os.path.join(self.external_path, 'MEG')
@@ -143,7 +143,7 @@ class OMDB(object):
 
         Parameters
         ----------
-        res_type : {'md', 'mc'}
+        res_type : {'meg', 'maps'}
             Which data type to check files for.
         verbose : boolean, optional (default = True)
             Whether to print out information during run.
@@ -158,10 +158,10 @@ class OMDB(object):
         word = 'Res'
 
         # Set up which files to look for
-        if res_type is 'md':
-            dat_path = self.md_save_path
-        elif res_type is 'mc':
-            dat_path = self.mc_save_path
+        if res_type is 'meg':
+            dat_path = self.meg_save_path
+        elif res_type is 'maps':
+            dat_path = self.maps_save_path
 
         # Get files
         files = os.listdir(dat_path)

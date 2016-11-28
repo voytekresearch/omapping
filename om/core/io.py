@@ -164,7 +164,7 @@ def load_foof_csv():
     pass
 
 
-def save_md_pickle(obj, save_name, db=None):
+def save_meg_pickle(obj, save_name, db=None):
     """Save current meg data object as a pickled object.
 
     Parameters
@@ -183,10 +183,10 @@ def save_md_pickle(obj, save_name, db=None):
     save_name = 'Res_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
 
     # Save out data to pickle file
-    pickle.dump(obj, open(os.path.join(db.md_save_path, save_name), 'wb'))
+    pickle.dump(obj, open(os.path.join(db.meg_save_path, save_name), 'wb'))
 
 
-def load_md_pickle(file_name, db=None):
+def load_meg_pickle(file_name, db=None):
     """Load a pickled file.
 
     Parameters
@@ -205,7 +205,7 @@ def load_md_pickle(file_name, db=None):
         db = OMDB()
 
     # Check what files are available
-    files = os.listdir(db.md_save_path)
+    files = os.listdir(db.meg_save_path)
     f_names = clean_file_list(files, file_name)
 
     # Check if there is a single file meeting description
@@ -215,4 +215,4 @@ def load_md_pickle(file_name, db=None):
         f_name = f_names[0]
 
     # Load file & return pickled object
-    return pickle.load(open(os.path.join(db.md_save_path, f_name), 'rb'))
+    return pickle.load(open(os.path.join(db.meg_save_path, f_name), 'rb'))

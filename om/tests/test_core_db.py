@@ -54,7 +54,7 @@ def test_check_res_files_md():
 
     db = OMDB()
 
-    files = db.check_res_files('md', verbose=True)
+    files = db.check_res_files('meg', verbose=True)
 
     assert type(files) == ListType
 
@@ -62,7 +62,7 @@ def test_check_res_files_mc():
 
     db = OMDB()
 
-    files = db.check_res_files('mc', verbose=True)
+    files = db.check_res_files('maps', verbose=True)
 
     assert type(files) == ListType
 

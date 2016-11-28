@@ -49,7 +49,7 @@ def test_save_md_pickle():
 
     dat = MegData(tdb, '')
 
-    save_md_pickle(dat, 'test', db=tdb)
+    save_meg_pickle(dat, 'test', db=tdb)
 
     assert True
 
@@ -57,4 +57,4 @@ def test_load_md_pickle():
 
     tdb = TDB()
 
-    assert load_md_pickle('test', db=tdb)
+    assert load_meg_pickle('test', db=tdb)
