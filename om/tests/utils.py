@@ -70,7 +70,7 @@ def load_test_meg_gr(bands_vertex=False, all_osc=False, peaks=False, calc_maps=F
             meg_subj.all_oscs()
 
         if peaks:
-            meg_subj.peak_freq()
+            meg_subj.peak_freq(dat='all')
 
         meg_group.add_subject(meg_subj, add_all_oscs=all_osc,
                               add_vertex_bands=bands_vertex,
