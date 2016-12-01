@@ -519,7 +519,7 @@ def _get_single_osc_power(osc_cens, osc_pows, osc_bws):
         return osc_cens[high_ind], osc_pows[high_ind], osc_bws[high_ind]
 
 
-def _get_demo_csv(subnum, meg_path, dat_source):
+def _get_demo_csv(subnum, meg_path, dat_source, use_restricted=True):
     """Get demographic information from csv file for specified subject.
 
     Parameters
@@ -541,31 +541,51 @@ def _get_demo_csv(subnum, meg_path, dat_source):
 
     # Set up paths for demographic info csv file
     if dat_source is 'OMEGA':
-        #csv_file_name = '00-OMEGA_Subjects.csv'
         num_ind = 1
         sex_ind = 4
         age_ind = 7
+        res = ''
     elif dat_source is 'HCP':
-        #csv_file_name = '00-HCP_Subjects.csv'
-        num_ind = 0
-        sex_ind = 3
-        age_ind = 4
+        if use_restricted:
+            num_ind = 0
+            sex_ind = None
+            age_ind = 1
+            res = '_RESTRICTED'
+        else:
+            res = ''
+            num_ind = 0
+            sex_ind = 3
+            age_ind = 4
+
     else:
         raise UnknownDataSourceError('Unrecognized database source to load from.')
-    #csv_file = os.path.join(meg_path, csv_file_name)
-    csv_file = os.path.join(meg_path, '00-' + dat_source + '_Subjects.csv')
+
+    # Set up name of CSV file to use
+    csv_file = os.path.join(meg_path, '00-' + dat_source + '_Subjects' + res + '.csv')
 
     # Open csv file, loop through looking for right row, grab age & sex information
-    with open(csv_file, 'rb') as f_name:
+    with open(csv_file, 'r') as f_name:
         reader = csv.reader(f_name, delimiter=',')
+
         for row in reader:
+
+            # Find subject line in file
             if row[num_ind] == str(subnum):
-                sex = row[sex_ind]
+
+                #
                 if dat_source is 'OMEGA':
+                    sex = row[sex_ind]
                     age = int(row[age_ind])
-                else:
+
+                elif dat_source is 'HCP' and not use_restricted:
+                    sex = row[sex_ind]
                     age_temp = (row[age_ind]).split('-')
                     age = (int(age_temp[0]) + int(age_temp[1]))/2
+
+                else:
+                    sex = None
+                    age = int(row[age_ind])
+
                 break
 
     return sex, age
