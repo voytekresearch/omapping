@@ -289,27 +289,45 @@ class MegData(object):
         self.all_osc = True
 
 
-    def peak_freq(self, avg='mean'):
+    def peak_freq(self, dat, avg='mean'):
         """Calculates the peak frequency for each oscillatory band.
 
         Parameters
         ----------
+        dat : {'all', 'band'}
+            xx
         avg : {'mean', 'median'}, optional
             Which type of averaging to do.
         """
-
-        # Check all osc data has been computed
-        if not self.all_osc:
-            raise DataNotComputedError('All Osc data has not been computed. Can not continue.')
 
         # Check that oscillation bands are defined
         if not self.bands:
             raise DataNotComputedError('Oscillation bands not specified, can not proceed.')
 
-        # Loop through each band, calculating peak frequency
-        for band in self.bands:
-            self.peaks[band] = _osc_peak(
-                self.centers_all, self.bands[band][0], self.bands[band][1], avg)
+        if dat is 'all':
+
+            # Check all osc data has been computed
+            if not self.all_osc:
+                raise DataNotComputedError('All Osc data has not been computed. Can not continue.')
+
+            # Loop through each band, calculating peak frequency
+            for band in self.bands:
+                self.peaks[band] = _osc_peak_all(
+                    self.centers_all, self.bands[band][0], self.bands[band][1], avg)
+
+        elif dat is 'band':
+
+            if not self.bands_vertex:
+                raise DataNotComputedError('Bands not computed per vertex, can not continue.')
+
+            for band in self.bands:
+
+                non_zero_inds = np.nonzero(self.oscs[band][:, 0])
+
+                if avg is 'mean':
+                    self.peaks[band] = np.mean(self.oscs[band][non_zero_inds, 0])
+                elif avg is 'median':
+                    self.peaks[band] = np.median(self.oscs[band][non_zero_inds, 0])
 
 
     def calc_osc_param_corrs(self):
@@ -591,7 +609,7 @@ def _get_demo_csv(subnum, meg_path, dat_source, use_restricted=True):
     return sex, age
 
 
-def _osc_peak(centers, osc_low, osc_high, avg='mean'):
+def _osc_peak_all(centers, osc_low, osc_high, avg='mean'):
     """Find the peak-frequency of a vector of center frequencies.
 
     Parameters
