@@ -73,7 +73,7 @@ def test_get_demo_csv_omega():
     assert sex == 'M'
     assert age == 30
 
-def test_get_demo_csv_hcp():
+def test_get_demo_csv_hcp_unres():
     """   """
 
     db = OMDB()
@@ -81,21 +81,21 @@ def test_get_demo_csv_hcp():
     subnum = 146129
     dat_source = 'HCP'
 
-    sex, age = single._get_demo_csv(subnum, db.meg_path, dat_source)
+    sex, age = single._get_demo_csv(subnum, db.meg_path, dat_source, use_restricted=False)
 
     assert sex == 'M'
     assert age == 23.5
 
-def test_osc_peak():
+def test_osc_peak_all():
     """   """
 
     centers = np.array([6, 9, 10, 12, 15])
     osc_low = 8
     osc_high = 13
 
-    test_ans = single._osc_peak(centers, osc_low, osc_high)
+    test_ans = single._osc_peak_all(centers, osc_low, osc_high)
 
     assert np.isclose(test_ans, 10.33, rtol=0.01)
 
-    test_ans = single._osc_peak(centers, osc_low, osc_high, 'median')
+    test_ans = single._osc_peak_all(centers, osc_low, osc_high, 'median')
     assert np.isclose(test_ans, 10.00, rtol=0.01)

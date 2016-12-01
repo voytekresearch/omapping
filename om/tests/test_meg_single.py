@@ -133,16 +133,19 @@ def test_cl_all_oscs_nan():
     # TODO: ADD MORE PROPER CHECKS HERE!!!
     assert meg_dat.all_osc
 
-def test_cl_peak_freq():
+def test_cl_peak_freq_all():
 
     meg_dat = load_test_meg_subj('test_v2')
 
     meg_dat.all_oscs()
 
-    meg_dat.peak_freq()
+    meg_dat.peak_freq(dat='all')
 
     # TODO: ADD MORE PROPER CHECKS HERE!!! CONSIDER HOW TO USE OSCS FOR PEAKS.
     assert meg_dat.peaks
+
+def test_cl_peak_freq_band():
+    pass
 
 def test_cl_peak_freq_errors():
 
@@ -151,12 +154,12 @@ def test_cl_peak_freq_errors():
     meg_dat = MegData(tdb, '')
 
     with raises(DataNotComputedError):
-        meg_dat.peak_freq()
+        meg_dat.peak_freq(dat='all')
 
     meg_dat.all_osc = True
 
     with raises(DataNotComputedError):
-        meg_dat.peak_freq()
+        meg_dat.peak_freq(dat='all')
 
 def test_cl_calc_osc_param_corrs():
 
