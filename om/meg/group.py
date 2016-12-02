@@ -294,8 +294,8 @@ class GroupMegData(MegData):
         for i in range(n_bands):
             for j in range(n_bands):
                 corrs_mat[i, j], ps_mat[i, j] = pearsonr(
-                    dat[sorted_bands[sort_inds[i]]],
-                    dat[sorted_bands[sort_inds[j]]])
+                    dat[sorted_bands[i]],
+                    dat[sorted_bands[j]])
 
         # Set diagonals to zero - where band is correlated with itself
         np.fill_diagonal(corrs_mat, 0)
