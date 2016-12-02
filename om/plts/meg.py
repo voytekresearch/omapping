@@ -536,21 +536,25 @@ def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, peak_lowgamma, save_ou
     # Theta
     ax[0, 0].plot(age, peak_theta, '.')
     ax[0, 0].set_title('Theta', {'fontsize': sp_fs, 'fontweight': 'bold'})
+    ax[0, 0].tick_params(axis='both', which='major', labelsize=ti_fs)
 
     # Alpha
     ax[0, 1].plot(age, peak_alpha, '.')
     ax[0, 1].set_title('Alpha', {'fontsize': sp_fs, 'fontweight': 'bold'})
+    ax[0, 1].tick_params(axis='both', which='major', labelsize=ti_fs)
 
     # Beta
     ax[1, 0].plot(age, peak_beta, '.')
     ax[1, 0].set_title('Beta', {'fontsize': sp_fs, 'fontweight': 'bold'})
+    ax[1, 0].tick_params(axis='both', which='major', labelsize=ti_fs)
 
     # Gamma
     ax[1, 1].plot(age, peak_lowgamma, '.')
     ax[1, 1].set_title('Low Gamma', {'fontsize': sp_fs, 'fontweight': 'bold'})
+    ax[1, 1].tick_params(axis='both', which='major', labelsize=ti_fs)
 
     # Set ticks font size
-    plt.tick_params(axis='both', which='major', labelsize=ti_fs)
+    #plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
     # Save out (if requested)
     if save_out:
@@ -579,6 +583,7 @@ def plot_age_n_oscs(ages, n_oscs, save_out=False):
     # Plot settings
     t_fs = f_info.t_fs
     ti_fs = f_info.ti_fs         # Axis ticks font size
+    ax_fs = f_info.ax_fs
 
     # Make the plot
     plt.plot(ages, n_oscs, '.')
@@ -586,6 +591,10 @@ def plot_age_n_oscs(ages, n_oscs, save_out=False):
     # Add title
     if f_info.add_title:
         plt.title('# Oscillations / Age', fontsize=t_fs, fontweight='bold')
+
+    # Add axis labels
+    plt.xlabel('Age', {'fontsize': ax_fs, 'fontweight': 'bold'})
+    plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
 
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
