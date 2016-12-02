@@ -1,6 +1,7 @@
 """Utility and helper functions for the testing of OM."""
 
 import os
+import pkg_resources as pkg
 
 from om.meg.single import MegData
 from om.meg.group import GroupMegData
@@ -19,18 +20,20 @@ class TestDB(OMDB):
         # Initialize from OMDB object
         OMDB.__init__(self)
 
-        # Reset base paths
-        self.internal_path = ("/Users/thomasdonoghue/Documents/GitCode/"
-                              "omegamappin/om/tests/data/Internal/")
-        self.external_path = ("/Users/thomasdonoghue/Documents/GitCode/"
-                              "omegamappin/om/tests/data/External/")
+        # Set up the base path to tests data
+        test_dat_path = pkg.resource_filename(__name__, 'data')
+        # Note: the following also works:
+        #   test_dat_path = pkg.resource_filename('om', 'tests/data')
+
+        # Set base paths, and add 'Other' path, for test specific files
+        self.internal_path = os.path.join(test_dat_path, 'Internal')
+        self.external_path = os.path.join(test_dat_path, 'External')
+        self.other_path = os.path.join(test_dat_path, 'Other')
 
         # Generate test paths
         self.gen_paths()
 
-        # Add other paths specific to testing
-        self.other_path = ("/Users/thomasdonoghue/Documents/GitCode/"
-                           "omegamappin/om/tests/data/Other/")
+        # Add relevant paths to 'Other'
         self.csvs_path = os.path.join(self.other_path, 'csvs')
 
 #############################################################################################
