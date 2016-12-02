@@ -1,8 +1,8 @@
+"""Fig info defines a class to store figure settings for plots created in omegamappin."""
 
-
-##
-##
-##
+###############################################################################
+######################## OMEGAMAPPIN - PLTS - FIG INFO ########################
+###############################################################################
 
 class FigInfo(object):
     """Object to hold settings to save figures.
@@ -12,25 +12,25 @@ class FigInfo(object):
     t_fs : int
         Font size for figure title.
     sp_fs : int
-        xx
+        Font size for figure sub-plots.
     ax_fs : int
-        xx
+        Font size for axis labels.
     ti_fs : int
-        xx
+        Font size for ticks.
     ax_lw : float
         Line width.
     add_title : boolean
-        Whether to add titles
+        Whether to add titles.
     title : str
-        xx
+        Title to add to plots.
     vis_opac : float
-        xx
+        Opacity to use for figures.
     save_path : str
-        xx
-    format : {'.svg', '.pdf'}
+        Path to save out figures to.
+    format : {'svg', 'pdf'}
         Format to save out figure as.
     bbox : {'tight'}
-        Setting for ...
+        Setting for boundary box.
     dpi : int
         DPI to save out the figure with.
     """
@@ -41,13 +41,13 @@ class FigInfo(object):
         self.t_fs = 22         # Title font size
         self.sp_fs = 20        # Subplot title font size
         self.ax_fs = 20        # Axis font size
-        self.ti_fs = 14        # Ticks font size
+        self.ti_fs = 12        # Ticks font size
 
         # Default Settings - other settings
         self.ax_lw = 2.5
 
         # Default Settings - what to add to plot
-        self.add_title = False
+        self.add_title = True
 
         # Plot Information
         self.title = 'Group'
