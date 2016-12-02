@@ -1,4 +1,4 @@
-"""Create fake data for testing OM"""
+"""Create fake data for testing OM."""
 
 from __future__ import print_function, division
 
@@ -267,6 +267,7 @@ def create_other():
 #######################################################################################
 
 def _mc_dat(data, dat_f_name, names=None, name_f_name=None):
+    """???"""
 
     if names:
         names_file = open(name_f_name, 'wb')
@@ -298,4 +299,3 @@ if __name__ == "__main__":
     create_other()
 
     print("\tTesting data created.\n")
-
