@@ -163,6 +163,7 @@ def load_foof_csv():
 
     pass
 
+
 def save_obj_pickle(obj, dat_type, save_name, db=None):
     """
 
@@ -192,39 +193,6 @@ def save_obj_pickle(obj, dat_type, save_name, db=None):
     # Save out data to pickle file
     pickle.dump(obj, open(os.path.join(db.save_path, dat_type, save_name), 'wb'))
 
-def save_maps_pickle(obj, save_name, db=None):
-    """   """
-
-    # Get database object, unless one was provided
-    if not db:
-        db = OMDB()
-
-    # Set save name and path
-    save_name = 'Maps_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
-
-    # Save out data to pickle file
-    pickle.dump(obj, open(os.path.join(db.maps_save_path, save_name), 'wb'))
-
-def save_meg_pickle(obj, save_name, db=None):
-    """Save current meg data object as a pickled object.
-
-    Parameters
-    ----------
-    obj : MegData() or GroupMegData()
-        Object to save to pickle
-    save_name : str
-        String to be included in the name of the file.
-    """
-
-    # Get database object, unless one was provided
-    if not db:
-        db = OMDB()
-
-    # Set save name and path
-    save_name = 'Res_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
-
-    # Save out data to pickle file
-    pickle.dump(obj, open(os.path.join(db.meg_save_path, save_name), 'wb'))
 
 def load_obj_pickle(dat_type, file_name, db=None):
     """
@@ -265,55 +233,3 @@ def load_obj_pickle(dat_type, file_name, db=None):
         f_name = f_names[0]
 
     return pickle.load(open(os.path.join(db.save_path, dat_type, f_name), 'rb'))
-
-def load_maps_pickle(file_name, db=None):
-    """   """
-
-    # Get database object, unless one was provided
-    if not db:
-        db = OMDB()
-
-    # Check what files are available
-    files = os.listdir(db.maps_save_path)
-    f_names = clean_file_list(files, file_name)
-
-    # Check if there is a single file meeting description
-    if len(f_names) > 1:
-        raise UnknownDataSourceError('Unclear which file to load - be more specific.')
-    else:
-        f_name = f_names[0]
-
-    # Load file & return pickled object
-    return pickle.load(open(os.path.join(db.maps_save_path, f_name), 'rb'))
-
-
-def load_meg_pickle(file_name, db=None):
-    """Load a pickled file.
-
-    Parameters
-    ----------
-    file_name : str
-        File name of the pickle file to be loaded.
-
-    Returns
-    -------
-    results : ?
-        xx
-    """
-
-    # Get database object, unless one was provided
-    if not db:
-        db = OMDB()
-
-    # Check what files are available
-    files = os.listdir(db.meg_save_path)
-    f_names = clean_file_list(files, file_name)
-
-    # Check if there is a single file meeting description
-    if len(f_names) > 1:
-        raise UnknownDataSourceError('Unclear which file to load - be more specific.')
-    else:
-        f_name = f_names[0]
-
-    # Load file & return pickled object
-    return pickle.load(open(os.path.join(db.meg_save_path, f_name), 'rb'))

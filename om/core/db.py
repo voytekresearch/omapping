@@ -49,8 +49,6 @@ class OMDB(object):
         self.maps_path = str()
         self.corrs_path = str()
         self.save_path = str()
-        #self.meg_save_path = str()
-        #self.maps_save_path = str()
 
         # Initialize all external paths
         self.meg_path = str()
@@ -72,9 +70,6 @@ class OMDB(object):
 
         # Set up internal paths to save data out to
         self.save_path = os.path.join(self.internal_path, 'Processed')
-        #processed_path = os.path.join(self.internal_path, 'Processed')
-        #self.meg_save_path = os.path.join(processed_path, 'meg')
-        #self.maps_save_path = os.path.join(processed_path, 'maps')
 
         # Set up external data paths
         self.meg_path = os.path.join(self.external_path, 'MEG')
@@ -156,17 +151,7 @@ class OMDB(object):
             A list of all the available files.
         """
 
-        # Settings
-        #word = 'Res'
-
-        # Set up which files to look for
-        #if res_type is 'meg':
-        #    dat_path = self.meg_save_path
-        #elif res_type is 'maps':
-        #    dat_path = self.maps_save_path
-
         # Get files
-        #files = os.listdir(dat_path)
         files = os.listdir(os.path.join(self.save_path, dat_type))
         files = clean_file_list(files, dat_type)
 
