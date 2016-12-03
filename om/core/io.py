@@ -163,6 +163,35 @@ def load_foof_csv():
 
     pass
 
+def save_obj_pickle(obj, dat_type, save_name, db=None):
+    """
+
+    Parameters
+    ----------
+    obj : ?
+        xx
+    dat_type : ?
+        xx
+    save_name : ?
+        xx
+    db : OMDB object, optional
+        xx
+    """
+
+    # Get database object, unless one was provided
+    if not db:
+        db = OMDB()
+
+    # Check that specified dat type is vale
+    if dat_type not in ['meg', 'maps']:
+        print("AHHHHHH")
+
+    # Set file name to save out
+    save_name = dat_type + '_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
+
+    # Save out data to pickle file
+    pickle.dump(obj, open(os.path.join(db.save_path, dat_type, save_name), 'wb'))
+
 def save_maps_pickle(obj, save_name, db=None):
     """   """
 
@@ -173,7 +202,7 @@ def save_maps_pickle(obj, save_name, db=None):
     # Set save name and path
     save_name = 'Maps_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
 
-        # Save out data to pickle file
+    # Save out data to pickle file
     pickle.dump(obj, open(os.path.join(db.maps_save_path, save_name), 'wb'))
 
 def save_meg_pickle(obj, save_name, db=None):
@@ -196,6 +225,46 @@ def save_meg_pickle(obj, save_name, db=None):
 
     # Save out data to pickle file
     pickle.dump(obj, open(os.path.join(db.meg_save_path, save_name), 'wb'))
+
+def load_obj_pickle(dat_type, file_name, db=None):
+    """
+
+    Parameters
+    ----------
+    dat_type : {'meg', 'maps'}
+        xx
+    file_name : ?
+        xx
+    db : OMDB object, optional
+        xx
+
+    Returns
+    -------
+    pickled object
+        xx
+    """
+
+    # Get database object, unless one was provided
+    if not db:
+        db = OMDB()
+
+    # Check that specified dat type is vale
+    if dat_type not in ['meg', 'maps']:
+        print("AHHHHHH")
+
+    # Check what files are available
+    files = os.listdir(os.path.join(db.save_path, dat_type))
+    f_names = clean_file_list(files, file_name)
+
+    # Check if there is a single file meeting description
+    if len(f_names) == 0:
+        raise UnknownDataSourceError('No files found matching description.')
+    elif len(f_names) > 1:
+        raise UnknownDataSourceError('Multiple files found, be more specific.')
+    else:
+        f_name = f_names[0]
+
+    return pickle.load(open(os.path.join(db.save_path, dat_type, f_name), 'rb'))
 
 def load_maps_pickle(file_name, db=None):
     """   """

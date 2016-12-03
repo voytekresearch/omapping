@@ -48,8 +48,9 @@ class OMDB(object):
         # Initialize all internal paths
         self.maps_path = str()
         self.corrs_path = str()
-        self.meg_save_path = str()
-        self.maps_save_path = str()
+        self.save_path = str()
+        #self.meg_save_path = str()
+        #self.maps_save_path = str()
 
         # Initialize all external paths
         self.meg_path = str()
@@ -70,9 +71,10 @@ class OMDB(object):
         self.corrs_path = os.path.join(self.internal_path, 'Corrs')
 
         # Set up internal paths to save data out to
-        processed_path = os.path.join(self.internal_path, 'Processed')
-        self.meg_save_path = os.path.join(processed_path, 'meg')
-        self.maps_save_path = os.path.join(processed_path, 'maps')
+        self.save_path = os.path.join(self.internal_path, 'Processed')
+        #processed_path = os.path.join(self.internal_path, 'Processed')
+        #self.meg_save_path = os.path.join(processed_path, 'meg')
+        #self.maps_save_path = os.path.join(processed_path, 'maps')
 
         # Set up external data paths
         self.meg_path = os.path.join(self.external_path, 'MEG')
@@ -138,7 +140,7 @@ class OMDB(object):
         return sub_nums, source
 
 
-    def check_res_files(self, res_type, verbose=True):
+    def check_res_files(self, dat_type, verbose=True):
         """Checks what result files are available.
 
         Parameters
@@ -155,17 +157,18 @@ class OMDB(object):
         """
 
         # Settings
-        word = 'Res'
+        #word = 'Res'
 
         # Set up which files to look for
-        if res_type is 'meg':
-            dat_path = self.meg_save_path
-        elif res_type is 'maps':
-            dat_path = self.maps_save_path
+        #if res_type is 'meg':
+        #    dat_path = self.meg_save_path
+        #elif res_type is 'maps':
+        #    dat_path = self.maps_save_path
 
         # Get files
-        files = os.listdir(dat_path)
-        files = clean_file_list(files, word)
+        #files = os.listdir(dat_path)
+        files = os.listdir(os.path.join(self.save_path, dat_type))
+        files = clean_file_list(files, dat_type)
 
         # If requested, print out the list of subject numbers
         if verbose:
