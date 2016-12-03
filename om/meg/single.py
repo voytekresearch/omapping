@@ -177,7 +177,7 @@ class MegData(object):
         files = os.listdir(os.path.join(self.db.foof_path, self.dat_source, load_type))
         files = clean_file_list(files, 'Foof_Vertex')
 
-        # Get specific file path for specific subject
+        # Get specific file name, and set up full file path for specified subject
         cur_subj_file = get_cur_subj(subnum, files)
         cur_subj_path = os.path.join(self.db.foof_path, self.dat_source, load_type, cur_subj_file)
 
