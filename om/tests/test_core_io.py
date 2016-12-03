@@ -43,18 +43,18 @@ def test_save_foof_csv():
     assert os.path.exists(os.path.join(tdb.foof_path, 'csv', '999_Slopes.csv'))
     assert os.path.exists(os.path.join(tdb.foof_path, 'csv', '999_Oscs.csv'))
 
-def test_save_md_pickle():
+def test_save_obj_pickle():
 
     tdb = TDB()
 
     dat = MegData(tdb, '')
 
-    save_meg_pickle(dat, 'test', db=tdb)
+    save_obj_pickle(dat, 'meg', 'test', db=tdb)
 
     assert True
 
-def test_load_md_pickle():
+def test_load_obj_pickle():
 
     tdb = TDB()
 
-    assert load_meg_pickle('test', db=tdb)
+    assert load_obj_pickle('meg', 'test', db=tdb)
