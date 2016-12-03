@@ -4,7 +4,7 @@ from __future__ import print_function, division
 import csv
 import numpy as np
 
-from om.core.errors import InconsistentDataError
+from om.core.errors import InconsistentDataError, UnknownDataSourceError
 
 ####################################################################################
 ############################ OMEGAMAPPIN - CORE - UTILS ############################
@@ -97,6 +97,9 @@ def get_cur_subj(cur_subj, files):
     for cur_file in files:
         if cur_subj_str in cur_file:
             return cur_file
+
+    # Raise error if no subject data file is found
+    raise UnknownDataSourceError('Could not find data file for requested subject.')
 
 
 def rm_files_ext(files_in):
