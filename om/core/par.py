@@ -162,7 +162,9 @@ def run_corr_par(dat):
     """
 
     # Get inds of data that contains numbers
-    inds_non_nan = [i for i in range(len(dat)) if not numpy.isnan(dat[i])]
+    inds_non_nan = numpy.invert(numpy.isnan(dat))
+    # The following also works, used to be how it was run, but is super slow
+    #inds_non_nan = [i for i in range(len(dat)) if not numpy.isnan(dat[i])]
 
     # Calculate corr between data and MEG map
     [corr_vals, p_vals] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
