@@ -251,7 +251,9 @@ class MapCompTG(MapCompBase):
                 dat = np.array(dat_df.ix[:, comp])
 
                 # Get inds of data that contains numbers
-                inds_non_nan = [i for i in range(len(dat)) if not np.isnan(dat[i])]
+                inds_non_nan = np.invert(np.isnan(dat))
+                # The following also works, used to be how it was run, but is super slow
+                #inds_non_nan = [i for i in range(len(dat)) if not np.isnan(dat[i])]
 
                 # Calculate correlation between data and meg map
                 [corr_vals[comp], p_vals[comp]] = sps.pearsonr(
