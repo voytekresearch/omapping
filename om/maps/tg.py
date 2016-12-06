@@ -395,7 +395,7 @@ class MapCompTG(MapCompBase):
 
             # Check if genes are currently loaded. Return if not.
             if not self.genes_loaded:
-                raise DataNotComputedError('Terms not loaded - can not unload.')
+                raise DataNotComputedError('Genes not loaded - can not unload.')
 
             # Unload genes by resetting map variable as empty
             self.gene_maps = np.array([])
@@ -689,7 +689,6 @@ def _pull_out_results(dat_in):
 
     # Loop through and pull out data
     for i in range(n_dat):
-        out_1[i] = dat_in[i][0]
-        out_2[i] = dat_in[i][1]
+        out_1[i], out_2[i] = dat_in[i]
 
     return out_1, out_2
