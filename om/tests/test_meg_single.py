@@ -3,7 +3,7 @@
 import numpy as np
 from py.test import raises
 
-from om.meg import *
+from om.meg.single import *
 from om.meg.single import _get_single_osc, _get_single_osc_power, _get_demo_csv, _osc_peak_all
 
 from om.core.db import OMDB
