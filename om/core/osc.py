@@ -1,6 +1,12 @@
 """DOCSTRING"""
 
+from collections import OrderedDict
+
 from om.core.errors import InconsistentDataError
+
+# TODO: fix up how you add your own band definitions.
+#   Make it take advantage of OrderedDict.
+#   Perhaps, sort bands, then add?
 
 ######################################################################################
 ############################## OMEGAMAPPIN - CORE - OSC ##############################
@@ -28,17 +34,25 @@ class Osc(object):
         Notes:
         - If supplied, an input_bands will over-ride the default bands option,
             even if it is set as True.
+        ^This behaviour is unhelpful. Fix up.
         """
 
         # Initialize bands as a dictionary
-        self.bands = dict()
+        self.bands = OrderedDict()
+        #self.bands = dict()
 
         # If requested use the default oscillation bands
         if default:
-            self.bands = dict({'Theta': (3, 8),
-                               'Alpha': (8, 13),
-                               'Beta': (13, 30),
-                               'LowGamma': (30, 40)})
+            self.add_band('Theta', (3, 8))
+            self.add_band('Alpha', (8, 13))
+            self.add_band('Beta', (13, 30))
+            self.add_band('LowGamma', (30, 40))
+
+            #OLD:
+            #self.bands = dict({'Theta': (3, 8),
+            #                   'Alpha': (8, 13),
+            #                   'Beta': (13, 30),
+            #                   'LowGamma': (30, 40)})
 
         # If supplied, use the given dictionary of oscillation bands
         if input_bands:
@@ -69,7 +83,7 @@ class Osc(object):
         self.bands[band_name] = band_lims
 
 
-    def rm_band(self, old_band):
+    def rm_band(self, rm_band):
         """Remove a previously defined oscillation band.
 
         Parameters
@@ -79,4 +93,4 @@ class Osc(object):
         """
 
         # Remove requested band from oscillation definition
-        self.bands.pop(old_band)
+        self.bands.pop(rm_band)
