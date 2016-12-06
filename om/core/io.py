@@ -8,7 +8,7 @@ import scipy.io as sio
 
 from om.core.db import OMDB
 from om.core.utils import clean_file_list, get_cur_subj
-from om.core.errors import UnknownDataSourceError
+from om.core.errors import UnknownDataSourceError, UnknownDataTypeError
 
 #####################################################################################
 ############################## OMEGAMAPPIN - CORE - IO ##############################
@@ -185,7 +185,7 @@ def save_obj_pickle(obj, dat_type, save_name, db=None):
 
     # Check that specified dat type is vale
     if dat_type not in ['meg', 'maps']:
-        print("AHHHHHH")
+        raise UnknownDataTypeError('Data type not understood.')
 
     # Set file name to save out
     save_name = dat_type + '_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
@@ -218,7 +218,7 @@ def load_obj_pickle(dat_type, file_name, db=None):
 
     # Check that specified dat type is vale
     if dat_type not in ['meg', 'maps']:
-        print("AHHHHHH")
+        raise UnknownDataTypeError('Data type not understood.')
 
     # Check what files are available
     files = os.listdir(os.path.join(db.save_path, dat_type))
