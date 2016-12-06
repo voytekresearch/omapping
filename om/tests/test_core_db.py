@@ -12,12 +12,21 @@ from om.core.db import OMDB
 def test_omdb():
     """Test that OMDB() returns properly."""
 
-    assert OMDB()
+    assert OMDB(auto_gen=False)
+
+def test_omdb_gen_paths():
+    """   """
+
+    db = OMDB(auto_gen=False)
+    db.gen_paths()
+
+    assert db
 
 def test_omdb_paths():
     """Test that all defined OMDB paths exist."""
 
     db = OMDB()
+    db.gen_paths()
 
     # Loops through all paths, checking they exist
     #  Skips vars with '_path' marker, and empty variables
@@ -50,7 +59,7 @@ def test_check_dat_files_foof():
     sub_nums, source = db.check_dat_files('foof', 'OMEGA', verbose=True)
     sub_nums, source = db.check_dat_files('foof', 'HCP', verbose=True)
 
-def test_check_res_files_md():
+def test_check_res_files_meg():
 
     db = OMDB()
 
@@ -58,7 +67,7 @@ def test_check_res_files_md():
 
     assert type(files) == ListType
 
-def test_check_res_files_mc():
+def test_check_res_files_maps():
 
     db = OMDB()
 
