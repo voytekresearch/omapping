@@ -251,7 +251,7 @@ class MapCompAnat(MapCompBase):
             self.meg_con[key] = _mat_mult(self.meg_roi_maps[key])
 
 
-    def comp_meg_anat_new(self, section='all', print_out=True):
+    def comp_meg_anat(self, section='all', print_out=True):
         """Compare anatomical connectivity to oscillation data.
 
         Parameters
@@ -311,67 +311,6 @@ class MapCompAnat(MapCompBase):
             print(key)
             print('    R value: ', format(self.stats[key][0], '1.4'))
             print('    P value: ', format(self.stats[key][1], '1.4'))
-
-
-    def comp_meg_anat(self, section='all', print_out=True):
-        """Compare anatomical connectivity to oscillation data.
-
-        Parameters
-        ----------
-        self : MapComproi() object
-            Object for storing and comparing map data, in roi format.
-        section : {'all, 'left', 'right'}
-            Which section of data to compare.
-        print_out : boolean, optional (default = True)
-            Whether to print out the stats results.
-
-        TODO: Separate out calculating MEG connectivity matrix, and comparing them.
-        Reason:
-            - post running this, the run method / data selection for what is stored
-                in meg_con is unclear
-            - more consistent to store full connectivity matrices, and pull out
-                relevant parts for comparison
-        """
-
-        # Initialize the dictionary to store MEG connectivity data
-        self.meg_con = _init_meg_map_dict(self.bands.keys())
-
-        # Get section indices to run comparisons
-        ind_st, ind_en, _, _ = get_section(section, self.rois.n_rois, self.rois.lrs)
-
-        # Calculate the meg connectivity data for each oscillation band
-        for key in self.meg_con.keys():
-            self.meg_con[key] = _mat_mult(self.meg_roi_maps[key][ind_st:ind_en])
-
-        # Initialize a dictionary to store data
-        stats = _init_meg_map_dict(self.bands.keys(), length=2)
-
-        # Get n_rois used in comparison
-        n_rois_used = ind_en - ind_st
-
-        # Extract anat range to use
-        anat_comp = self.anat_con[ind_st:ind_en, ind_st:ind_en]
-
-        # Calculate the correlations between each oscillation and anat data
-        for key in stats.keys():
-            stats[key][0], stats[key][1] = sps.pearsonr(
-                self.meg_con[key][np.triu_indices(n_rois_used, 1)],
-                anat_comp[np.triu_indices(n_rois_used, 1)])
-
-        # Attach the stats dictionary to object
-        self.stats = stats
-
-        # Print out results, if asked for
-        if print_out:
-            print('Anatomical data used is: ', self.anat.comment)
-            print('Correlation between MEG and anatomical connectivity: \n')
-
-            # Loop through each oscillation, and print out R-val and p-val
-            for key in self.stats.keys():
-                print(key)
-                print('    R value: ', format(self.stats[key][0], '1.4'))
-                print('    P value: ', format(self.stats[key][1], '1.4'))
-
 
 ############################################################################################
 ###################### OMEGAMAPPIN - CL_MC_ANAT - FUNCTIONS (PRIVATE) ######################
