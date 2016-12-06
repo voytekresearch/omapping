@@ -7,6 +7,8 @@ import time
 from ipyparallel import Client
 from ipyparallel.util import interactive
 
+from om.core.errors import ClusterAlreadyRunningError
+
 # TODO: Add check for 'cluster already started' in file, otherwise can hang there'
 
 ####################################################################################
@@ -57,6 +59,9 @@ class Par(object):
         command = "ipcluster start --n=" + str(n_core) + " &> " + self.f_name + " &"
         os.system(command)
         time.sleep(0.25)
+
+        # Check if a cluster is already open
+        self.check_for_open()
 
         # Set as active, wait for it to finish
         self.active = True
@@ -111,7 +116,20 @@ class Par(object):
 
             # Otherwise, wait and re-try
             else:
+                self.check_for_open()
                 time.sleep(n_wait)
+
+
+    def check_for_open(self):
+        """Check if a cluster is already open, while trying to open a new one."""
+
+        # Use log file to check for text containing info that a cluster is already up
+        with open(self.f_name) as cur_file:
+
+            # If any row of the log file has the message, throw an error
+            for row in cur_file:
+                if 'Cluster is already running' in row:
+                    raise ClusterAlreadyRunningError("Can't start cluster, already running.")
 
 ###################################################################################
 ########################## OMEGAMAPPIN - PAR - FUNCTIONS ##########################

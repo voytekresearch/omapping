@@ -19,3 +19,7 @@ class InconsistentDataError(Exception):
 class DataNotComputedError(Exception):
     """An Error indicating some required data has not been computed."""
     pass
+
+class ClusterAlreadyRunningError(Exception):
+    """An Error indicating that a cluster cannot be opened, as there is an existing one."""
+    pass
