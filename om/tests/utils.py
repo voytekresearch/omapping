@@ -5,6 +5,7 @@ import pkg_resources as pkg
 
 from om.meg.single import MegData
 from om.meg.group import GroupMegData
+from om.maps.anat import MapCompAnat
 from om.core.db import OMDB
 from om.core.osc import Osc
 
@@ -85,3 +86,27 @@ def load_test_meg_gr(bands_vertex=False, all_osc=False, peaks=False, calc_maps=F
         meg_group.osc_score()
 
     return meg_group
+
+def load_test_anat(load_meg=False, load_scout=False, load_anat=False,
+                   align=False, convert=False, calc_meg=False):
+    """   """
+
+    tdb = TestDB()
+
+    map_comp = MapCompAnat(tdb)
+
+    if load_meg:
+        map_comp.load_meg_maps('test_meg')
+    if load_scout:
+        map_comp.load_elec_rois('test_scout.mat')
+    if load_anat:
+        map_comp.load_anat_maps('test_anat.mat', 'test')
+
+    if align:
+        map_comp.align_rois()
+    if convert:
+        map_comp.conv_meg_rois()
+    if calc_meg:
+        map_comp.calc_meg_con()
+
+    return map_comp
