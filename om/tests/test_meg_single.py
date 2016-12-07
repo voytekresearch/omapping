@@ -11,6 +11,8 @@ from om.core.osc import Osc
 from om.tests.utils import TestDB as TDB
 from om.tests.utils import load_test_meg_subj
 
+# TODO: Update tests to use updated boolean structure of available data
+
 ########################################################################################
 #################### TESTS - OMEGAMAPPIN - MEG - SINGLE - FUNCTIONS ####################
 ########################################################################################
@@ -66,7 +68,7 @@ def test_set_bands_error():
 
     meg_dat = MegData(tdb, '', osc=osc)
 
-    meg_dat.has_bands_vertex = True
+    meg_dat.has_vertex_bands = True
 
     with raises(InconsistentDataError):
         meg_dat.set_bands(osc)
@@ -97,24 +99,6 @@ def test_import_foof_error():
     with raises(InconsistentDataError):
         meg_dat.import_foof('test_v5', get_demo=False, load_type='pickle')
 
-def test_osc_bands_vertex():
-
-    meg_dat = load_test_meg_subj('test_v2')
-
-    meg_dat.osc_bands_vertex()
-
-    # TODO: ADD MORE PROPER CHECKS HERE!!!
-    assert meg_dat.has_bands_vertex
-
-def tests_osc_bands_vertex_error():
-
-    tdb = TDB()
-
-    meg_dat = MegData(tdb, '')
-
-    with raises(DataNotComputedError):
-        meg_dat.osc_bands_vertex()
-
 def test_all_oscs():
 
     meg_dat = load_test_meg_subj('test_v2')
@@ -135,11 +119,27 @@ def test_all_oscs_nan():
     # TODO: ADD MORE PROPER CHECKS HERE!!!
     assert meg_dat.has_all_osc
 
-def test_peak_freq_all():
+def test_osc_bands_vertex():
 
     meg_dat = load_test_meg_subj('test_v2')
 
-    meg_dat.all_oscs()
+    meg_dat.osc_bands_vertex()
+
+    # TODO: ADD MORE PROPER CHECKS HERE!!!
+    assert meg_dat.has_vertex_bands
+
+def tests_osc_bands_vertex_error():
+
+    tdb = TDB()
+
+    meg_dat = MegData(tdb, '')
+
+    with raises(DataNotComputedError):
+        meg_dat.osc_bands_vertex()
+
+def test_peak_freq_all():
+
+    meg_dat = load_test_meg_subj('test_v2', all_oscs=True)
 
     meg_dat.peak_freq(dat='all')
 
@@ -187,9 +187,7 @@ def test_peak_freq_errors():
 
 def test_calc_osc_param_corrs():
 
-    meg_dat = load_test_meg_subj('test_v2')
-
-    meg_dat.all_oscs()
+    meg_dat = load_test_meg_subj('test_v2', all_oscs=True)
 
     a, b, c = meg_dat.calc_osc_param_corrs()
 

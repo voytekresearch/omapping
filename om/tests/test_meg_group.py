@@ -6,6 +6,7 @@ from py.test import raises
 from om.meg.group import *
 from om.meg.group import _get_all_osc, _osc_prob, _osc_pow_ratio, _band_sort
 
+from om.meg.single import MegData
 from om.core.db import OMDB
 from om.core.osc import Osc
 from om.tests.utils import TestDB as TDB
@@ -18,26 +19,66 @@ from om.tests.utils import load_test_meg_subj, load_test_meg_gr
 def test_group_meg_data():
     """   """
 
-    db = OMDB()
+    tdb = TDB()
     osc = Osc()
 
-    assert GroupMegData(db, osc)
+    assert GroupMegData(tdb, osc)
 
 def test_cl_add_subject():
+    """
 
-    db = OMDB()
-    osc = Osc()
+    TODO: ADD TESTING DIFFERENT ADD SUBJECT SETTINGS
+    """
 
-    meg_group = GroupMegData(db, osc)
+    tdb = TDB()
+    osc = Osc(default=True)
 
-    meg_subj_dat = load_test_meg_subj('test_v2')
+    # Check adding single subject of data
+    meg_group = GroupMegData(tdb, osc)
+    meg_subj = load_test_meg_subj('test_v2')
+    meg_group.add_subject(meg_subj)
+    assert meg_group.n_subjs == 1
 
-    meg_group.add_subject(meg_subj_dat)
+    # Test error of adding empty subject of data
+    meg_group = GroupMegData(tdb, osc)
+    meg_subj = MegData(tdb, '', osc)
+    with raises(DataNotComputedError):
+        meg_group.add_subject(meg_subj)
 
-    # TODO: ADD MORE TESTING OF THIS
-    assert meg_group
+    # Test add_vertex_oscs
+    meg_group = GroupMegData(tdb, osc)
+    meg_subj = load_test_meg_subj('test_v2')
+    meg_group.add_subject(meg_subj, add_vertex_oscs=True)
+    assert meg_group.has_vertex_oscs
 
-#TODO: ADD TESTING DIFFERENT ADD SUBJECT SETTINGS
+    # Test add_vertex_slopes
+    meg_group = GroupMegData(tdb, osc)
+    meg_subj = load_test_meg_subj('test_v2')
+    meg_group.add_subject(meg_subj, add_vertex_slopes=True)
+    assert meg_group.has_vertex_slopes
+
+    # Test add_all_oscs
+    meg_group = GroupMegData(tdb, osc)
+    meg_subj = load_test_meg_subj('test_v2', all_oscs=True)
+    meg_group.add_subject(meg_subj, add_all_oscs=True)
+    assert meg_group.has_all_osc
+
+    # Test add_vertex_bands
+    meg_group = GroupMegData(tdb, osc)
+    meg_subj = load_test_meg_subj('test_v2')
+    meg_group.add_subject(meg_subj, add_vertex_bands=True)
+    assert meg_group.has_vertex_bands
+
+    # Test add_peak_freqs
+    meg_group = GroupMegData(tdb, osc)
+    meg_subj = load_test_meg_subj('test_v2', all_oscs=True)
+    meg_subj.peak_freq(dat='all')
+    meg_group.add_subject(meg_subj, add_peak_freqs=True)
+    assert meg_group.has_peak_freqs
+
+    # Test add_demo
+    # TODO
+
 
 def test_cl_group_slope():
 
