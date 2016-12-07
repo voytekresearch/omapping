@@ -41,7 +41,7 @@ class TestDB(OMDB):
 #############################################################################################
 #############################################################################################
 
-def load_test_meg_subj(sub):
+def load_test_meg_subj(sub, all_oscs=False):
     """Loads a test subject of MD_SING data."""
 
     tdb = TestDB()
@@ -50,6 +50,9 @@ def load_test_meg_subj(sub):
     dat = MegData(tdb, '', osc)
 
     dat.import_foof(sub, get_demo=False, load_type='pickle')
+
+    if all_oscs:
+        dat.all_oscs()
 
     return dat
 
