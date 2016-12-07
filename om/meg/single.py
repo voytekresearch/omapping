@@ -319,7 +319,7 @@ class MegData(object):
         if not self.bands:
             raise DataNotComputedError('Oscillation bands not specified, can not proceed.')
 
-        # Calculate peak frequency from all oscillations, across all vertices, found within band range
+        # Calculate peak frequency from all oscillations, across all vertices, within band range
         if dat is 'all':
 
             # Check all osc data has been computed
