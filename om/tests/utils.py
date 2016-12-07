@@ -41,7 +41,7 @@ class TestDB(OMDB):
 #############################################################################################
 #############################################################################################
 
-def load_test_meg_subj(sub, all_oscs=False):
+def load_test_meg_subj(sub, all_oscs=False, bands_vertex=False):
     """Loads a test subject of MD_SING data."""
 
     tdb = TestDB()
@@ -53,6 +53,9 @@ def load_test_meg_subj(sub, all_oscs=False):
 
     if all_oscs:
         dat.all_oscs()
+
+    if bands_vertex:
+        dat.osc_bands_vertex()
 
     return dat
 
