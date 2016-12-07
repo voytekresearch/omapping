@@ -11,11 +11,13 @@ def test_par():
 
     assert Par()
 
-#def test_launch_stop():
-#    """   """
+"""
+def test_launch_stop():
+    """   """
 
-#    par = Par()
+    par = Par()
 
-#    par.launch()
+    par.launch()
 
-#    par.stop()
+    par.stop()
+"""
