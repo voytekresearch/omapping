@@ -48,7 +48,7 @@ def test_meg_data():
 
     assert MegData(db, '')
 
-def test_cl_set_bands():
+def test_set_bands():
 
     tdb = TDB()
 
@@ -58,7 +58,7 @@ def test_cl_set_bands():
 
     meg_dat.set_bands(osc)
 
-def test_cl_set_bands_error():
+def test_set_bands_error():
 
     tdb = TDB()
 
@@ -66,12 +66,12 @@ def test_cl_set_bands_error():
 
     meg_dat = MegData(tdb, '', osc=osc)
 
-    meg_dat.bands_vertex = True
+    meg_dat.has_bands_vertex = True
 
     with raises(InconsistentDataError):
         meg_dat.set_bands(osc)
 
-def test_cl_import_foof():
+def test_import_foof():
 
     tdb = TDB()
 
@@ -87,7 +87,7 @@ def test_cl_import_foof():
     assert np.array_equal(meg_dat.osc_count, exp_osc_count)
     assert meg_dat.has_data
 
-def test_cl_import_foof_error():
+def test_import_foof_error():
 
     tdb = TDB()
 
@@ -97,16 +97,16 @@ def test_cl_import_foof_error():
     with raises(InconsistentDataError):
         meg_dat.import_foof('test_v5', get_demo=False, load_type='pickle')
 
-def test_cl_osc_bands_vertex():
+def test_osc_bands_vertex():
 
     meg_dat = load_test_meg_subj('test_v2')
 
     meg_dat.osc_bands_vertex()
 
     # TODO: ADD MORE PROPER CHECKS HERE!!!
-    assert meg_dat.bands_vertex
+    assert meg_dat.has_bands_vertex
 
-def tests_cl_osc_bands_vertex_error():
+def tests_osc_bands_vertex_error():
 
     tdb = TDB()
 
@@ -115,16 +115,16 @@ def tests_cl_osc_bands_vertex_error():
     with raises(DataNotComputedError):
         meg_dat.osc_bands_vertex()
 
-def test_cl_all_oscs():
+def test_all_oscs():
 
     meg_dat = load_test_meg_subj('test_v2')
 
     meg_dat.all_oscs(verbose=True)
 
     # TODO: ADD MORE PROPER CHECKS HERE!!!
-    assert meg_dat.all_osc
+    assert meg_dat.has_all_osc
 
-def test_cl_all_oscs_nan():
+def test_all_oscs_nan():
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -133,9 +133,9 @@ def test_cl_all_oscs_nan():
     meg_dat.all_oscs(verbose=True)
 
     # TODO: ADD MORE PROPER CHECKS HERE!!!
-    assert meg_dat.all_osc
+    assert meg_dat.has_all_osc
 
-def test_cl_peak_freq_all():
+def test_peak_freq_all():
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -146,10 +146,32 @@ def test_cl_peak_freq_all():
     # TODO: ADD MORE PROPER CHECKS HERE!!! CONSIDER HOW TO USE OSCS FOR PEAKS.
     assert meg_dat.peaks
 
-def test_cl_peak_freq_band():
-    pass
+    # Check error
+    meg_dat = load_test_meg_subj('test_v2')
 
-def test_cl_peak_freq_errors():
+    with raises(DataNotComputedError):
+        meg_dat.peak_freq(dat='all')
+
+def test_peak_freq_band():
+
+    meg_dat = load_test_meg_subj('test_v2')
+
+    meg_dat.osc_bands_vertex()
+
+    meg_dat.peak_freq(dat='band')
+
+    assert meg_dat.peaks
+
+    # Check median
+    meg_dat.peak_freq(dat='band', avg='median')
+
+    # Check error
+    meg_dat = load_test_meg_subj('test_v2')
+
+    with raises(DataNotComputedError):
+        meg_dat.peak_freq(dat='band')
+
+def test_peak_freq_errors():
 
     tdb = TDB()
 
@@ -158,12 +180,12 @@ def test_cl_peak_freq_errors():
     with raises(DataNotComputedError):
         meg_dat.peak_freq(dat='all')
 
-    meg_dat.all_osc = True
+    meg_dat.has_all_osc = True
 
     with raises(DataNotComputedError):
         meg_dat.peak_freq(dat='all')
 
-def test_cl_calc_osc_param_corrs():
+def test_calc_osc_param_corrs():
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -174,14 +196,14 @@ def test_cl_calc_osc_param_corrs():
     # TODO: ADD MORE PROPER CHECKS HERE!!! CONSIDER HOW TO USE OSCS FOR PEAKS.
     assert a.any()
 
-def test_cl_calc_osc_param_corrs_error():
+def test_calc_osc_param_corrs_error():
 
     meg_dat = load_test_meg_subj('test_v2')
 
     with raises(DataNotComputedError):
         meg_dat.calc_osc_param_corrs()
 
-def test_cl_set_foof_viz():
+def test_set_foof_viz():
 
     meg_dat = load_test_meg_subj('test_v2')
 
