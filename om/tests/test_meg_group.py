@@ -24,7 +24,7 @@ def test_group_meg_data():
 
     assert GroupMegData(tdb, osc)
 
-def test_cl_add_subject():
+def test_add_subject():
     """
 
     TODO: ADD TESTING DIFFERENT ADD SUBJECT SETTINGS
@@ -65,7 +65,7 @@ def test_cl_add_subject():
 
     # Test add_vertex_bands
     meg_group = GroupMegData(tdb, osc)
-    meg_subj = load_test_meg_subj('test_v2')
+    meg_subj = load_test_meg_subj('test_v2', bands_vertex=True)
     meg_group.add_subject(meg_subj, add_vertex_bands=True)
     assert meg_group.has_vertex_bands
 
@@ -80,7 +80,7 @@ def test_cl_add_subject():
     # TODO
 
 
-def test_cl_group_slope():
+def test_group_slope():
 
     meg_group = load_test_meg_gr()
 
@@ -92,7 +92,7 @@ def test_cl_group_slope():
     meg_group.group_slope('median')
     assert meg_group.slopes_gr_avg
 
-def test_cl_osc_prob():
+def test_osc_prob():
 
     meg_group = load_test_meg_gr(bands_vertex=True)
 
@@ -109,7 +109,7 @@ def test_osc_prob_error():
     with raises(DataNotComputedError):
         meg_group.osc_prob()
 
-def test_cl_osc_score():
+def test_osc_score():
 
     meg_group = load_test_meg_gr(bands_vertex=True)
 
@@ -120,7 +120,7 @@ def test_cl_osc_score():
     assert meg_group.osc_scores
     assert meg_group.osc_score_done
 
-def test_cl_osc_map_corrs_prob():
+def test_osc_map_corrs_prob():
 
     meg_group = load_test_meg_gr(bands_vertex=True)
 
@@ -130,7 +130,7 @@ def test_cl_osc_map_corrs_prob():
     # TODO: ADD TESTING OF THIS
     assert True
 
-def test_cl_osc_map_corrs_score():
+def test_osc_map_corrs_score():
 
     meg_group = load_test_meg_gr(bands_vertex=True, calc_maps=True)
 
@@ -139,7 +139,7 @@ def test_cl_osc_map_corrs_score():
     # TODO: ADD TESTING OF THIS
     assert True
 
-def test_cl_calc_osc_peak_age():
+def test_calc_osc_peak_age():
 
     meg_group = load_test_meg_gr(bands_vertex=True, all_osc=True, peaks=True, calc_maps=True)
 
@@ -150,7 +150,7 @@ def test_cl_calc_osc_peak_age():
     # TODO: ADD TESTING OF THIS
     assert True
 
-def test_cl_freq_corr():
+def test_freq_corr():
 
     meg_group = load_test_meg_gr(vertex_osc=True)
 
