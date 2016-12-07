@@ -67,9 +67,9 @@ class MegData(object):
         Number of oscillations extracted per vertex.
     has_data : boolean
         Whether or not data has been loaded to current object.
-    all_osc : boolean
+    has_all_osc : boolean
         Whether data has been flattened into all oscillations.
-    bands_vertex : boolean
+    has_bands_vertex : boolean
         Whether data has been converted into band specific oscillations, per vertex.
     """
 
@@ -126,8 +126,8 @@ class MegData(object):
 
         # Set boolean for what has been run
         self.has_data = False
-        self.all_osc = False
-        self.bands_vertex = False
+        self.has_all_osc = False
+        self.has_bands_vertex = False
 
         # Initialize demographic variables
         self.sex = []
@@ -146,7 +146,7 @@ class MegData(object):
             xx
         """
 
-        if self.bands and (self.bands_vertex or self.peaks):
+        if self.bands and (self.has_bands_vertex or self.peaks):
             raise InconsistentDataError("Can't change band definitions after they have been used.")
         else:
             self.bands = osc.bands
@@ -234,7 +234,7 @@ class MegData(object):
                                                         self.bands[band][0], self.bands[band][1])
 
         # Update boolean to note that current subject has band specific oscs calculated.
-        self.bands_vertex = True
+        self.has_bands_vertex = True
 
 
     def all_oscs(self, verbose=True):
@@ -286,7 +286,7 @@ class MegData(object):
         self.n_oscs = len(self.centers_all)
 
         # Update boolean that all-oscillations has been computed
-        self.all_osc = True
+        self.has_all_osc = True
 
 
     def peak_freq(self, dat, avg='mean'):
@@ -295,7 +295,7 @@ class MegData(object):
         Parameters
         ----------
         dat : {'all', 'band'}
-            xx
+            Which data to use to calculate peak frequency.
         avg : {'mean', 'median'}, optional
             Which type of averaging to do.
         """
@@ -304,10 +304,11 @@ class MegData(object):
         if not self.bands:
             raise DataNotComputedError('Oscillation bands not specified, can not proceed.')
 
+        # Calculate peak frequency from all oscillations, across all vertices, found within band range
         if dat is 'all':
 
             # Check all osc data has been computed
-            if not self.all_osc:
+            if not self.has_all_osc:
                 raise DataNotComputedError('All Osc data has not been computed. Can not continue.')
 
             # Loop through each band, calculating peak frequency
@@ -315,9 +316,11 @@ class MegData(object):
                 self.peaks[band] = _osc_peak_all(
                     self.centers_all, self.bands[band][0], self.bands[band][1], avg)
 
+        # Calculate peak frequency from within band specific maps, which have enforced
+        #  a single oscillation per band, per vertex, choosing highest power oscillations
         elif dat is 'band':
 
-            if not self.bands_vertex:
+            if not self.has_bands_vertex:
                 raise DataNotComputedError('Bands not computed per vertex, can not continue.')
 
             for band in self.bands:
@@ -344,7 +347,7 @@ class MegData(object):
         """
 
         # Check all osc data has been computed
-        if not self.all_osc:
+        if not self.has_all_osc:
             raise DataNotComputedError('All Osc data has not been computed. Can not continue.')
 
         # Set labels for the things being correlated
