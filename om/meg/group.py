@@ -15,6 +15,8 @@ from scipy.stats.stats import pearsonr
 from om.meg.single import MegData
 from om.core.errors import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
 
+# TODO: work through whether sort_bands is still needed with OrderedDict
+
 ##########################################################################################
 ############################  OMEGAMAPPIN - MD_GROUP CLASSES  ############################
 ##########################################################################################
@@ -23,7 +25,7 @@ class GroupMegData(MegData):
     """A class to store OMEGA data from multiple subjects.
 
     Holds all oscillations, regardless of spatial location.
-    Note: Class derived from MegData()
+    Note: Class derived from MegData()v=b
 
     Attributes
     ----------
@@ -125,7 +127,7 @@ class GroupMegData(MegData):
 
         # Check if subject has data
         if not new_subj.has_data:
-            print("Empty meg data object. Cannot add data.")
+            raise DataNotComputedError("Empty meg data object. Cannot add data.")
 
         # Add All-Osc Data
         if add_all_oscs:
@@ -196,12 +198,17 @@ class GroupMegData(MegData):
         self.subjs.append(new_subj.subnum)
 
         # Update booleans about what is loaded
-        self.all_osc = add_all_oscs
-        self.bands_vertex = add_vertex_bands
+        self.has_all_osc = add_all_oscs
+        self.has_bands_vertex = add_vertex_bands
 
         # Add demographic data
         self.sex.append(new_subj.sex)
         self.age = np.append(self.age, new_subj.age)
+
+
+    def check_consistency(self):
+        """   """
+        pass
 
 
     def group_slope(self, avg='mean'):
@@ -227,7 +234,7 @@ class GroupMegData(MegData):
          """
 
         # Check if vertex data is set
-        if not self.bands_vertex:
+        if not self.has_bands_vertex:
             raise DataNotComputedError('Vertex oscillation bands data not available.')
 
         # For each oscillation band, compute the probability of an oscillation in that band - NEW
