@@ -75,6 +75,10 @@ class GroupMegData(MegData):
         self.n_subjs = int()
         self.subjs = []
 
+        # Update variable types for demographic
+        self.sex = list()
+        self.age = np.array([])
+
         # Set definition of oscillation bands used for the group
         self.bands = osc.bands
 
@@ -105,20 +109,21 @@ class GroupMegData(MegData):
         self.osc_score_done = False
 
 
-    def add_subject(self, new_subj, add_all_oscs=False, add_vertex_bands=False,
-                    add_vertex_oscs=False, add_peak_freqs=False, add_vertex_slopes=False):
+    def add_subject(self, new_subj, add_vertex_oscs=False, add_vertex_slopes=False, add_all_oscs=False,
+                    add_vertex_bands=False, add_peak_freqs=False, add_demo=False):
         """Adds a new subject to the GroupMegData object.
 
         Parameters
         ----------
         new_subj : MegData() Object
             MEG subject (instance of MegData)
+        add_vertex_oscs : boolean, optional (default: False)
+            Whether to add all oscillations, across vertices.
         add_all_oscs : boolean, optional (default: False)
             Whether to add the vectors of all oscillations, collapsed across vertices.
         add_vertex_bands : boolean, optional (default: False)
             Whether to add the oscillation band data, across vertices.
-        add_vertex_oscs : boolean, optional (default: False)
-            Whether to add all oscillations, across vertices.
+
         add_peak_freqs : boolean, optional (default: False)
             Whether to add peak frequencies.
         add_vertex_slopes : boolean, optional (default: False)
@@ -129,8 +134,34 @@ class GroupMegData(MegData):
         if not new_subj.has_data:
             raise DataNotComputedError("Empty meg data object. Cannot add data.")
 
+        # Add oscillations per vertex
+        if add_vertex_oscs:
+
+            if self.n_subjs == 0:
+                self.centers = new_subj.centers
+                self.powers = new_subj.powers
+                self.bws = new_subj.bws
+                self.has_vertex_oscs = True
+            else:
+                self.centers = np.dstack([self.centers, new_subj.centers])
+                self.powers = np.dstack([self.powers, new_subj.powers])
+                self.bws = np.dstack([self.bws, new_subj.bws])
+
+        # Add slopes per vertex
+        if add_vertex_slopes:
+
+            if self.n_subjs == 0:
+                self.vert_slopes = new_subj.slopes
+                self.has_vertex_slopes = True
+            else:
+                self.vert_slopes = np.hstack([self.vert_slopes, new_subj.slopes])
+
         # Add All-Osc Data
         if add_all_oscs:
+
+            # Check that incoming subject has all_osc data available
+            if not new_subj.has_all_osc:
+                raise DataNotComputedError('New subject does not have all_osc data available to add.')
 
             # Add oscillation parameters to current data
             self.centers_all = np.append(self.centers_all, new_subj.centers_all)
@@ -145,6 +176,10 @@ class GroupMegData(MegData):
             self.n_oscs = np.append(self.n_oscs, new_subj.n_oscs)
             self.n_oscs_tot = len(self.centers_all)
 
+            # If first subject, update what kind of data is loaded
+            if self.n_subjs == 0:
+                self.has_all_osc = True
+
         # Add band-specific data
         if add_vertex_bands:
 
@@ -155,21 +190,10 @@ class GroupMegData(MegData):
             # Add new subject to group oscillations
             if self.n_subjs == 0:
                 self.gr_oscs = new_subj.oscs
+                self.has_vertex_bands = True
             else:
                 for band in self.bands:
                     self.gr_oscs[band] = np.dstack([self.gr_oscs[band], new_subj.oscs[band]])
-
-        # Add oscillations per vertex
-        if add_vertex_oscs:
-
-            if self.n_subjs == 0:
-                self.centers = new_subj.centers
-                self.powers = new_subj.powers
-                self.bws = new_subj.bws
-            else:
-                self.centers = np.dstack([self.centers, new_subj.centers])
-                self.powers = np.dstack([self.powers, new_subj.powers])
-                self.bws = np.dstack([self.bws, new_subj.bws])
 
         # Add oscillation peak data
         if add_peak_freqs:
@@ -178,37 +202,63 @@ class GroupMegData(MegData):
             if not set(self.bands) == set(new_subj.bands):
                 raise InconsistentDataError('Oscillation bands are inconsistent.')
 
-            #
             if self.n_subjs == 0:
                 self.peaks = new_subj.peaks
+                self.has_peak_freqs = True
             else:
                 for band in self.bands:
                     self.peaks[band] = np.append(self.peaks[band], new_subj.peaks[band])
 
-        # Add slopes per vertex
-        if add_vertex_slopes:
+        # Add demographic data
+        if add_demo:
 
+            # Check that incoming subject has demo data
+            if not new_subj.has_demo:
+                raise DataNotComputedError('Demographic data not available')
+
+            # Add demographic data to group object
+            self.sex.append(new_subj.sex)
+            self.age = np.append(self.age, new_subj.age)
+
+            # If first subject, update what kind of data is loaded
             if self.n_subjs == 0:
-                self.vert_slopes = new_subj.slopes
-            else:
-                self.vert_slopes = np.hstack([self.vert_slopes, new_subj.slopes])
+                self.has_demo = True
+
+        # If first subject, update that object has data
+        if self.n_subjs == 0:
+            self.has_data = True
 
         # Update subj count and subject number list
         self.n_subjs += 1
         self.subjs.append(new_subj.subnum)
 
-        # Update booleans about what is loaded
-        self.has_all_osc = add_all_oscs
-        self.has_bands_vertex = add_vertex_bands
-
-        # Add demographic data
-        self.sex.append(new_subj.sex)
-        self.age = np.append(self.age, new_subj.age)
+        # Check consistency of group data
+        self.check_consistency()
 
 
     def check_consistency(self):
-        """   """
-        pass
+        """Check for consistency of data loaded in group object."""
+
+        if self.n_subjs != len(self.subjs):
+            raise InconsistentDataError('Discrepancy in subject numbers.')
+
+        if self.has_vertex_oscs:
+            pass
+
+        if self.has_vertex_slopes:
+            pass
+
+        if self.has_all_osc:
+            pass
+
+        if self.has_vertex_bands:
+            pass
+
+        if self.has_peak_freqs:
+            pass
+
+        if self.has_demo:
+            pass
 
 
     def group_slope(self, avg='mean'):
@@ -234,7 +284,7 @@ class GroupMegData(MegData):
          """
 
         # Check if vertex data is set
-        if not self.has_bands_vertex:
+        if not self.has_vertex_bands:
             raise DataNotComputedError('Vertex oscillation bands data not available.')
 
         # For each oscillation band, compute the probability of an oscillation in that band - NEW
