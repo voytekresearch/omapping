@@ -9,8 +9,6 @@ from ipyparallel.util import interactive
 
 from om.core.errors import ClusterAlreadyRunningError
 
-# TODO: Add check for 'cluster already started' in file, otherwise can hang there'
-
 ####################################################################################
 ############################# OMEGAMAPPIN - CORE - PAR #############################
 ####################################################################################
