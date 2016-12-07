@@ -67,10 +67,18 @@ class MegData(object):
         Number of oscillations extracted per vertex.
     has_data : boolean
         Whether or not data has been loaded to current object.
+    has_vertex_oscs : boolean
+        Whether data is defined for oscillations at each vertex (not in bands).
+    has_vertex_slopes : boolean
+        Whether slope values per vertex are loaded.
     has_all_osc : boolean
         Whether data has been flattened into all oscillations.
-    has_bands_vertex : boolean
+    has_vertex_bands : boolean
         Whether data has been converted into band specific oscillations, per vertex.
+    has_peak_freqs : boolean
+        Whether peak frequencies, within oscillatory bands, have been calculated.
+    has_demo : boolean
+        Whether demographic data has been loaded.
     """
 
     def __init__(self, db, dat_source, osc=None):
@@ -126,12 +134,16 @@ class MegData(object):
 
         # Set boolean for what has been run
         self.has_data = False
+        self.has_vertex_oscs = False
+        self.has_vertex_slopes = False
         self.has_all_osc = False
-        self.has_bands_vertex = False
+        self.has_vertex_bands = False
+        self.has_peak_freqs = False
+        self.has_demo = False
 
         # Initialize demographic variables
-        self.sex = []
-        self.age = np.array([])
+        self.sex = str()
+        self.age = int()
 
         # Initialize oscillation count
         self.osc_count = int()
@@ -146,7 +158,7 @@ class MegData(object):
             xx
         """
 
-        if self.bands and (self.has_bands_vertex or self.peaks):
+        if self.bands and (self.has_vertex_bands or self.peaks):
             raise InconsistentDataError("Can't change band definitions after they have been used.")
         else:
             self.bands = osc.bands
@@ -187,9 +199,11 @@ class MegData(object):
         #elif load_type is 'csv': # NOTE: not yet implemented
         #    results = _load_foof_csv(cur_subj_path)
 
-        # Pull out data from results - NOTE: New version.
+        # Pull out data from results, and update that this data is loaded
         self.centers, self.powers, self.bws, self.slopes, self.n_psds \
             = extract_foof_pickle(results)
+        self.has_vertex_oscs = True
+        self.has_vertex_slopes = True
 
         # Check how many oscillations per vertex
         self.osc_count = np.zeros([self.n_psds])
@@ -198,43 +212,11 @@ class MegData(object):
 
         # Get demographic data
         if get_demo:
+            self.has_demo = True
             self.sex, self.age = _get_demo_csv(self.subnum, self.db.meg_path, self.dat_source)
 
         # Update boolean to say current subject has data attached
         self.has_data = True
-
-
-    def osc_bands_vertex(self):
-        """Groups oscillations at each vertex in distinct frequency bands.
-
-        Stores band specific oscillations in (self.){thetas, alphas, betas, lowgammas}.
-        """
-
-        # Check that oscillation bands are defined
-        if not self.bands:
-            raise DataNotComputedError('Oscillation bands not specified, can not proceed.')
-
-        # Initialize matrices to store oscillations in each band
-        for band in self.bands:
-            self.oscs[band] = np.zeros([self.n_psds, 4])
-
-        # Loop through each vertex
-        for i in range(self.n_psds):
-
-            # Get centers, powers and bws from individual vertex
-            centers_temp = self.centers[i, :]
-            powers_temp = self.powers[i, :]
-            bws_temp = self.bws[i, :]
-
-            # Loop through each oscillation band
-            for band in self.bands:
-
-                # Get oscillations in specific band
-                self.oscs[band][i, :] = _get_single_osc(centers_temp, powers_temp, bws_temp,
-                                                        self.bands[band][0], self.bands[band][1])
-
-        # Update boolean to note that current subject has band specific oscs calculated.
-        self.has_bands_vertex = True
 
 
     def all_oscs(self, verbose=True):
@@ -289,6 +271,39 @@ class MegData(object):
         self.has_all_osc = True
 
 
+    def osc_bands_vertex(self):
+        """Groups oscillations at each vertex in distinct frequency bands.
+
+        Stores band specific oscillations in (self.){thetas, alphas, betas, lowgammas}.
+        """
+
+        # Check that oscillation bands are defined
+        if not self.bands:
+            raise DataNotComputedError('Oscillation bands not specified, can not proceed.')
+
+        # Initialize matrices to store oscillations in each band
+        for band in self.bands:
+            self.oscs[band] = np.zeros([self.n_psds, 4])
+
+        # Loop through each vertex
+        for i in range(self.n_psds):
+
+            # Get centers, powers and bws from individual vertex
+            centers_temp = self.centers[i, :]
+            powers_temp = self.powers[i, :]
+            bws_temp = self.bws[i, :]
+
+            # Loop through each oscillation band
+            for band in self.bands:
+
+                # Get oscillations in specific band
+                self.oscs[band][i, :] = _get_single_osc(centers_temp, powers_temp, bws_temp,
+                                                        self.bands[band][0], self.bands[band][1])
+
+        # Update boolean to note that current subject has band specific oscs calculated.
+        self.has_vertex_bands = True
+
+
     def peak_freq(self, dat, avg='mean'):
         """Calculates the peak frequency for each oscillatory band.
 
@@ -320,7 +335,7 @@ class MegData(object):
         #  a single oscillation per band, per vertex, choosing highest power oscillations
         elif dat is 'band':
 
-            if not self.has_bands_vertex:
+            if not self.has_vertex_bands:
                 raise DataNotComputedError('Bands not computed per vertex, can not continue.')
 
             for band in self.bands:
@@ -331,6 +346,9 @@ class MegData(object):
                     self.peaks[band] = np.mean(self.oscs[band][non_zero_inds, 0])
                 elif avg is 'median':
                     self.peaks[band] = np.median(self.oscs[band][non_zero_inds, 0])
+
+        # Update tracking of what data has been loaded/computed
+        self.has_peak_freqs = True
 
 
     def calc_osc_param_corrs(self):
