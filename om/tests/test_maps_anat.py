@@ -92,7 +92,25 @@ def test_comp_meg_anat():
     map_comp = load_test_anat(load_meg=True, load_scout=True, load_anat=True,
                               align=True, convert=True, calc_meg=True)
 
-    map_comp.comp_meg_anat()
+    map_comp.comp_meg_anat(print_out=False)
+
+    assert True
+
+def test_check_comp():
+
+    map_comp = load_test_anat()
+
+    with raises(DataNotComputedError):
+        map_comp.check_comp()
+
+    map_comp = load_test_anat(load_meg=True, load_scout=True, load_anat=True,
+                          align=True, convert=True, calc_meg=True)
+
+    map_comp.comp_meg_anat(print_out=False)
+
+    map_comp.check_comp()
+
+    map_comp.comp_meg_anat(print_out=True)
 
     assert True
 
