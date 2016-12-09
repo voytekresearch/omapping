@@ -3,8 +3,11 @@
 import os
 import csv
 import numpy as np
+from scipy.stats.stats import pearsonr
 
 from om.core.db import OMDB
+from om.core.osc import Osc
+from om.meg.single import MegData
 
 ##########################################################################################
 ##########################################################################################
@@ -122,3 +125,93 @@ def match_twins(dat, parent_ind):
             twin_pairs.append(list(all_ids[check_pair]))
 
     return twin_pairs, single_twins
+
+
+def check_complete_pairs(twin_ids, available_files):
+    """Check which twin pairs have both sets of subject data available.
+
+    Parameters
+    ----------
+    twin_ids : ?
+        xx
+    available_files : ?
+        xx
+    """
+
+    complete_pairs = []
+
+    for pair in twin_ids:
+
+        if pair[0] in available_files and pair[1] in available_files:
+            complete_pairs.append(pair)
+
+    return complete_pairs
+
+
+def rm_twin_pairs(all_pairs, twin_pairs):
+    """Given all possible subject pairs, remove twins leaving only unrelated pairs.
+
+    Parameters
+    ----------
+    all_pairs : list of int
+        xx
+    twin_pairs : list of int
+        xx
+
+    Returns
+    -------
+    all_pairs : list of int
+        xx
+    """
+
+    for pair in all_pairs:
+
+        for twins in twin_pairs:
+
+            if set(pair) == set(twins):
+                all_pairs.remove(pair)
+
+    return all_pairs
+
+
+def compare_pair(pair_inds, db=None):
+    """Compares center frequency data for a pairing of MEG subjects.
+
+    Parameters
+    ----------
+    pair_inds : list of int
+        xx
+
+    Returns
+    -------
+    corr_dat : 2d array
+        xx
+    """
+
+    # Initialize database object, unless one is supplied
+    if not db:
+        db = OMDB()
+
+    # Set up oscillation band definition, and dat source
+    osc = Osc(default=True)
+    dat_source = 'HCP'
+
+    # Initialize data object and load data - pair data-A
+    pair_a = MegData(db, dat_source, osc)
+    pair_a.import_foof(pair_inds[0], get_demo=False)
+    pair_a.osc_bands_vertex()
+
+    # Initialize data object and load data - pair data-B
+    pair_b = MegData(db, dat_source, osc)
+    pair_b.import_foof(pair_inds[1], get_demo=False)
+    pair_b.osc_bands_vertex()
+
+    # Initialize to store correlation results
+    corr_dat = np.zeros([4, 2])
+
+    # Compare center frequencies within oscillatory bands
+    for ind, band in enumerate(osc.bands):
+        corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(pair_a.oscs[band][:, 0],
+                                                      pair_b.oscs[band][:, 0])
+
+    return corr_dat
