@@ -18,14 +18,18 @@ def get_twin_data():
 
     Returns
     -------
-    mz_twins : ?
-        xx
-    dz_twins : ?
-        xx
-    twin_list : ?
-        xx
-    not_twin_list : ?
-        xx
+    mz_twins : 2d array
+        IDs for MZ twins and their parents - columns: [twin_id, mother_id, father_id].
+    dz_twins : 2d array
+        Ds for DZ twins and their parents - columns: [twin_id, mother_id, father_id].
+    twin_list : list of int
+        Subject IDs for all twins.
+    not_twin_list : list of int
+        Subject IDs for non-twin subjects.
+
+    Notes
+    -----
+    TODO:
     """
 
     # Initialize database object, and set file name
@@ -88,10 +92,10 @@ def match_twins(dat, parent_ind=1):
 
     Returns
     -------
-    twin_pairs : ?
-        xx
-    single_twins : ?
-        xx
+    twin_pairs : list of list of int
+        Each list within the list contains the subject IDs for a twin pair.
+    single_twins : list of list of int
+        Each list within the list contains the ID of a twins that is unmatched.
 
     Notes
     -----
@@ -99,34 +103,35 @@ def match_twins(dat, parent_ind=1):
     """
 
     # Pull out relevant data from input matrix
-    all_parents = dat[:, parent_ind]
-    all_ids = dat[:, 0]
+    all_parent_ids = dat[:, parent_ind]
+    all_subj_ids = dat[:, 0]
 
-    #
-    unique_parents = set(list(all_parents))
+    # Get all the unique parent IDs
+    unique_parents = set(list(all_parent_ids))
 
     # Initliaze variables to store data
-    pair_inds = []
     twin_pairs = []
-    single_inds = []
     single_twins = []
+    #pair_inds = []
+    #single_inds = []
 
-    #
+    # For a given parent, find their kids
     for parent in unique_parents:
 
-        check_pair = list(np.where(all_parents == parent)[0])
+        # Find all kids for current parents
+        kids = list(np.where(all_parent_ids == parent)[0])
 
-        #
-        if len(check_pair) == 1:
+        # If only one subject found, add to unpaired twins
+        if len(kids) == 1:
+            single_twins.append(list(all_subj_ids[kids]))
+            #single_inds.append(kids)
 
-            single_inds.append(check_pair)
-            single_twins.append(list(all_ids[check_pair]))
-
-        #
-        elif len(check_pair) == 2:
-
-            pair_inds.append(check_pair)
-            twin_pairs.append(list(all_ids[check_pair]))
+        # If two subjects found, add as a pair of twins
+        elif len(kids) == 2:
+            twin_pairs.append(list(all_subj_ids[kids]))
+            #pair_inds.append(kids)
+        else:
+            print('AHHHHH')
 
     return twin_pairs, single_twins
 
@@ -139,6 +144,11 @@ def check_complete_pairs(twin_ids, available_files):
     twin_ids : ?
         xx
     available_files : ?
+        xx
+
+    Returns
+    -------
+    complete_pairs : ?
         xx
     """
 
