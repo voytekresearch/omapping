@@ -1,4 +1,5 @@
 """MODULE DOCSTRING"""
+from __future__ import print_function
 
 import os
 import csv
@@ -92,9 +93,9 @@ def match_twins(dat, parent_ind=1):
 
     Returns
     -------
-    twin_pairs : list of list of int
+    twin_pairs : list of tuple of (int, int)
         Each list within the list contains the subject IDs for a twin pair.
-    single_twins : list of list of int
+    single_twins : list of tuple of (int, int)
         Each list within the list contains the ID of a twins that is unmatched.
 
     Notes
@@ -112,8 +113,6 @@ def match_twins(dat, parent_ind=1):
     # Initliaze variables to store data
     twin_pairs = []
     single_twins = []
-    #pair_inds = []
-    #single_inds = []
 
     # For a given parent, find their kids
     for parent in unique_parents:
@@ -123,13 +122,11 @@ def match_twins(dat, parent_ind=1):
 
         # If only one subject found, add to unpaired twins
         if len(kids) == 1:
-            single_twins.append(list(all_subj_ids[kids]))
-            #single_inds.append(kids)
+            single_twins.append(tuple(all_subj_ids[kids]))
 
         # If two subjects found, add as a pair of twins
         elif len(kids) == 2:
-            twin_pairs.append(list(all_subj_ids[kids]))
-            #pair_inds.append(kids)
+            twin_pairs.append(tuple(all_subj_ids[kids]))
         else:
             print('AHHHHH')
 
@@ -167,25 +164,20 @@ def rm_twin_pairs(all_pairs, twin_pairs):
 
     Parameters
     ----------
-    all_pairs : list of int
+    all_pairs : list of tuple
         xx
-    twin_pairs : list of int
+    twin_pairs : list of tuple
         xx
 
     Returns
     -------
-    all_pairs : list of int
+    non_twins : list of tuple
         xx
     """
 
-    for pair in all_pairs:
+    non_twins = list(set(all_pairs) - set(twin_pairs))
 
-        for twins in twin_pairs:
-
-            if set(pair) == set(twins):
-                all_pairs.remove(pair)
-
-    return all_pairs
+    return non_twins
 
 
 def load_pair(pair_inds, osc_bands_vert=False, osc=None, db=None, dat_source='HCP'):
@@ -250,8 +242,8 @@ def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
 
     Returns
     -------
-    corr_dat : 2d array
-        xx
+    corr_dat : 2d array, shape=(n_bands, 2), row = [r-val, p-val]
+        Results of the correlation within each band between subjects.
     """
 
     # Initialize database object, unless one is supplied
@@ -331,8 +323,8 @@ def compare_slope(pair_inds, db=None, dat_source='HCP'):
 
     Returns
     -------
-    corr_dat : ?
-        xx
+    corr_dat : 1d array, [r-val, p-val]
+        Results of the correlation between subjects.
     """
 
     # Initialize database object, unless one is supplied
@@ -349,3 +341,17 @@ def compare_slope(pair_inds, db=None, dat_source='HCP'):
     corr_dat[0], corr_dat[1] = pearsonr(dat[0].slopes, dat[1].slopes)
 
     return corr_dat
+
+def print_twin_results(corr_dat, labels):
+    """Print out correlation results.
+
+    Parameters
+    ----------
+    corr_dat : ?
+        xx
+    labels : ?
+        xx
+    """
+
+    for ind, label in enumerate(labels):
+        print('\t', label, ' : ', '{:5.4f}'.format(corr_dat[ind, 0]))
