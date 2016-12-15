@@ -7,6 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 from om.core.db import OMDB
 from om.meg.single import MegData
+from om.core.errors import InconsistentDataError
 
 ##########################################################################################
 ##########################################################################################
@@ -49,22 +50,29 @@ def load_subjs(sub_nums, dat_source, db=None):
     return subjs
 
 
-def test_train_inds(n_oscs, n_train, n_test):
-    """
+def split_inds(n_oscs, n_train, n_test):
+    """Split indices into train and test groups.
 
     Parameters
     ----------
     n_oscs : int
-        xx
+        The number of oscillations that can be split.
     n_train : list of int
-        xx
+        Number of data points for training group.
     n_test : list of int
+        Number of data points for testing group.
+
+    Returns
+    -------
+    train : ?
+        xx
+    test : ?
         xx
     """
 
     # Check that there are enough oscillations for desired split
     if not n_oscs >= n_train + n_test:
-        print('AHHH')
+        raise InconsistentDataError('Number of data points is insufficient for requested split.')
 
     # Get a shuffled list of possible indices
     inds = range(n_oscs)
@@ -117,7 +125,7 @@ def check_accuracy_all(dat, labels):
 
     # Check data and labels are the same length
     if not len(dat) == len(labels):
-        print('AHHHHH')
+        raise InconsistentDataError('Length of data does not match labels.')
 
     #
     n_correct = len([True for i, j in zip(dat, labels) if i == j])
