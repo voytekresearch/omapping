@@ -1,3 +1,5 @@
+"""DOCSTRING"""
+
 from __future__ import division
 
 import random
@@ -19,7 +21,7 @@ def load_subjs(sub_nums, dat_source, db=None):
     Parameters
     ----------
     sub_nums : list of int
-        xx
+        Subject IDs to load.
     dat_source : {'OMEGA', 'HCP'}
         Which database the data comes from.
     db : OMDB() object
@@ -64,9 +66,9 @@ def split_inds(n_oscs, n_train, n_test):
 
     Returns
     -------
-    train : ?
+    train : list of int
         xx
-    test : ?
+    test : list of int
         xx
     """
 
@@ -156,7 +158,7 @@ def knn(subjs, n_train=1500, n_test=50):
     for ind, subj in enumerate(subjs):
 
         # Get random sets of indices to pull out data
-        tr_inds, te_inds = test_train_inds(subj.n_oscs, n_train, n_test)
+        tr_inds, te_inds = split_inds(subj.n_oscs, n_train, n_test)
 
         # Pull out the training data from current subject
         all_dat = np.vstack([all_dat, np.array([subj.centers_all[tr_inds], subj.powers_all[tr_inds],
@@ -181,7 +183,7 @@ def knn(subjs, n_train=1500, n_test=50):
         for t_i in t_inds:
 
             test_dat = np.array([subjs[s_ind].centers_all[t_i], subjs[s_ind].powers_all[t_i],
-                                subjs[s_ind].bws_all[t_i]], ndmin=2)
+                                 subjs[s_ind].bws_all[t_i]], ndmin=2)
             results.append(neigh.predict(test_dat)[0])
 
     acc = check_accuracy_all(results, all_test_labels)
