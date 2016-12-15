@@ -76,15 +76,15 @@ def get_twin_data():
     return mz_twins, dz_twins, twin_list, not_twin_list
 
 
-def match_twins(dat, parent_ind):
+def match_twins(dat, parent_ind=1):
     """Match twin pairs.
 
     Parameters
     ----------
-    dat : ?
-        xx
-    parent_ind : ?
-        xx
+    dat : 2d array
+        IDs for twins and their parents - columns: [twin_id, mother_id, father_id].
+    parent_ind : {1, 2}, optional (default=1)
+        Which parent to use to match twins, which should be irrelevant. Defaults to mother.
 
     Returns
     -------
@@ -92,6 +92,10 @@ def match_twins(dat, parent_ind):
         xx
     single_twins : ?
         xx
+
+    Notes
+    -----
+    TODO: EXPLAIN LOGIC.
     """
 
     # Pull out relevant data from input matrix
@@ -174,12 +178,98 @@ def rm_twin_pairs(all_pairs, twin_pairs):
     return all_pairs
 
 
-def compare_pair(pair_inds, db=None):
+def load_pair(pair_inds, osc_bands_vert=False, osc=None, db=None, dat_source='HCP'):
+    """Load a pair of MEG subjects into MegData objects.
+
+    Parameters
+    ----------
+    pair_inds : ?
+        xx
+    osc_band_vert : boolean, optional (default:False)
+        xx
+    osc : Osc() object, optional
+        xx
+    db : OMDB() object, optional
+        xx
+    dat_source : {'HCP', 'OMEGA'}, optional (default='HCP')
+        Which database to use for data.
+
+    Returns
+    -------
+    dat_out : list of MegData() objects
+        xx
+    """
+
+    # Initialize database object, unless one is supplied
+    if not db:
+        db = OMDB()
+
+    # Initialize data object to return
+    dat_out = []
+
+    # Loop through subject pair, loading and processing data
+    for subj_id in pair_inds:
+
+        # Initialize MegData, load foof dat
+        temp = MegData(db, dat_source, osc)
+        temp.import_foof(subj_id, get_demo=False)
+
+        # Convert to oscillation vertex bands, if requested
+        if osc_bands_vert:
+            temp.osc_bands_vertex()
+
+        # Add subject to output object
+        dat_out.append(temp)
+
+    return dat_out
+
+
+def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
     """Compares center frequency data for a pairing of MEG subjects.
 
     Parameters
     ----------
     pair_inds : list of int
+        xx
+    osc : Osc() object, optional
+        xx
+    db : OMDB() object, optional
+        xx
+    dat_source : {'HCP', 'OMEGA'}, optional (default='HCP')
+        Which database to use for data.
+
+    Returns
+    -------
+    corr_dat : 2d array
+        xx
+    """
+
+    # Initialize database object, unless one is supplied
+    if not db:
+        db = OMDB()
+
+    # Load data
+    dat = load_pair(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
+
+    # Initialize to store correlation results
+    corr_dat = np.zeros([4, 2])
+
+    # Compare center frequencies within oscillatory bands
+    for ind, band in enumerate(osc.bands):
+        corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(dat[0].oscs[band][:, 0],
+                                                      dat[1].oscs[band][:, 0])
+
+    return corr_dat
+
+
+def compare_pair_old(pair_inds, db=None):
+    """Compares center frequency data for a pair of MEG subjects.
+
+    Parameters
+    ----------
+    pair_inds : list of int
+        xx
+    db : OMDB() object, optional
         xx
 
     Returns
@@ -213,5 +303,39 @@ def compare_pair(pair_inds, db=None):
     for ind, band in enumerate(osc.bands):
         corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(pair_a.oscs[band][:, 0],
                                                       pair_b.oscs[band][:, 0])
+
+    return corr_dat
+
+
+def compare_slope(pair_inds, db=None, dat_source='HCP'):
+    """Compares slope value data for a pair of MEG subjects.
+
+    Parameters
+    ----------
+    pair_inds : ?
+        xx
+    db : OMDB() object, optional
+        xx
+    dat_source : {'HCP', 'OMEGA'}, optional (default='HCP')
+        Which database to use for data.
+
+    Returns
+    -------
+    corr_dat : ?
+        xx
+    """
+
+    # Initialize database object, unless one is supplied
+    if not db:
+        db = OMDB()
+
+    # Load data
+    dat = load_pair(pair_inds, db=db, dat_source=dat_source)
+
+    # Initialize to store correlation results
+    corr_dat = np.zeros(2)
+
+    # Compare slopes
+    corr_dat[0], corr_dat[1] = pearsonr(dat[0].slopes, dat[1].slopes)
 
     return corr_dat
