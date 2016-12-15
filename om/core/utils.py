@@ -134,6 +134,46 @@ def rm_files_ext(files_in):
     return files_out
 
 
+def check_file_status(subjs, db, dat_source, verbose=True,):
+    """Checks, for a list of subjects, if FOOF data is available.
+
+    Parameters
+    ----------
+    subjs : list of int
+        xx
+    db : OMDB() object
+        xx
+    dat_source : {'HCP', 'OMEGA'}
+        xx
+
+    Returns
+    -------
+    dat : list of int
+        List of subject IDs for which FOOF data is available.
+    no_dat : list of int
+        List of subject IDs for which FOOF data is not available.
+    """
+
+    # Check all FOOFed files from the HCP database
+    foof_files, _ = db.check_dat_files('foof', dat_source=dat_source, verbose=False)
+
+    # Check which subjects listed in the demographic information are not yet FOOFed
+    dat = []
+    no_dat = []
+    for f in subjs:
+        if f not in foof_files:
+            no_dat.append(f)
+        else:
+            dat.append(f)
+
+    # If requested, print out number of files
+    if verbose:
+        print("Of {} subjects, {} files are available and {} files"
+              " are unavailable.".format(len(subjs), len(dat), len(no_dat)))
+
+    return dat, no_dat
+
+
 def get_section(section, n_rois, roi_lr):
     """Get indices for desired section of connectivity matrix.
 
