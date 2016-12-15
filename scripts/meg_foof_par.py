@@ -7,9 +7,8 @@ import sys
 import time
 import numpy as np
 
-# Import required things from ipyparallel
-from ipyparallel import Client
-from ipyparallel.util import interactive
+# Import custom code from module om, and OO code for handling data
+sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
 
 # Import general code from custom module om
 from om.core.par import Par, run_foof_par
@@ -25,7 +24,7 @@ from om.core.utils import clean_file_list, get_sub_nums, extract_psd
 DAT_SOURCE = 'HCP'
 
 # Initiate queue of subjects to process
-MEG_QUEUE = [358144, 433839, 512835, 555348, 559053, 568963, 581450, 599671]
+MEG_QUEUE = []
 
 ############################################################################
 ################################# RUN CODE #################################
