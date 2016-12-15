@@ -158,13 +158,8 @@ def check_file_status(subjs, db, dat_source, verbose=True,):
     foof_files, _ = db.check_dat_files('foof', dat_source=dat_source, verbose=False)
 
     # Check which subjects listed in the demographic information are not yet FOOFed
-    dat = []
-    no_dat = []
-    for f in subjs:
-        if f not in foof_files:
-            no_dat.append(f)
-        else:
-            dat.append(f)
+    dat = list(set(subjs) & set(foof_files))
+    no_dat = list(set(subjs) - set(foof_files))
 
     # If requested, print out number of files
     if verbose:
