@@ -7,7 +7,7 @@ import numpy as np
 
 from sklearn.neighbors import KNeighborsClassifier
 
-from om.core.db import OMDB
+from om.core.db import OMDB, check_db
 from om.meg.single import MegData
 from om.core.errors import InconsistentDataError
 
@@ -15,8 +15,9 @@ from om.core.errors import InconsistentDataError
 ##########################################################################################
 ##########################################################################################
 
+"""
 def load_subjs(sub_nums, dat_source, db=None):
-    """Loads a list of subjects into a list.
+    "Loads a list of subjects into a list.
 
     Parameters
     ----------
@@ -31,11 +32,10 @@ def load_subjs(sub_nums, dat_source, db=None):
     -------
     subjs : list of MegData() objects
         xx
-    """
+    "
 
-    # Get a database object, unless one is provided
-    if not db:
-        db = OMDB()
+    # Check db, initialize if not provided
+    db = check_db(db)
 
     # Loop through subject numbers to load
     subjs = []
@@ -50,7 +50,7 @@ def load_subjs(sub_nums, dat_source, db=None):
         subjs.append(temp)
 
     return subjs
-
+"""
 
 def split_inds(n_oscs, n_train, n_test):
     """Split indices into train and test groups.
