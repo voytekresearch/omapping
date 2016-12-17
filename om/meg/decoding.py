@@ -15,43 +15,6 @@ from om.core.errors import InconsistentDataError
 ##########################################################################################
 ##########################################################################################
 
-"""
-def load_subjs(sub_nums, dat_source, db=None):
-    "Loads a list of subjects into a list.
-
-    Parameters
-    ----------
-    sub_nums : list of int
-        Subject IDs to load.
-    dat_source : {'OMEGA', 'HCP'}
-        Which database the data comes from.
-    db : OMDB() object
-        xx
-
-    Returns
-    -------
-    subjs : list of MegData() objects
-        xx
-    "
-
-    # Check db, initialize if not provided
-    db = check_db(db)
-
-    # Loop through subject numbers to load
-    subjs = []
-    for sub_num in sub_nums:
-
-        # Load subject of data and process to all oscs
-        temp = MegData(db, dat_source)
-        temp.import_foof(sub_num)
-        temp.all_oscs(verbose=False)
-
-        # Add new subject to output list
-        subjs.append(temp)
-
-    return subjs
-"""
-
 def split_inds(n_oscs, n_train, n_test):
     """Split indices into train and test groups.
 

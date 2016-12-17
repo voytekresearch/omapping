@@ -186,52 +186,6 @@ def rm_twin_pairs(all_pairs, twin_pairs):
 
     return non_twins
 
-"""
-def load_pair(pair_inds, osc_bands_vert=False, osc=None, db=None, dat_source='HCP'):
-    "Load a pair of MEG subjects into MegData objects.
-
-    Parameters
-    ----------
-    pair_inds : ?
-        xx
-    osc_band_vert : boolean, optional (default:False)
-        xx
-    osc : Osc() object, optional
-        xx
-    db : OMDB() object, optional
-        xx
-    dat_source : {'HCP', 'OMEGA'}, optional (default='HCP')
-        Which database to use for data.
-
-    Returns
-    -------
-    dat_out : list of MegData() objects
-        xx
-    "
-
-    # Check db, initialize if not provided
-    db = check_db(db)
-
-    # Initialize data object to return
-    dat_out = []
-
-    # Loop through subject pair, loading and processing data
-    for subj_id in pair_inds:
-
-        # Initialize MegData, load foof dat
-        temp = MegData(db, dat_source, osc)
-        temp.import_foof(subj_id, get_demo=False)
-
-        # Convert to oscillation vertex bands, if requested
-        if osc_bands_vert:
-            temp.osc_bands_vertex()
-
-        # Add subject to output object
-        dat_out.append(temp)
-
-    return dat_out
-"""
-
 
 def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
     """Compares center frequency data for a pairing of MEG subjects.
