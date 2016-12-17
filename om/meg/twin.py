@@ -6,7 +6,8 @@ import csv
 import numpy as np
 from scipy.stats.stats import pearsonr
 
-from om.core.db import OMDB
+from om.core.io import load_meg_list
+from om.core.db import OMDB, check_db
 from om.core.osc import Osc
 from om.meg.single import MegData
 
@@ -14,8 +15,15 @@ from om.meg.single import MegData
 ##########################################################################################
 ##########################################################################################
 
-def get_twin_data():
+def get_twin_data(db=None, file_name='00-HCP_Subjects_RESTRICTED.csv'):
     """Extract twin status data from data file.
+
+    Parameters
+    ----------
+    db : OMDB() object, optional
+        xx
+    f_name : str, optional
+        xx
 
     Returns
     -------
@@ -33,9 +41,8 @@ def get_twin_data():
     TODO:
     """
 
-    # Initialize database object, and set file name
-    db = OMDB()
-    file_name = '00-HCP_Subjects_RESTRICTED.csv'
+    # Check db, initialize if not provided
+    db = check_db(db)
 
     # Set up file indices
     id_ind = 0
@@ -94,9 +101,9 @@ def match_twins(dat, parent_ind=1):
     Returns
     -------
     twin_pairs : list of tuple of (int, int)
-        Each list within the list contains the subject IDs for a twin pair.
-    single_twins : list of tuple of (int, int)
-        Each list within the list contains the ID of a twins that is unmatched.
+        Each element within the list contains the subject IDs for a twin pair.
+    single_twins : list of tuple of (int)
+        Each element within the list contains the ID of a twins that is unmatched.
 
     Notes
     -----
@@ -138,9 +145,9 @@ def check_complete_pairs(twin_ids, available_files):
 
     Parameters
     ----------
-    twin_ids : ?
+    twin_ids : list of tuple of (int, int)
         xx
-    available_files : ?
+    available_files : list of int
         xx
 
     Returns
@@ -164,14 +171,14 @@ def rm_twin_pairs(all_pairs, twin_pairs):
 
     Parameters
     ----------
-    all_pairs : list of tuple
+    all_pairs : list of tuple of (int, int)
         xx
-    twin_pairs : list of tuple
+    twin_pairs : list of tuple of (int, int)
         xx
 
     Returns
     -------
-    non_twins : list of tuple
+    non_twins : list of tuple of (int, int)
         xx
     """
 
@@ -179,9 +186,9 @@ def rm_twin_pairs(all_pairs, twin_pairs):
 
     return non_twins
 
-
+"""
 def load_pair(pair_inds, osc_bands_vert=False, osc=None, db=None, dat_source='HCP'):
-    """Load a pair of MEG subjects into MegData objects.
+    "Load a pair of MEG subjects into MegData objects.
 
     Parameters
     ----------
@@ -200,11 +207,10 @@ def load_pair(pair_inds, osc_bands_vert=False, osc=None, db=None, dat_source='HC
     -------
     dat_out : list of MegData() objects
         xx
-    """
+    "
 
-    # Initialize database object, unless one is supplied
-    if not db:
-        db = OMDB()
+    # Check db, initialize if not provided
+    db = check_db(db)
 
     # Initialize data object to return
     dat_out = []
@@ -224,6 +230,7 @@ def load_pair(pair_inds, osc_bands_vert=False, osc=None, db=None, dat_source='HC
         dat_out.append(temp)
 
     return dat_out
+"""
 
 
 def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
@@ -246,12 +253,13 @@ def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
         Results of the correlation within each band between subjects.
     """
 
-    # Initialize database object, unless one is supplied
-    if not db:
-        db = OMDB()
+    # Check db, initialize if not provided
+    db = check_db(db)
 
     # Load data
-    dat = load_pair(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
+    #dat = load_pair(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
+    dat = load_meg_list(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
+
 
     # Initialize to store correlation results
     corr_dat = np.zeros([4, 2])
@@ -260,51 +268,6 @@ def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
     for ind, band in enumerate(osc.bands):
         corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(dat[0].oscs[band][:, 0],
                                                       dat[1].oscs[band][:, 0])
-
-    return corr_dat
-
-
-def compare_pair_old(pair_inds, db=None):
-    """Compares center frequency data for a pair of MEG subjects.
-
-    Parameters
-    ----------
-    pair_inds : list of int
-        xx
-    db : OMDB() object, optional
-        xx
-
-    Returns
-    -------
-    corr_dat : 2d array
-        xx
-    """
-
-    # Initialize database object, unless one is supplied
-    if not db:
-        db = OMDB()
-
-    # Set up oscillation band definition, and dat source
-    osc = Osc(default=True)
-    dat_source = 'HCP'
-
-    # Initialize data object and load data - pair data-A
-    pair_a = MegData(db, dat_source, osc)
-    pair_a.import_foof(pair_inds[0], get_demo=False)
-    pair_a.osc_bands_vertex()
-
-    # Initialize data object and load data - pair data-B
-    pair_b = MegData(db, dat_source, osc)
-    pair_b.import_foof(pair_inds[1], get_demo=False)
-    pair_b.osc_bands_vertex()
-
-    # Initialize to store correlation results
-    corr_dat = np.zeros([4, 2])
-
-    # Compare center frequencies within oscillatory bands
-    for ind, band in enumerate(osc.bands):
-        corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(pair_a.oscs[band][:, 0],
-                                                      pair_b.oscs[band][:, 0])
 
     return corr_dat
 
@@ -327,12 +290,12 @@ def compare_slope(pair_inds, db=None, dat_source='HCP'):
         Results of the correlation between subjects.
     """
 
-    # Initialize database object, unless one is supplied
-    if not db:
-        db = OMDB()
+    # Check db, initialize if not provided
+    db = check_db(db)
 
     # Load data
-    dat = load_pair(pair_inds, db=db, dat_source=dat_source)
+    #dat = load_pair(pair_inds, db=db, dat_source=dat_source)
+    dat = load_meg_list(pair_inds, db=db, dat_source=dat_source)
 
     # Initialize to store correlation results
     corr_dat = np.zeros(2)
@@ -341,6 +304,7 @@ def compare_slope(pair_inds, db=None, dat_source='HCP'):
     corr_dat[0], corr_dat[1] = pearsonr(dat[0].slopes, dat[1].slopes)
 
     return corr_dat
+
 
 def print_twin_results(corr_dat, labels):
     """Print out correlation results.
@@ -354,4 +318,4 @@ def print_twin_results(corr_dat, labels):
     """
 
     for ind, label in enumerate(labels):
-        print('\t', label, ' : ', '{:5.4f}'.format(corr_dat[ind, 0]))
+        print('\t', label, '\t : ', '{:5.4f}'.format(corr_dat[ind, 0]))
