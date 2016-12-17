@@ -9,7 +9,7 @@ import scipy.stats.stats as sps
 
 # Import custom om code
 from om.maps.base import MapCompBase
-from om.core.db import OMDB
+from om.core.db import OMDB, check_db
 from om.core.par import Par, run_corr_par
 from om.core.utils import clean_file_list, avg_csv_files
 from om.core.errors import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
@@ -505,7 +505,7 @@ class MapCompTG(MapCompBase):
 ######################### OMEGAMAPPIN - CL_MC_TG - FUNCTIONS (PUBLIC) #########################
 ###############################################################################################
 
-def calc_avg_gene_map(subj_list, file_title):
+def calc_avg_gene_map(subj_list, file_title, db=None):
     """XXX
 
     Parameters
@@ -514,10 +514,12 @@ def calc_avg_gene_map(subj_list, file_title):
         List of subject numbers to average together.
     file_title : str
         String to add to front of file to save out.
+    db : OMDB() object, optional
+        xx
     """
 
-    # Get OMDB object
-    db = OMDB()
+    # Check db, initialize if not provided
+    db = check_db(db)
 
     # Check how many subjects to average over
     n_subjs = len(subj_list)
