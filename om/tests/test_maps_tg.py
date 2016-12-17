@@ -274,6 +274,21 @@ def test_unload_data_terms():
 
     assert not map_comp.terms_loaded
 
+def test_unload_data_errors():
+    """   """
+
+    tdb = TDB()
+    map_comp = MapCompTG(tdb)
+
+    with raises(DataNotComputedError):
+        map_comp.unload_data('Genes')
+
+    with raises(DataNotComputedError):
+        map_comp.unload_data('Terms')
+
+    with raises(UnknownDataTypeError):
+        map_comp.unload_data('BAD')
+
 def test_save_corrs():
     """   """
 
