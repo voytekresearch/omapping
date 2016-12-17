@@ -4,6 +4,7 @@ import numpy as np
 from py.test import raises
 
 from om.core.io import *
+from om.core.osc import Osc
 from om.tests.utils import TestDB as TDB
 from om.meg.single import MegData
 
@@ -72,3 +73,13 @@ def test_load_obj_pickle():
 
     with raises(UnknownDataTypeError):
         load_obj_pickle('BAD', 'test', db=tdb)
+
+def test_load_meg_list():
+
+    tdb = TDB()
+    osc = Osc(default=True)
+
+    dat = load_meg_list(['test_v5', 'test_v5'], osc_bands_vert=True,
+                        all_oscs=True, osc=osc, db=tdb, dat_source='')
+
+    assert dat
