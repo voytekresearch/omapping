@@ -239,11 +239,23 @@ def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=N
 
     Parameters
     ----------
+    sub_nums : list of int
+        Subject IDs to load and add to list.
+    osc_bands_vert : boolean, optional (default: False)
+        Whether convert data to oscillations bands across vertices.
+    all_oscs : boolean, optional (default: False)
+        Whether to convert data to all oscillations.
+    osc : Osc() object, optional
+        Oscillation band definitions.
+    db : OMDB() object, optional
+        OM database object.
+    dat_source : str, optional
+        Which database subject comes from.
 
     Returns
     -------
     dat_out : list of MegData() objects
-        xx
+        A list containing all the loaded MegData objects.
     """
 
     # Check db, initialize if not provided
