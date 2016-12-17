@@ -206,6 +206,29 @@ class OMDB(object):
 ############################## OMEGAMAPPIN - CORE - DB - FUNCTIONS ##############################
 #################################################################################################
 
+def check_db(db):
+    """Checks if OMDB object is initialized. If not, returns OMDB() object.
+
+    Parameters
+    ----------
+    db : {OMDB() object, None}
+        Can be None, or a OMDB() object.
+
+    Returns
+    -------
+    db : OMDB() object
+        xx
+    """
+
+    if not db:
+        db = OMDB()
+
+    return db
+
+#########################################################################################
+########################## CREATE DATABASE STRUCTURE FUNCTIONS ##########################
+#########################################################################################
+
 def make_file_directory_internal(base_path):
     """Generates the database folder structure for internal data."""
 
