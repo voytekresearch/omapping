@@ -6,7 +6,8 @@ import pickle
 import datetime
 import scipy.io as sio
 
-from om.core.db import OMDB
+from om.meg.single import MegData
+from om.core.db import OMDB, check_db
 from om.core.utils import clean_file_list, get_cur_subj
 from om.core.errors import UnknownDataSourceError, UnknownDataTypeError
 
@@ -179,9 +180,8 @@ def save_obj_pickle(obj, dat_type, save_name, db=None):
         xx
     """
 
-    # Get database object, unless one was provided
-    if not db:
-        db = OMDB()
+    # Check db, initialize if not provided
+    db = check_db(db)
 
     # Check that specified dat type is vale
     if dat_type not in ['meg', 'maps']:
@@ -212,9 +212,8 @@ def load_obj_pickle(dat_type, file_name, db=None):
         xx
     """
 
-    # Get database object, unless one was provided
-    if not db:
-        db = OMDB()
+    # Check db, initialize if not provided
+    db = check_db(db)
 
     # Check that specified dat type is vale
     if dat_type not in ['meg', 'maps']:
@@ -233,3 +232,40 @@ def load_obj_pickle(dat_type, file_name, db=None):
         f_name = f_names[0]
 
     return pickle.load(open(os.path.join(db.save_path, dat_type, f_name), 'rb'))
+
+
+def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=None, dat_source=None):
+    """Loads a group of subject IDs into MegData() objects, collected in a list.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    dat_out : list of MegData() objects
+        xx
+    """
+
+    # Check db, initialize if not provided
+    db = check_db(db)
+
+    # Loop through subject numbers to load
+    dat_out = []
+    for subj_id in sub_nums:
+
+        # Initialize MegData, load foof dat
+        temp = MegData(db, dat_source, osc)
+        temp.import_foof(subj_id, get_demo=False)
+
+        # Convert to oscillation vertex bands, if requested
+        if osc_bands_vert:
+            temp.osc_bands_vertex()
+
+        # Convert to all-oscs, if requested
+        if all_oscs:
+            temp.all_oscs(verbose=False)
+
+        # Add new subject to output list
+        dat_out.append(temp)
+
+    return dat_out
