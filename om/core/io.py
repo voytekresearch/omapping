@@ -1,4 +1,4 @@
-"""DOCSTRING"""
+"""Load and save functions for the OM project."""
 
 import os
 import csv
@@ -7,7 +7,7 @@ import datetime
 import scipy.io as sio
 
 from om.meg.single import MegData
-from om.core.db import OMDB, check_db
+from om.core.db import check_db
 from om.core.utils import clean_file_list, get_cur_subj
 from om.core.errors import UnknownDataSourceError, UnknownDataTypeError
 
@@ -166,18 +166,18 @@ def load_foof_csv():
 
 
 def save_obj_pickle(obj, dat_type, save_name, db=None):
-    """
+    """Save a custom object out to a pickle file.
 
     Parameters
     ----------
-    obj : ?
-        xx
-    dat_type : ?
-        xx
-    save_name : ?
-        xx
-    db : OMDB object, optional
-        xx
+    obj : obj()
+        Custom object to be saved out.
+    dat_type : {'meg', 'maps'}
+        Data type of the object.
+    save_name : str
+        Name to attach to saved out file name.
+    db : OMDB() object, optional
+        Database object for the OM project.
     """
 
     # Check db, initialize if not provided
@@ -195,21 +195,21 @@ def save_obj_pickle(obj, dat_type, save_name, db=None):
 
 
 def load_obj_pickle(dat_type, file_name, db=None):
-    """
+    """Load a custom object from a pickled file.
 
     Parameters
     ----------
     dat_type : {'meg', 'maps'}
-        xx
-    file_name : ?
-        xx
+        Data type of the object.
+    file_name : str
+        Label in the filename to be loaded.
     db : OMDB object, optional
-        xx
+        Database object for the OM project.
 
     Returns
     -------
     pickled object
-        xx
+        Custom object loaded from pickle.
     """
 
     # Check db, initialize if not provided
