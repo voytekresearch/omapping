@@ -21,9 +21,9 @@ def get_twin_data(db=None, file_name='00-HCP_Subjects_RESTRICTED.csv'):
     Parameters
     ----------
     db : OMDB() object, optional
-        xx
+        Database object for omegamappin project.
     f_name : str, optional
-        xx
+        File name for the metadata file to use.
 
     Returns
     -------
@@ -135,6 +135,7 @@ def match_twins(dat, parent_ind=1):
         elif len(kids) == 2:
             twin_pairs.append(tuple(all_subj_ids[kids]))
         else:
+            # TODO: fix this up
             print('AHHHHH')
 
     return twin_pairs, single_twins
@@ -146,20 +147,21 @@ def check_complete_pairs(twin_ids, available_files):
     Parameters
     ----------
     twin_ids : list of tuple of (int, int)
-        xx
+        Twin ID pairs.
     available_files : list of int
-        xx
+        All subject data files that are available.
 
     Returns
     -------
-    complete_pairs : ?
-        xx
+    complete_pairs : list of tuple of (int, int)
+        Twin ID pairs for which both subject's data are available.
     """
 
+    # Loop through all twin pairs
     complete_pairs = []
-
     for pair in twin_ids:
 
+        # Keep pair if both IDs are available
         if pair[0] in available_files and pair[1] in available_files:
             complete_pairs.append(pair)
 
@@ -172,16 +174,17 @@ def rm_twin_pairs(all_pairs, twin_pairs):
     Parameters
     ----------
     all_pairs : list of tuple of (int, int)
-        xx
+        All possible subject ID pairs.
     twin_pairs : list of tuple of (int, int)
-        xx
+        Twin ID pairs.
 
     Returns
     -------
     non_twins : list of tuple of (int, int)
-        xx
+        Subject ID pairs for all non-twins.
     """
 
+    # Remove all pairs that are twin pairs
     non_twins = list(set(all_pairs) - set(twin_pairs))
 
     return non_twins
@@ -193,11 +196,11 @@ def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
     Parameters
     ----------
     pair_inds : list of int
-        xx
+        List of subject IDs for a pair for subjects to compare.
     osc : Osc() object, optional
-        xx
+        Oscillation band definitions.
     db : OMDB() object, optional
-        xx
+        Database object for omegamappin project.
     dat_source : {'HCP', 'OMEGA'}, optional (default='HCP')
         Which database to use for data.
 
@@ -211,9 +214,7 @@ def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
     db = check_db(db)
 
     # Load data
-    #dat = load_pair(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
     dat = load_meg_list(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
-
 
     # Initialize to store correlation results
     corr_dat = np.zeros([4, 2])
@@ -231,10 +232,10 @@ def compare_slope(pair_inds, db=None, dat_source='HCP'):
 
     Parameters
     ----------
-    pair_inds : ?
-        xx
+    pair_inds : list of int
+        List of subject IDs for a pair for subjects to compare.
     db : OMDB() object, optional
-        xx
+        Database object for omegamappin project.
     dat_source : {'HCP', 'OMEGA'}, optional (default='HCP')
         Which database to use for data.
 
@@ -248,7 +249,6 @@ def compare_slope(pair_inds, db=None, dat_source='HCP'):
     db = check_db(db)
 
     # Load data
-    #dat = load_pair(pair_inds, db=db, dat_source=dat_source)
     dat = load_meg_list(pair_inds, db=db, dat_source=dat_source)
 
     # Initialize to store correlation results
@@ -265,9 +265,9 @@ def print_twin_results(corr_dat, labels):
 
     Parameters
     ----------
-    corr_dat : ?
+    corr_dat : 2d array
         xx
-    labels : ?
+    labels : list of str
         xx
     """
 
