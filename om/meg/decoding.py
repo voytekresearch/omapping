@@ -15,6 +15,38 @@ from om.core.errors import InconsistentDataError
 ##########################################################################################
 ##########################################################################################
 
+def arrange_dat(subjs):
+    """Arrange data from subjects to be able to run decoding on them.
+
+    Parameters
+    ----------
+    subjs : ?
+        xx
+
+    Returns
+    -------
+    all_dat : 2d array
+        xx
+    all_labels : 1d array
+        xx
+    """
+
+    # Initilialize data variables
+    all_dat = np.empty((0, 3))
+    all_labels = np.array([], dtype=int)
+
+    # Loop through each subject
+    for ind, subj in enumerate(subjs):
+
+        # Pull out data from current subject
+        all_dat = np.vstack([all_dat, np.array([subj.centers_all, subj.powers_all, subj.bws_all]).T])
+
+        # Set the train labels for current subject
+        all_labels = np.append(all_labels, np.ones(len(subj.centers_all), dtype=int) * ind)
+
+    return all_dat, all_labels
+
+
 def split_inds(n_oscs, n_train, n_test):
     """NOTE: OLD! Use 'train_test_split' from sklearn
 
@@ -102,25 +134,6 @@ def check_accuracy_all(dat, labels):
     acc = n_correct / len(dat)
 
     return acc
-
-
-def arrange_dat(subjs):
-    """   """
-
-    # Initilialize data variables
-    all_dat = np.empty((0, 3))
-    all_labels = np.array([], dtype=int)
-
-    # Loop through each subject
-    for ind, subj in enumerate(subjs):
-
-        # Pull out data from current subject
-        all_dat = np.vstack([all_dat, np.array([subj.centers_all, subj.powers_all, subj.bws_all]).T])
-
-        # Set the train labels for current subject
-        all_labels = np.append(all_labels, np.ones(len(subj.centers_all), dtype=int) * ind)
-
-    return all_dat, all_labels
 
 
 def knn(subjs, n_train=1500, n_test=50):
