@@ -8,6 +8,7 @@ from om.meg.group import GroupMegData
 from om.maps.anat import MapCompAnat
 from om.core.db import OMDB
 from om.core.osc import Osc
+from om.core.io import load_meg_list
 
 #############################################################################################
 #############################################################################################
@@ -116,3 +117,14 @@ def load_test_anat(load_meg=False, load_scout=False, load_anat=False,
         map_comp.calc_meg_con()
 
     return map_comp
+
+def load_test_meg_pair(osc_bands_vert=False):
+    """   """
+
+    tdb = TestDB()
+    osc = Osc(default=True)
+
+    dat = load_meg_list(['test_v5', 'test_v5'], osc_bands_vert=osc_bands_vert,
+                        osc=osc, db=tdb, dat_source='')
+
+    return dat
