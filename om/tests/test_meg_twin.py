@@ -54,7 +54,7 @@ def test_compare_pair():
     tdb = TDB()
     osc = Osc(default=True)
 
-    corr_dat = compare_pair(['test_v5', 'test_v5'], osc=osc, db=tdb, dat_source='')
+    corr_dat = compare_pair(['test_v5', 'test_v5'], 0, osc=osc, db=tdb, dat_source='')
 
     assert np.any(corr_dat)
 
