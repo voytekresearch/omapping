@@ -39,7 +39,9 @@ class Osc(object):
 
         # Initialize bands as a dictionary
         self.bands = OrderedDict()
-        #self.bands = dict()
+
+        # Add running total of how many bands are defined
+        self.n_bands = int()
 
         # If requested use the default oscillation bands
         if default:
@@ -47,12 +49,7 @@ class Osc(object):
             self.add_band('Alpha', (8, 13))
             self.add_band('Beta', (13, 30))
             self.add_band('LowGamma', (30, 40))
-
-            #OLD:
-            #self.bands = dict({'Theta': (3, 8),
-            #                   'Alpha': (8, 13),
-            #                   'Beta': (13, 30),
-            #                   'LowGamma': (30, 40)})
+            self.n_bands = 4
 
         # If supplied, use the given dictionary of oscillation bands
         if input_bands:
@@ -81,6 +78,7 @@ class Osc(object):
 
         # Add the given band to oscillation definition
         self.bands[band_name] = band_lims
+        self.n_bands += 1
 
 
     def rm_band(self, rm_band):
@@ -94,3 +92,4 @@ class Osc(object):
 
         # Remove requested band from oscillation definition
         self.bands.pop(rm_band)
+        self.n_bands -= 1
