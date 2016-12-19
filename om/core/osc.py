@@ -1,24 +1,32 @@
-"""DOCSTRING"""
+"""Oscillation band defintion object for OM.
 
+Notes
+-----
+ - The Osc object uses the OrderedDict object, which is a special dictionary object which enforces and
+ensures a consistent order of items within the dictionary. This allows for looping through bands in a
+consistent manner.
+More information here: https://docs.python.org/2/library/collections.html#collections.OrderedDict
+"""
+
+import numpy as np
 from collections import OrderedDict
+from types import StringType
 
 from om.core.errors import InconsistentDataError
-
-# TODO: fix up how you add your own band definitions.
-#   Make it take advantage of OrderedDict.
-#   Perhaps, sort bands, then add?
 
 ######################################################################################
 ############################## OMEGAMAPPIN - CORE - OSC ##############################
 ######################################################################################
 
 class Osc(object):
-    """Class to hold definition of oscillation bands.
+    """Class to hold definitions of oscillation bands.
 
     Attributes
     ----------
     bands : dict
         Dictionary of oscillation band definitions.
+    n_bands : int
+        The number of oscillation bands that are defined.
     """
 
     def __init__(self, default=False, input_bands=None):
@@ -49,11 +57,61 @@ class Osc(object):
             self.add_band('Alpha', (8, 13))
             self.add_band('Beta', (13, 30))
             self.add_band('LowGamma', (30, 40))
-            self.n_bands = 4
 
         # If supplied, use the given dictionary of oscillation bands
         if input_bands:
-            self.bands = input_bands
+
+            # Print a warning if adding custom bands on top of the default ones
+            if default:
+                print('WARNING: Input bands will be added to the default bands.')
+
+            # Initialize lists
+            keys = []
+            lower_bounds = []
+
+            # Loop through the provided dictionary
+            for key in input_bands:
+
+                # Check that provided bands are legal
+                self.check_band(key, input_bands[key])
+
+                # Keep a running list of the band names and lower bound
+                keys.append(key)
+                lower_bounds.append(input_bands[key][0])
+
+            # Sort the bands, and add them in ascending order
+            sort_inds = np.argsort(lower_bounds)
+            for ind in sort_inds:
+                self.add_band(keys[ind], input_bands[keys[ind]])
+
+
+    def check_band(self, band_name, band_limits):
+        """Check that a proposed band definition is properly formatted.
+
+        Parameters
+        ----------
+        band_name : str
+            The name of the new oscillation band.
+        band_limits : tuple(float, float)
+            The lower and upper frequency limit of the band.
+
+        Raises
+        ------
+        InconsistentDataError
+            If oscillation band definition is not properly formatted.
+        """
+
+        # Check that band name is a string
+        if type(band_name) is not StringType:
+            raise InconsistentDataError('Band name definition is not a string.')
+
+        # Check that band limits has the right size
+        if not len(band_limits) == 2:
+            raise InconsistentDataError('Band limit definition is not the right size.')
+
+        # Safety check that limits are in correct order
+        if not band_limits[0] < band_limits[1]:
+            raise InconsistentDataError('Band limits are incorrect.')
 
 
     def add_band(self, band_name, band_lims):
@@ -65,16 +123,10 @@ class Osc(object):
             The name of the new oscillation band.
         band_lims : tuple(float, float)
             The lower and upper frequency limit of the band.
-
-        Raises
-        ------
-        InconsistentDataError
-            If oscillation band limits given do not work.
         """
 
-        # Safety check that limits are in correct order
-        if not band_lims[0] < band_lims[1]:
-            raise InconsistentDataError('Band limits are incorrect.')
+        # Check that band definition is properly formatted
+        self.check_band(band_name, band_lims)
 
         # Add the given band to oscillation definition
         self.bands[band_name] = band_lims
@@ -86,7 +138,7 @@ class Osc(object):
 
         Parameters
         ----------
-        old_band : str
+        rm_band : str
             Band name to remove from oscillation band definitions.
         """
 
