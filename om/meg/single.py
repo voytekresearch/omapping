@@ -89,6 +89,7 @@ class MegData(object):
         db : OMDB() object
             Database object for omegamappin project.
         osc : Osc() object, optional
+            Oscillation band definitions.
         """
 
         # Store which db is set
