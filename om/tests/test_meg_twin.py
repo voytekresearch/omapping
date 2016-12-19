@@ -2,6 +2,7 @@
 
 from om.core.osc import Osc
 from om.tests.utils import TestDB as TDB
+from om.tests.utils import load_test_meg_pair
 
 from om.meg.twin import *
 
@@ -48,22 +49,30 @@ def test_rm_twin_pairs():
     assert len(non_twins) == 2
     assert set([(111, 112) , (112, 113)]) == set(non_twins)
 
-def test_compare_pair():
+def test_compare_spatial_pair():
     """   """
 
-    tdb = TDB()
-    osc = Osc(default=True)
+    dat = load_test_meg_pair(osc_bands_vert=True)
 
-    corr_dat = compare_pair(['test_v5', 'test_v5'], 0, osc=osc, db=tdb, dat_source='')
+    res = compare_spatial_pair(dat)
+
+    assert np.any(res)
+
+def test_compare_osc_param_pair():
+    """   """
+
+    dat = load_test_meg_pair(osc_bands_vert=True)
+
+    corr_dat = compare_osc_param_pair(dat, 0)
 
     assert np.any(corr_dat)
 
-def test_compare_slope():
+def test_compare_slope_pair():
     """   """
 
-    tdb = TDB()
+    dat = load_test_meg_pair(osc_bands_vert=True)
 
-    corr_dat = compare_slope(['test_v5', 'test_v5'], db=tdb, dat_source='')
+    corr_dat = compare_slope_pair(dat)
 
     assert np.any(corr_dat)
 
