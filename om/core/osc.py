@@ -2,15 +2,16 @@
 
 Notes
 -----
- - The Osc object uses the OrderedDict object, which is a special dictionary object which enforces and
-ensures a consistent order of items within the dictionary. This allows for looping through bands in a
-consistent manner.
+ - The Osc object uses the OrderedDict object, which is a special dictionary object
+which enforces and ensures a consistent order of items within the dictionary.
 More information here: https://docs.python.org/2/library/collections.html#collections.OrderedDict
 """
 
-import numpy as np
-from collections import OrderedDict
+from __future__ import print_function
+
 from types import StringType
+from collections import OrderedDict
+import numpy as np
 
 from om.core.errors import InconsistentDataError
 
@@ -102,7 +103,7 @@ class Osc(object):
         """
 
         # Check that band name is a string
-        if type(band_name) is not StringType:
+        if not isinstance(band_name, StringType):
             raise InconsistentDataError('Band name definition is not a string.')
 
         # Check that band limits has the right size
