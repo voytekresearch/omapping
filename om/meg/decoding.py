@@ -1,4 +1,4 @@
-"""DOCSTRING"""
+"""Decoding subject ID from magnetophysiological data."""
 
 from __future__ import division
 
@@ -16,7 +16,9 @@ from om.core.errors import InconsistentDataError
 ##########################################################################################
 
 def split_inds(n_oscs, n_train, n_test):
-    """Split indices into train and test groups.
+    """NOTE: OLD! Use 'train_test_split' from sklearn
+
+    Split indices into train and test groups.
 
     Parameters
     ----------
@@ -30,9 +32,9 @@ def split_inds(n_oscs, n_train, n_test):
     Returns
     -------
     train : list of int
-        xx
+        Indices to be used for training data.
     test : list of int
-        xx
+        Indices to be used for test data.
     """
 
     # Check that there are enough oscillations for desired split
@@ -50,30 +52,33 @@ def split_inds(n_oscs, n_train, n_test):
     return train, test
 
 
-def check_accuracy_single(dat, lab):
-    """Test the accuracy for a list of results, with single answer.
+def check_accuracy_single(dat, label):
+    """NOTE: OLD! UNUSED. Use sklearn funcs.
+
+    Test the accuracy for a list of results, with single answer.
 
     Parameters
     ----------
     dat : list of int
-        xx
-    lab : int
-        xx
+        Predicted labels of a set of test data.
+    label : int
+        The correct label.
 
     Returns
     -------
     acc : float
-        xx
+        Prediction accuracy for given data.
     """
 
-    #
-    n_correct = dat.count(lab)
+    # Check how accuracy of all results
+    n_correct = dat.count(label)
     acc = n_correct / len(dat)
 
     return acc
 
+
 def check_accuracy_all(dat, labels):
-    """
+    """NOTE: OLD! UNUSED. Use sklearn funcs.
 
     Parameters
     ----------
@@ -98,8 +103,28 @@ def check_accuracy_all(dat, labels):
 
     return acc
 
+
+def arrange_dat(subjs):
+    """   """
+
+    # Initilialize data variables
+    all_dat = np.empty((0, 3))
+    all_labels = np.array([], dtype=int)
+
+    # Loop through each subject
+    for ind, subj in enumerate(subjs):
+
+        # Pull out data from current subject
+        all_dat = np.vstack([all_dat, np.array([subj.centers_all, subj.powers_all, subj.bws_all]).T])
+
+        # Set the train labels for current subject
+        all_labels = np.append(all_labels, np.ones(len(subj.centers_all), dtype=int) * ind)
+
+    return all_dat, all_labels
+
+
 def knn(subjs, n_train=1500, n_test=50):
-    """
+    """NOTE: OLD! UNUSED. Use sklearn funcs.
 
     Parameters
     ----------
