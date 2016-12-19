@@ -60,16 +60,21 @@ def get_sub_nums(files_in, f_l):
     # Check and remove file extensions
     files_in = rm_files_ext(files_in)
 
+    if f_l is 'first':
+        ind = 0
+    elif f_l is 'last':
+        ind = 1
+
     # Intialize variable to store subject numbers
     subnums = []
 
     # Loop through files, extracting subject numbers
     for f_name in files_in:
         str_split = f_name.split('_', 1)
-        if f_l is 'first':
-            subnums.append(int(str_split[0]))
-        elif f_l is 'last':
-            subnums.append(int(str_split[1]))
+        try:
+            subnums.append(int(str_split[ind]))
+        except ValueError:
+            print('WARNING: found a file for which subject number could not be extracted')
 
     return subnums
 
