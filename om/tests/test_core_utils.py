@@ -65,6 +65,18 @@ def test_rm_files_ext():
     assert not 'npz' in files_out[0]
     assert not '.ok' in files_out[3]
 
+def test_check_file_status():
+    """   """
+
+    tdb = TDB()
+
+    subj_list = [999, 1000]
+
+    dat, no_dat = check_file_status(subj_list, tdb, '', verbose=True)
+
+    assert dat[0] == 999
+    assert no_dat[0] == 1000
+
 def test_get_section():
     """   """
 
