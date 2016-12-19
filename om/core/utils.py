@@ -1,4 +1,4 @@
-"""DOCSTRING"""
+"""Basic utilites for the OM project."""
 
 from __future__ import print_function, division
 import csv
@@ -140,11 +140,11 @@ def check_file_status(subjs, db, dat_source, verbose=True,):
     Parameters
     ----------
     subjs : list of int
-        xx
+        Subjects to check file status for.
     db : OMDB() object
-        xx
+        Database object for the OM project.
     dat_source : {'HCP', 'OMEGA'}
-        xx
+        Which database subjects are from.
 
     Returns
     -------
@@ -195,7 +195,7 @@ def get_section(section, n_rois, roi_lr):
     Raises
     ------
     InconsistentDataError
-        xx
+        If provided section range is unclear or impossible.
 
     Notes
     -----
