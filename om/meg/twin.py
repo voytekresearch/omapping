@@ -8,7 +8,7 @@ from scipy.stats.stats import pearsonr
 
 from om.core.io import load_meg_list
 from om.core.db import OMDB, check_db
-from om.core.osc import Osc
+from om.core.osc import Osc, check_oscs
 from om.meg.single import MegData
 
 ##########################################################################################
@@ -190,15 +190,13 @@ def rm_twin_pairs(all_pairs, twin_pairs):
     return non_twins
 
 
-def compare_spatial(dat, osc):
+def compare_spatial_pair(dat):
     """Compare the spatial overlap of oscillatory bands between two subjects.
 
     Parameters
     ----------
     dat : list of MegData() objects
         Pair of subjects to compare, loaded in MegData objects and collected into a list.
-    osc : Osc()
-        Oscillation band definitions.
 
     Returns
     -------
@@ -210,11 +208,14 @@ def compare_spatial(dat, osc):
         - Add to MegData object as an attribute?
     """
 
+    # Check that oscillation band definitions are consistent
+    bands = check_oscs([dat[0].bands, dat[1].bands])
+
     # Initialize variable to store output data
-    res = np.zeros([osc.n_bands])
+    res = np.zeros([len(bands)])
 
     # Loop through each oscillatory band
-    for ind, band in enumerate(osc.bands):
+    for ind, band in enumerate(bands):
 
         # Create boolean arrays of vertices with oscillation, for each subject, then compare
         #   Use the number of vertices that are the same (have / don't have osc) divided by n_verts
@@ -223,21 +224,15 @@ def compare_spatial(dat, osc):
     return res
 
 
-def compare_pair(pair_inds, osc_param, osc=None, db=None, dat_source='HCP'):
+def compare_osc_param_pair(dat, osc_param):
     """Compares center frequency data for a pairing of MEG subjects.
 
     Parameters
     ----------
-    pair_inds : list of int
-        List of subject IDs for a pair for subjects to compare.
+    dat : list of MegData() objects
+        Pair of subjects to compare, loaded in MegData objects and collected into a list.
     osc_param : {0, 1, 2}
         Which oscillatory parameter to compare: {0: CF, 1: Power, 2: BW}.
-    osc : Osc() object, optional
-        Oscillation band definitions.
-    db : OMDB() object, optional
-        Database object for omegamappin project.
-    dat_source : {'HCP', 'OMEGA'}, optional (default='HCP')
-        Which database to use for data.
 
     Returns
     -------
@@ -245,46 +240,33 @@ def compare_pair(pair_inds, osc_param, osc=None, db=None, dat_source='HCP'):
         Results of the correlation within each band between subjects.
     """
 
-    # Check db, initialize if not provided
-    db = check_db(db)
-
-    # Load data
-    dat = load_meg_list(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
+    # Check that oscillation band definitions are consistent
+    bands = check_oscs([dat[0].bands, dat[1].bands])
 
     # Initialize to store correlation results
-    corr_dat = np.zeros([len(osc.bands), 2])
+    corr_dat = np.zeros([len(bands), 2])
 
     # Compare center frequencies within oscillatory bands
-    for ind, band in enumerate(osc.bands):
+    for ind, band in enumerate(bands):
         corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(dat[0].oscs[band][:, osc_param],
                                                       dat[1].oscs[band][:, osc_param])
 
     return corr_dat
 
 
-def compare_slope(pair_inds, db=None, dat_source='HCP'):
+def compare_slope_pair(dat):
     """Compares slope value data for a pair of MEG subjects.
 
     Parameters
     ----------
-    pair_inds : list of int
-        List of subject IDs for a pair for subjects to compare.
-    db : OMDB() object, optional
-        Database object for omegamappin project.
-    dat_source : {'HCP', 'OMEGA'}, optional (default='HCP')
-        Which database to use for data.
+    dat : list of MegData() objects
+        Pair of subjects to compare, loaded in MegData objects and collected into a list.
 
     Returns
     -------
     corr_dat : 1d array, [r-val, p-val]
         Results of the correlation between subjects.
     """
-
-    # Check db, initialize if not provided
-    db = check_db(db)
-
-    # Load data
-    dat = load_meg_list(pair_inds, db=db, dat_source=dat_source)
 
     # Initialize to store correlation results
     corr_dat = np.zeros(2)
