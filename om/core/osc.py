@@ -118,9 +118,9 @@ class Osc(object):
         self.bands.pop(rm_band)
         self.n_bands -= 1
 
-##
-##
-##
+##################################################################################################
+##################################################################################################
+##################################################################################################
 
 def check_oscs(osc_lst):
     """Check that a list of oscillation band definitions are all the same. If so, return bands.
@@ -128,22 +128,23 @@ def check_oscs(osc_lst):
     Parameters
     ----------
     osc_lst : list of Osc() objects
-        xx
+        Oscillation band definitions to compare.
 
     Returns
     -------
-    Osc()
+    OrderedDict
         Oscillation band oscillations.
     """
 
+    # Check that all oscillation definitions provided are the same
     if not all(x == osc_lst[0] for x in osc_lst):
         raise InconsistentDataError('Oscillation definitions are inconsistent.')
 
     return osc_lst[0]
 
-##
-##
-##
+##################################################################################################
+##################################################################################################
+##################################################################################################
 
 def _check_band(band_name, band_limits):
     """Check that a proposed band definition is properly formatted.
