@@ -74,7 +74,7 @@ class Osc(object):
             for key in input_bands:
 
                 # Check that provided bands are legal
-                self.check_band(key, input_bands[key])
+                _check_band(key, input_bands[key])
 
                 # Keep a running list of the band names and lower bound
                 keys.append(key)
@@ -84,35 +84,6 @@ class Osc(object):
             sort_inds = np.argsort(lower_bounds)
             for ind in sort_inds:
                 self.add_band(keys[ind], input_bands[keys[ind]])
-
-
-    def check_band(self, band_name, band_limits):
-        """Check that a proposed band definition is properly formatted.
-
-        Parameters
-        ----------
-        band_name : str
-            The name of the new oscillation band.
-        band_limits : tuple(float, float)
-            The lower and upper frequency limit of the band.
-
-        Raises
-        ------
-        InconsistentDataError
-            If oscillation band definition is not properly formatted.
-        """
-
-        # Check that band name is a string
-        if not isinstance(band_name, StringType):
-            raise InconsistentDataError('Band name definition is not a string.')
-
-        # Check that band limits has the right size
-        if not len(band_limits) == 2:
-            raise InconsistentDataError('Band limit definition is not the right size.')
-
-        # Safety check that limits are in correct order
-        if not band_limits[0] < band_limits[1]:
-            raise InconsistentDataError('Band limits are incorrect.')
 
 
     def add_band(self, band_name, band_lims):
@@ -127,7 +98,7 @@ class Osc(object):
         """
 
         # Check that band definition is properly formatted
-        self.check_band(band_name, band_lims)
+        _check_band(band_name, band_lims)
 
         # Add the given band to oscillation definition
         self.bands[band_name] = band_lims
@@ -146,3 +117,35 @@ class Osc(object):
         # Remove requested band from oscillation definition
         self.bands.pop(rm_band)
         self.n_bands -= 1
+
+##
+##
+##
+
+def _check_band(band_name, band_limits):
+    """Check that a proposed band definition is properly formatted.
+
+    Parameters
+    ----------
+    band_name : str
+        The name of the new oscillation band.
+    band_limits : tuple(float, float)
+        The lower and upper frequency limit of the band.
+
+    Raises
+    ------
+    InconsistentDataError
+        If oscillation band definition is not properly formatted.
+    """
+
+    # Check that band name is a string
+    if not isinstance(band_name, StringType):
+        raise InconsistentDataError('Band name definition is not a string.')
+
+    # Check that band limits has the right size
+    if not len(band_limits) == 2:
+        raise InconsistentDataError('Band limit definition is not the right size.')
+
+    # Safety check that limits are in correct order
+    if not band_limits[0] < band_limits[1]:
+        raise InconsistentDataError('Band limits are incorrect.')
