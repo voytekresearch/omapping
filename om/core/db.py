@@ -1,4 +1,4 @@
-"""DOCSTRING"""
+"""Database structure object for the OM project."""
 from __future__ import print_function, division
 
 import os
@@ -15,9 +15,9 @@ class OMDB(object):
     Attributes
     ----------
     internal_path : str
-        xx
+        Base path to all internal data.
     external_path : str
-        xx
+        Base path to all external data.
     maps_path : str
         Path to Maps data.
     corrs_path : str
@@ -217,7 +217,7 @@ def check_db(db):
     Returns
     -------
     db : OMDB() object
-        xx
+        Database object for OM project.
     """
 
     if not db:
