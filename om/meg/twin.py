@@ -190,27 +190,25 @@ def rm_twin_pairs(all_pairs, twin_pairs):
     return non_twins
 
 
-def compare_spatial(pair_inds, osc=None, db=None, dat_source='HCP'):
+def compare_spatial(dat, osc):
     """Compare the spatial overlap of oscillatory bands between two subjects.
 
     Parameters
     ----------
+    dat : list of MegData() objects
+        Pair of subjects to compare, loaded in MegData objects and collected into a list.
+    osc : Osc()
+        Oscillation band definitions.
 
     Returns
     -------
     res : 1d array
-        xx
+        Vector of spatial overlap, in percent, for each oscillatory band.
 
     NOTE:
     - Update hard coded value for number of vertices.
-        - Add to MegData object?
+        - Add to MegData object as an attribute?
     """
-
-    # Check db, initialize if not provided
-    db = check_db(db)
-
-    # Load data
-    dat = load_meg_list(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
 
     # Initialize variable to store output data
     res = np.zeros([osc.n_bands])
