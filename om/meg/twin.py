@@ -1,5 +1,5 @@
 """MODULE DOCSTRING"""
-from __future__ import print_function
+from __future__ import print_function, division
 
 import os
 import csv
@@ -190,6 +190,41 @@ def rm_twin_pairs(all_pairs, twin_pairs):
     return non_twins
 
 
+def compare_spatial(pair_inds, osc=None, db=None, dat_source='HCP'):
+    """Compare the spatial overlap of oscillatory bands between two subjects.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    res : 1d array
+        xx
+
+    NOTE:
+    - Update hard coded value for number of vertices.
+        - Add to MegData object?
+    """
+
+    # Check db, initialize if not provided
+    db = check_db(db)
+
+    # Load data
+    dat = load_meg_list(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
+
+    # Initialize variable to store output data
+    res = np.zeros([osc.n_bands])
+
+    # Loop through each oscillatory band
+    for ind, band in enumerate(osc.bands):
+
+        # Create boolean arrays of vertices with oscillation, for each subject, then compare
+        #   Use the number of vertices that are the same (have / don't have osc) divided by n_verts
+        res[ind] = sum((dat[0].oscs[band][:, 0] > 0) == (dat[1].oscs[band][:, 0] > 0)) / 7500
+
+    return res
+
+
 def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
     """Compares center frequency data for a pairing of MEG subjects.
 
@@ -217,7 +252,7 @@ def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
     dat = load_meg_list(pair_inds, osc_bands_vert=True, osc=osc, db=db, dat_source=dat_source)
 
     # Initialize to store correlation results
-    corr_dat = np.zeros([4, 2])
+    corr_dat = np.zeros([len(osc.bands), 2])
 
     # Compare center frequencies within oscillatory bands
     for ind, band in enumerate(osc.bands):
