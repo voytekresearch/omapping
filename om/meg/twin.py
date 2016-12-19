@@ -225,13 +225,15 @@ def compare_spatial(pair_inds, osc=None, db=None, dat_source='HCP'):
     return res
 
 
-def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
+def compare_pair(pair_inds, osc_param, osc=None, db=None, dat_source='HCP'):
     """Compares center frequency data for a pairing of MEG subjects.
 
     Parameters
     ----------
     pair_inds : list of int
         List of subject IDs for a pair for subjects to compare.
+    osc_param : {0, 1, 2}
+        Which oscillatory parameter to compare: {0: CF, 1: Power, 2: BW}.
     osc : Osc() object, optional
         Oscillation band definitions.
     db : OMDB() object, optional
@@ -256,8 +258,8 @@ def compare_pair(pair_inds, osc=None, db=None, dat_source='HCP'):
 
     # Compare center frequencies within oscillatory bands
     for ind, band in enumerate(osc.bands):
-        corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(dat[0].oscs[band][:, 0],
-                                                      dat[1].oscs[band][:, 0])
+        corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(dat[0].oscs[band][:, osc_param],
+                                                      dat[1].oscs[band][:, osc_param])
 
     return corr_dat
 
