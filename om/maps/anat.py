@@ -1,7 +1,4 @@
-"""MODULE DOCSTRING - TO FILL IN
-
-"""
-
+"""Anatomical analyses for the OM project."""
 from __future__ import print_function, division
 
 import os
@@ -53,7 +50,6 @@ class MapCompAnat(MapCompBase):
 
         # Inherit from MapComp() class
         MapCompBase.__init__(self, db)
-
 
         # Initialize vars to store ROI data
         self.rois = ROI()
@@ -179,36 +175,38 @@ class MapCompAnat(MapCompBase):
         rois = ROI()
 
         # Loop through and line up scout names
-        # Loops through anat ROIs, finding corresponding ROI in elec
+        #   Loops through anat ROIs, finding corresponding ROI in elec
         for anat_ind, anat_label in enumerate(self.anat.labels):
 
+            # Pull out current anat ROI label
             anat_lr = self.anat.lrs[anat_ind]
 
             for elec_ind, elec_label in enumerate(self.elec.labels):
 
+                # Pull out current elec ROI label
                 elec_lr = self.elec.lrs[elec_ind]
 
-                # Check labels match
+                # Check if labels match
                 if anat_label == elec_label:
 
                     # Check if L/R is right
                     if anat_lr == elec_lr:
 
-                        #
+                        # If label & L/R match, add to ROI
                         rois.labels.append(anat_label)
                         rois.lrs.append(anat_lr)
 
-                        #
+                        # Add the vertex definitions for ROI for elec data
                         rois.verts.append(self.elec.verts[elec_ind])
 
-        #
+        # Update the number of labels, and set that ROI data is loaded
         rois.n_rois = len(rois.labels)
         rois.loaded = True
 
-        #
+        # Check that ROI definitions are consistent
         rois.check_consistency()
 
-        # Add
+        # Add ROI definition to object
         self.rois = rois
 
 
@@ -226,14 +224,11 @@ class MapCompAnat(MapCompBase):
         # Loop through all rois
         for ind, cur_verts in enumerate(self.rois.verts):
 
-            # Add current roi data to dict
-            # Loop through all oscs
+            # Add current roi data to dict, and loop through oscillations
             for band in self.meg_maps.keys():
 
                 n_verts = len(cur_verts)
-
                 temp_dat = self.meg_maps[band][cur_verts]
-
                 roi_meg_dat[band][ind] = (sum(temp_dat) / n_verts)
 
         # Add the current roi data to object
@@ -317,21 +312,21 @@ class MapCompAnat(MapCompBase):
 ############################################################################################
 
 def _extract_lr(labels_in, dat_type):
-    """
+    """Pull out the L/R information from ROI label.
 
     Parameters
     ----------
-    labels : list of str
-        xx
+    labels_in : list of str
+        ROI labels.
     dat_type : {'anat', 'elec'}
-        xx
+        Whether ROI label comes from anat or elec data.
 
     Returns
     -------
     labels : list of str
-        xx
+        Cleaned ROI labels.
     lrs : list of str
-        xx
+        L/R information for each ROI.
     """
 
     # Initialize lists to collect data
@@ -344,19 +339,19 @@ def _extract_lr(labels_in, dat_type):
     elif dat_type is 'elec':
         ch_ind = -1
 
-    #
+    # Loop through all provided labels
     for label in labels_in:
 
-        #
+        # Check which side ROI is from
         if label[ch_ind].lower() == 'l':
             lr = 'L'
         elif label[ch_ind].lower() == 'r':
             lr = 'R'
 
-        #
+        # Clean up the ROI label
         label = _clean_label(label, lr, dat_type)
 
-        #
+        # Add label information to return
         labels_out.append(label)
         lrs.append(lr)
 
@@ -364,23 +359,23 @@ def _extract_lr(labels_in, dat_type):
 
 
 def _clean_label(label, lr, dat_type):
-    """
+    """Clean the ROI label.
 
     Parameters
     ----------
     label : str
-        xx
-    lr : str
-        xx
+        ROI label.
+    lr : {'L', 'R'}
+        Whether current ROI is left/right.
     dat_type : {'anat', 'elec'}
-        xx
+        Whether ROI label comes from anat or elec data.
     """
 
-    #
+    # For elec, drop the L/R from the end
     if dat_type is 'elec':
         label = label[:-2]
 
-    #
+    # For anat, drop the leading 'left', 'right'
     if dat_type is 'anat':
         if lr is 'L':
             label = label[5:]
