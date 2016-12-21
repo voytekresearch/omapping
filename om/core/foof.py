@@ -1,4 +1,4 @@
-"""DOCSTRING"""
+"""Functions to run FOOF for the OM project."""
 
 import numpy as np
 

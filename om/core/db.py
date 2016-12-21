@@ -37,7 +37,7 @@ class OMDB(object):
     """
 
     def __init__(self, auto_gen=True):
-        """   """
+        """Initialize OMDB object."""
 
         # Initialize base paths
         self.internal_path = ("/Users/thomasdonoghue/Documents/Research/"
