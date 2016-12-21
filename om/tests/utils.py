@@ -20,7 +20,7 @@ class TestDB(OMDB):
     def __init__(self):
 
         # Initialize from OMDB object
-        OMDB.__init__(self)
+        OMDB.__init__(self, auto_gen=False)
 
         # Set up the base path to tests data
         test_dat_path = pkg.resource_filename(__name__, 'data')
