@@ -1,4 +1,4 @@
-"""   """
+"""Testing of database functions and classes for OM."""
 
 import os
 from types import ListType
@@ -15,7 +15,7 @@ def test_omdb():
     assert OMDB(auto_gen=False)
 
 def test_omdb_gen_paths():
-    """   """
+    """Test that gen_paths method of OMDB works."""
 
     db = OMDB(auto_gen=False)
     db.gen_paths()
@@ -35,6 +35,7 @@ def test_omdb_paths():
             assert os.path.exists(val)
 
 def test_check_dat_files_psd():
+    """Test that OMDB() check_dat_files method runs properly, for PSD files."""
 
     db = OMDB()
 
@@ -48,6 +49,7 @@ def test_check_dat_files_psd():
     sub_nums, source = db.check_dat_files('PSD', 'HCP', verbose=True)
 
 def test_check_dat_files_foof():
+    """Test that OMDB() check_dat_files method runs properly, for FOOF files."""
 
     db = OMDB()
 
@@ -60,6 +62,7 @@ def test_check_dat_files_foof():
     sub_nums, source = db.check_dat_files('foof', 'HCP', verbose=True)
 
 def test_check_res_files_meg():
+    """Test that OMDB() check_res_files method runs properly, for MEG files."""
 
     db = OMDB()
 
@@ -68,6 +71,7 @@ def test_check_res_files_meg():
     assert type(files) == ListType
 
 def test_check_res_files_maps():
+    """Test that OMDB() check_res_files method runs properly, for MAPS files."""
 
     db = OMDB()
 
@@ -76,6 +80,7 @@ def test_check_res_files_maps():
     assert type(files) == ListType
 
 def test_check_map_files():
+    """Test that OMDB() check_maps_files method runs properly."""
 
     db = OMDB()
 
