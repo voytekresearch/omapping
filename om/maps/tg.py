@@ -97,6 +97,8 @@ class MapCompTG(MapCompBase):
         ----------
         subject : str
             Which subject of gene data to load, of the form 'sub#'.
+        names_file, str, optional (default: '00-real_gene_names.csv')
+            Which file to load the gene names from.
         """
 
         # Load gene names
@@ -151,6 +153,8 @@ class MapCompTG(MapCompBase):
         ----------
         term_data_file : str
             File name of term data file.
+        names_file, str, optional (default: '00-ns_terms.csv')
+            Which file to load the term names from.
         """
 
         # Load term names
