@@ -209,9 +209,9 @@ def test_get_all_osc():
     assert len(oscs_out) == 5
     assert np.all(oscs_out == np.array([3, 4, 5, 6, 7]))
 
-def test_osc_prob():
-    """   """
-    pass
+#def test_osc_prob():
+#    """   """
+#    pass
 
 
 def test_osc_pow_ratio():
@@ -224,9 +224,9 @@ def test_band_sort():
 
     osc = Osc()
 
-    osc.add_band('b', [12, 14])
-    osc.add_band('a', [4, 5])
-    osc.add_band('c', [15, 19])
+    osc.add_band('b', (12, 14))
+    osc.add_band('a', (4, 5))
+    osc.add_band('c', (15, 19))
 
     ord_bands, sort_inds = _band_sort(osc.bands)
 
