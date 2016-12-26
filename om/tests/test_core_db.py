@@ -55,7 +55,8 @@ def test_check_dat_files_foof():
 
     sub_nums, source = db.check_dat_files('foof', verbose=True)
 
-    assert type(sub_nums) == type(source) == ListType
+    assert isinstance(sub_nums, ListType)
+    assert isinstance(source, ListType)
     assert len(sub_nums) == len(source)
 
     sub_nums, source = db.check_dat_files('foof', 'OMEGA', verbose=True)
@@ -68,7 +69,7 @@ def test_check_res_files_meg():
 
     files = db.check_res_files('meg', verbose=True)
 
-    assert type(files) == ListType
+    assert isinstance(files, ListType)
 
 def test_check_res_files_maps():
     """Test that OMDB() check_res_files method runs properly, for MAPS files."""
@@ -77,7 +78,7 @@ def test_check_res_files_maps():
 
     files = db.check_res_files('maps', verbose=True)
 
-    assert type(files) == ListType
+    assert isinstance(files, ListType)
 
 def test_check_map_files():
     """Test that OMDB() check_maps_files method runs properly."""
@@ -86,4 +87,7 @@ def test_check_map_files():
 
     osc, sl, gene, term = db.check_map_files(verbose=True, return_files=True)
 
-    assert type(osc) == type(sl) == type(gene) == type(term) == ListType
+    assert isinstance(osc, ListType)
+    assert isinstance(sl, ListType)
+    assert isinstance(gene, ListType)
+    assert isinstance(term, ListType)

@@ -324,8 +324,8 @@ def test_get_map_names_terms():
     names = _get_map_names(names_file, os.path.join(db.maps_path, 'Terms'))
 
     assert names
-    assert type(names) == ListType
-    assert type(names[0]) == StringType
+    assert isinstance(names, ListType)
+    assert isinstance(names[0], StringType)
 
 def test_get_map_names_genes():
     """   """
@@ -336,8 +336,8 @@ def test_get_map_names_genes():
     names = _get_map_names(names_file, os.path.join(db.maps_path, 'Genes'))
 
     assert names
-    assert type(names) is ListType
-    assert type(names[0]) is StringType
+    assert isinstance(names, ListType)
+    assert isinstance(names[0], StringType)
 
 def test_get_gene_files():
     """   """
@@ -347,7 +347,7 @@ def test_get_gene_files():
     genes_files_path = _get_gene_files('sub1', db)
 
     assert genes_files_path
-    assert type(genes_files_path) is ListType
+    assert isinstance(genes_files_path, ListType)
     for path in genes_files_path:
         assert os.path.exists(path)
 
