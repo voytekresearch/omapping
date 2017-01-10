@@ -15,7 +15,7 @@ from om.core.io import load_meg_list
 #############################################################################################
 
 class TestDB(OMDB):
-    """   """
+    """Overloads the OMDB object as database object for test data."""
 
     def __init__(self):
 
