@@ -101,9 +101,9 @@ def match_twins(dat, parent_ind=1):
     Returns
     -------
     twin_pairs : list of tuple of (int, int)
-        Each element within the list contains the subject IDs for a twin pair.
+        List of subject IDs for twin pairs.
     single_twins : list of tuple of (int)
-        Each element within the list contains the ID of a twins that is unmatched.
+        IDs for twins who's pair is not available in MEG data.
 
     Notes
     -----
