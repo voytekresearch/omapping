@@ -13,6 +13,7 @@ from scipy.stats.stats import pearsonr
 
 # Import custom om code
 from om.meg.single import MegData
+from om.core.osc import check_bands
 from om.core.errors import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
 
 # TODO: work through whether sort_bands is still needed with OrderedDict
@@ -224,8 +225,7 @@ class GroupMegData(MegData):
                 raise DataNotComputedError('New subject does not have vertex band data.')
 
             # Check that new subject has same bands defined
-            if not set(self.bands) == set(new_subj.bands):
-                raise InconsistentDataError('Oscillation bands are inconsistent.')
+            _ = check_bands([self.bands, new_subj.bands])
 
             # Add new subject to group oscillations
             if not self.has_data:
@@ -254,8 +254,7 @@ class GroupMegData(MegData):
                 raise DataNotComputedError('New subject does not have peak freq data.')
 
             # Check that new subject has same bands defined
-            if not set(self.bands) == set(new_subj.bands):
-                raise InconsistentDataError('Oscillation bands are inconsistent.')
+            _ = check_bands([self.bands, new_subj.bands])
 
             # Add new subject to peak frequencies
             if not self.has_data:
