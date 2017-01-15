@@ -281,3 +281,29 @@ def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=N
         dat_out.append(temp)
 
     return dat_out
+
+
+def load_meg_pairs(dat_list, osc_bands_vert=False, all_oscs=False, osc=None, db=None):
+    """Loads pairs of subject IDs into MegData() objects.
+
+    Parameters
+    ----------
+    pairs_list : list of tuple of (int, int)
+        Pairs of subject IDs to load and add to list.
+    osc_bands_vert : boolean, optional (default: False)
+        Whether convert data to oscillations bands across vertices.
+    all_oscs : boolean, optional (default: False)
+        Whether to convert data to all oscillations.
+    osc : Osc() object, optional
+        Oscillation band definitions.
+    db : OMDB() object, optional
+        OM database object.
+
+    Returns
+    -------
+    list of list of (MegSubj, MegSubj)
+        Data for all subject pairs.
+    """
+
+    return [load_meg_list(pair, osc_bands_vert=osc_bands_vert, all_oscs=all_oscs,
+                          osc=osc, db=db, dat_source='HCP') for pair in dat_list]
