@@ -6,7 +6,7 @@ import pickle
 import datetime
 import scipy.io as sio
 
-from om.meg.single import MegData
+from om.meg.single import MegSubj
 from om.core.db import check_db
 from om.core.utils import clean_file_list, get_cur_subj
 from om.core.errors import UnknownDataSourceError, UnknownDataTypeError
@@ -235,7 +235,7 @@ def load_obj_pickle(dat_type, file_name, db=None):
 
 
 def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=None, dat_source=None):
-    """Loads a group of subject IDs into MegData() objects, collected in a list.
+    """Loads a group of subject IDs into MegSubj() objects, collected in a list.
 
     Parameters
     ----------
@@ -254,8 +254,8 @@ def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=N
 
     Returns
     -------
-    dat_out : list of MegData() objects
-        A list containing all the loaded MegData objects.
+    dat_out : list of MegSubj() objects
+        A list containing all the loaded MegSubj objects.
     """
 
     # Check db, initialize if not provided
@@ -265,8 +265,8 @@ def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=N
     dat_out = []
     for subj_id in sub_nums:
 
-        # Initialize MegData, load foof dat
-        temp = MegData(db, dat_source, osc)
+        # Initialize MegSubj, load foof dat
+        temp = MegSubj(db, dat_source, osc)
         temp.import_foof(subj_id, get_demo=False)
 
         # Convert to oscillation vertex bands, if requested
@@ -284,7 +284,7 @@ def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=N
 
 
 def load_meg_pairs(dat_list, osc_bands_vert=False, all_oscs=False, osc=None, db=None):
-    """Loads pairs of subject IDs into MegData() objects.
+    """Loads pairs of subject IDs into MegSubj() objects.
 
     Parameters
     ----------

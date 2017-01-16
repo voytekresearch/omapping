@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 
 from om.core.db import OMDB, check_db
-from om.meg.single import MegData
+from om.meg.single import MegSubj
 from om.core.errors import InconsistentDataError
 
 ##########################################################################################

@@ -48,13 +48,13 @@ def test_meg_data():
 
     db = OMDB()
 
-    assert MegData(db, '')
+    assert MegSubj(db, '')
 
 def test_set_bands():
 
     tdb = TDB()
 
-    meg_dat = MegData(tdb, '')
+    meg_dat = MegSubj(tdb, '')
 
     osc = Osc(default=True)
 
@@ -66,7 +66,7 @@ def test_set_bands_error():
 
     osc = Osc(default=True)
 
-    meg_dat = MegData(tdb, '', osc=osc)
+    meg_dat = MegSubj(tdb, '', osc=osc)
 
     meg_dat.has_vertex_bands = True
 
@@ -77,7 +77,7 @@ def test_import_foof():
 
     tdb = TDB()
 
-    meg_dat = MegData(tdb, '')
+    meg_dat = MegSubj(tdb, '')
 
     meg_dat.import_foof('test_v2', get_demo=False, load_type='pickle')
 
@@ -93,7 +93,7 @@ def test_import_foof_error():
 
     tdb = TDB()
 
-    meg_dat = MegData(tdb, '')
+    meg_dat = MegSubj(tdb, '')
     meg_dat.import_foof('test_v2', get_demo=False, load_type='pickle')
 
     with raises(InconsistentDataError):
@@ -132,7 +132,7 @@ def tests_osc_bands_vertex_error():
 
     tdb = TDB()
 
-    meg_dat = MegData(tdb, '')
+    meg_dat = MegSubj(tdb, '')
 
     with raises(DataNotComputedError):
         meg_dat.osc_bands_vertex()
@@ -175,7 +175,7 @@ def test_peak_freq_errors():
 
     tdb = TDB()
 
-    meg_dat = MegData(tdb, '')
+    meg_dat = MegSubj(tdb, '')
 
     with raises(DataNotComputedError):
         meg_dat.peak_freq(dat='all')

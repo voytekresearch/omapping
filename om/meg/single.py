@@ -2,8 +2,8 @@
 
 This code...
 """
-
 from __future__ import print_function, division
+
 import os
 import csv
 import pickle
@@ -16,11 +16,14 @@ from scipy.stats.stats import pearsonr
 from om.core.utils import clean_file_list, get_cur_subj, extract_foof_pickle
 from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
+# TODO: Update class name of MegSubj?
+#   If so: Update GroupMegSubj to MegGroup
+
 ###########################################################################################
 ###########################  OMEGAMAPPIN - MD_SINGLE - CLASSES  ###########################
 ###########################################################################################
 
-class MegData(object):
+class MegSubj(object):
     """Class for a single subject of FOOF results for MEG Source PSDs.
 
     Attributes
@@ -166,7 +169,7 @@ class MegData(object):
 
 
     def import_foof(self, subnum, get_demo=True, load_type='pickle'):
-        """Import FOOF results to MegData object.
+        """Import FOOF results to MegSubj object.
 
         Parameters
         ----------
@@ -485,7 +488,7 @@ def _get_single_osc(centers, powers, bws, osc_low, osc_high):
     """ Searches for an oscillations of specified frequency band.
 
     Returns a single oscillation in that band.
-    Helper function for osc_per_vertex in MegData.
+    Helper function for osc_per_vertex in MegSubj.
 
     Parameters
     ----------

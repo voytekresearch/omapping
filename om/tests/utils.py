@@ -3,8 +3,8 @@
 import os
 import pkg_resources as pkg
 
-from om.meg.single import MegData
-from om.meg.group import GroupMegData
+from om.meg.single import MegSubj
+from om.meg.group import MegGroup
 from om.maps.anat import MapCompAnat
 from om.core.db import OMDB
 from om.core.osc import Osc
@@ -48,7 +48,7 @@ def load_test_meg_subj(sub, all_oscs=False, bands_vertex=False):
     tdb = TestDB()
     osc = Osc(default=True)
 
-    dat = MegData(tdb, '', osc)
+    dat = MegSubj(tdb, '', osc)
 
     dat.import_foof(sub, get_demo=False, load_type='pickle')
 
@@ -66,7 +66,7 @@ def load_test_meg_gr(bands_vertex=False, all_osc=False, peaks=False, calc_maps=F
     tdb = TestDB()
     osc = Osc(default=True)
 
-    meg_group = GroupMegData(tdb, osc)
+    meg_group = MegGroup(tdb, osc)
 
     subjs = ['test_v5', 'test_v5']
 

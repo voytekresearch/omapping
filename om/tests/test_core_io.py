@@ -6,7 +6,7 @@ from py.test import raises
 from om.core.io import *
 from om.core.osc import Osc
 from om.tests.utils import TestDB as TDB
-from om.meg.single import MegData
+from om.meg.single import MegSubj
 
 ##########################################################################################
 ##########################################################################################
@@ -56,7 +56,7 @@ def test_save_obj_pickle():
 
     tdb = TDB()
 
-    dat = MegData(tdb, '')
+    dat = MegSubj(tdb, '')
 
     save_obj_pickle(dat, 'meg', 'test', db=tdb)
 

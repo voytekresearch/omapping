@@ -12,7 +12,7 @@ import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
 # Import custom om code
-from om.meg.single import MegData
+from om.meg.single import MegSubj
 from om.core.osc import check_bands
 from om.core.errors import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
 
@@ -22,11 +22,11 @@ from om.core.errors import DataNotComputedError, InconsistentDataError, UnknownD
 ############################  OMEGAMAPPIN - MD_GROUP CLASSES  ############################
 ##########################################################################################
 
-class GroupMegData(MegData):
+class MegGroup(MegSubj):
     """A class to store OMEGA data from multiple subjects.
 
     Holds all oscillations, regardless of spatial location.
-    Note: Class derived from MegData()v=b
+    Note: Class derived from MegSubj()v=b
 
     Attributes
     ----------
@@ -69,8 +69,8 @@ class GroupMegData(MegData):
             Object to store oscillatory band definitions.
         """
 
-        # Initialize from MegData() object
-        MegData.__init__(self, db, 'both')
+        # Initialize from MegSubj() object
+        MegSubj.__init__(self, db, 'both')
 
         # Initialize groups subject variables
         self.n_subjs = int()
@@ -113,12 +113,12 @@ class GroupMegData(MegData):
     def add_subject(self, new_subj, add_vertex_oscs=False, add_vertex_slopes=False,
                     add_all_oscs=False, add_vertex_bands=False, add_peak_freqs=False,
                     add_demo=False):
-        """Adds a new subject to the GroupMegData object.
+        """Adds a new subject to the MegGroup object.
 
         Parameters
         ----------
-        new_subj : MegData() Object
-            MEG subject (instance of MegData)
+        new_subj : MegSubj() Object
+            MEG subject (instance of MegSubj)
         add_vertex_oscs : boolean, optional (default: False)
             Whether to add all oscillations, across vertices.
         add_vertex_slopes : boolean, optional (default: False)
