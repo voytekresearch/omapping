@@ -6,7 +6,6 @@ Notes
 which enforces and ensures a consistent order of items within the dictionary.
 More information here: https://docs.python.org/2/library/collections.html#collections.OrderedDict
 """
-
 from __future__ import print_function
 
 from types import StringType
@@ -26,6 +25,8 @@ class Osc(object):
     ----------
     bands : dict
         Dictionary of oscillation band definitions.
+    labels : list of str
+        Labels for all oscillation bands.
     n_bands : int
         The number of oscillation bands that are defined.
     """
@@ -104,6 +105,9 @@ class Osc(object):
         self.bands[band_name] = band_lims
         self.n_bands += 1
 
+        # Update labels
+        self.labels = self.bands.keys()
+
 
     def rm_band(self, rm_band):
         """Remove a previously defined oscillation band.
@@ -122,13 +126,13 @@ class Osc(object):
 ##################################################################################################
 ##################################################################################################
 
-def check_oscs(osc_lst):
+def check_bands(osc_lst):
     """Check that a list of oscillation band definitions are all the same. If so, return bands.
 
     Parameters
     ----------
-    osc_lst : list of Osc() objects
-        Oscillation band definitions to compare.
+    osc_lst : dict
+        Oscillation band definitions to compare. Should be dict from Osc.bands.
 
     Returns
     -------
@@ -142,9 +146,30 @@ def check_oscs(osc_lst):
 
     return osc_lst[0]
 
-##################################################################################################
-##################################################################################################
-##################################################################################################
+
+def CheckBands(func):
+    """Decorator function to check that all oscillation band definitions are consistent.
+
+    Notes
+    -----
+    - This decorator requires that 'dat', a variable with a list of MegData objects be
+        the first argument for any function it is wrapped around.
+    - It also requires the wrapped function to take an argument 'bands', but it need not
+        be given, as this decorator will provide it.
+    """
+
+    def wrapper(dat, *args, **kwargs):
+        """Wrapper that checks band definitions, and passes through given inputs & bands."""
+
+        bands = check_bands([subj.bands for subj in dat])
+
+        return func(dat, bands=bands, *args, **kwargs)
+
+    return wrapper
+
+###################################################################################################
+###################################################################################################
+###################################################################################################
 
 def _check_band(band_name, band_limits):
     """Check that a proposed band definition is properly formatted.
