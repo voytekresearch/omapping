@@ -16,9 +16,6 @@ from scipy.stats.stats import pearsonr
 from om.core.utils import clean_file_list, get_cur_subj, extract_foof_pickle
 from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
-# TODO: Update class name of MegSubj?
-#   If so: Update GroupMegSubj to MegGroup
-
 ###########################################################################################
 ###########################  OMEGAMAPPIN - MD_SINGLE - CLASSES  ###########################
 ###########################################################################################
