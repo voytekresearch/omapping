@@ -1,4 +1,4 @@
-"""   """
+"""Test for the single subject functions from om.meg."""
 
 import numpy as np
 from py.test import raises
@@ -51,6 +51,7 @@ def test_meg_data():
     assert MegSubj(db, '')
 
 def test_set_bands():
+    """   """
 
     tdb = TDB()
 
@@ -61,6 +62,7 @@ def test_set_bands():
     meg_dat.set_bands(osc)
 
 def test_set_bands_error():
+    """   """
 
     tdb = TDB()
 
@@ -74,6 +76,7 @@ def test_set_bands_error():
         meg_dat.set_bands(osc)
 
 def test_import_foof():
+    """   """
 
     tdb = TDB()
 
@@ -90,6 +93,7 @@ def test_import_foof():
     assert meg_dat.has_data
 
 def test_import_foof_error():
+    """   """
 
     tdb = TDB()
 
@@ -100,6 +104,7 @@ def test_import_foof_error():
         meg_dat.import_foof('test_v5', get_demo=False, load_type='pickle')
 
 def test_all_oscs():
+    """   """
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -109,6 +114,7 @@ def test_all_oscs():
     assert meg_dat.has_all_osc
 
 def test_all_oscs_nan():
+    """   """
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -120,6 +126,7 @@ def test_all_oscs_nan():
     assert meg_dat.has_all_osc
 
 def test_osc_bands_vertex():
+    """   """
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -129,6 +136,7 @@ def test_osc_bands_vertex():
     assert meg_dat.has_vertex_bands
 
 def tests_osc_bands_vertex_error():
+    """   """
 
     tdb = TDB()
 
@@ -138,6 +146,7 @@ def tests_osc_bands_vertex_error():
         meg_dat.osc_bands_vertex()
 
 def test_peak_freq_all():
+    """   """
 
     meg_dat = load_test_meg_subj('test_v2', all_oscs=True)
 
@@ -153,6 +162,7 @@ def test_peak_freq_all():
         meg_dat.peak_freq(dat='all')
 
 def test_peak_freq_band():
+    """   """
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -172,6 +182,7 @@ def test_peak_freq_band():
         meg_dat.peak_freq(dat='band')
 
 def test_peak_freq_errors():
+    """   """
 
     tdb = TDB()
 
@@ -186,6 +197,7 @@ def test_peak_freq_errors():
         meg_dat.peak_freq(dat='all')
 
 def test_calc_osc_param_corrs():
+    """   """
 
     meg_dat = load_test_meg_subj('test_v2', all_oscs=True)
 
@@ -195,6 +207,7 @@ def test_calc_osc_param_corrs():
     assert a.any()
 
 def test_calc_osc_param_corrs_error():
+    """   """
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -202,6 +215,7 @@ def test_calc_osc_param_corrs_error():
         meg_dat.calc_osc_param_corrs()
 
 def test_set_foof_viz():
+    """   """
 
     meg_dat = load_test_meg_subj('test_v2')
 
@@ -243,6 +257,7 @@ def test_get_single_osc_power_none():
     assert out_bw == 0.
 
 def test_get_single_osc_power_one():
+    """   """
 
     cens = np.array([10.])
     pows = np.array([1.])
@@ -255,6 +270,7 @@ def test_get_single_osc_power_one():
     assert out_bw == 1.
 
 def test_get_single_osc_power_mult():
+    """   """
 
     cens = np.array([10., 11.])
     pows = np.array([1., 2.])

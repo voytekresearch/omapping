@@ -1,4 +1,4 @@
-"""   """
+"""Tests for the group analysis functions from om.meg."""
 
 import numpy as np
 from py.test import raises
@@ -81,6 +81,7 @@ def test_add_subject():
 
 
 def test_group_slope():
+    """   """
 
     meg_group = load_test_meg_gr()
 
@@ -93,6 +94,7 @@ def test_group_slope():
     assert meg_group.slopes_gr_avg
 
 def test_osc_prob():
+    """   """
 
     meg_group = load_test_meg_gr(bands_vertex=True)
 
@@ -103,6 +105,7 @@ def test_osc_prob():
     assert meg_group.osc_prob_done
 
 def test_osc_prob_error():
+    """   """
 
     meg_group = load_test_meg_gr(bands_vertex=False)
 
@@ -110,6 +113,7 @@ def test_osc_prob_error():
         meg_group.osc_prob()
 
 def test_osc_score():
+    """   """
 
     meg_group = load_test_meg_gr(bands_vertex=True)
 
@@ -121,6 +125,7 @@ def test_osc_score():
     assert meg_group.osc_score_done
 
 def test_osc_map_corrs_prob():
+    """   """
 
     meg_group = load_test_meg_gr(bands_vertex=True)
 
@@ -131,6 +136,7 @@ def test_osc_map_corrs_prob():
     assert True
 
 def test_osc_map_corrs_score():
+    """   """
 
     meg_group = load_test_meg_gr(bands_vertex=True, calc_maps=True)
 
@@ -140,6 +146,7 @@ def test_osc_map_corrs_score():
     assert True
 
 def test_calc_osc_peak_age():
+    """   """
 
     meg_group = load_test_meg_gr(bands_vertex=True, all_osc=True, peaks=True, calc_maps=True)
 
@@ -151,6 +158,7 @@ def test_calc_osc_peak_age():
     assert True
 
 def test_freq_corr():
+    """   """
 
     meg_group = load_test_meg_gr(vertex_osc=True)
 
@@ -160,6 +168,7 @@ def test_freq_corr():
     assert True
 
 def test_save_gr_slope():
+    """   """
 
     meg_group = load_test_meg_gr()
 
@@ -170,6 +179,7 @@ def test_save_gr_slope():
     assert True
 
 def test_save_map():
+    """   """
 
     meg_group = load_test_meg_gr(bands_vertex=True, calc_maps=True)
 
@@ -177,6 +187,7 @@ def test_save_map():
     meg_group.save_map('score', 'test_score_save')
 
 def test_set_slope_viz():
+    """   """
 
     meg_group = load_test_meg_gr()
 
@@ -187,6 +198,7 @@ def test_set_slope_viz():
     assert True
 
 def test_set_map_viz():
+    """   """
 
     meg_group = load_test_meg_gr(bands_vertex=True, calc_maps=True)
 
@@ -213,11 +225,9 @@ def test_get_all_osc():
 #    """   """
 #    pass
 
-
 def test_osc_pow_ratio():
     """   """
     pass
-
 
 def test_band_sort():
     """   """
