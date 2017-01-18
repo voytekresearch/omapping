@@ -8,12 +8,14 @@ from scipy.stats.stats import pearsonr
 
 from om.core.io import load_meg_list
 from om.core.db import OMDB, check_db
-from om.core.osc import Osc, check_oscs
-from om.meg.single import MegData
+from om.core.osc import Osc, check_bands, CheckBands
+from om.meg.single import MegSubj
 
-##########################################################################################
-##########################################################################################
-##########################################################################################
+#TODO: Make check_bands functionality into a decorator?
+
+##################################################################################################
+##################################################################################################
+##################################################################################################
 
 def get_twin_data(db=None, file_name='00-HCP_Subjects_RESTRICTED.csv'):
     """Extract twin status data from data file.
@@ -35,10 +37,6 @@ def get_twin_data(db=None, file_name='00-HCP_Subjects_RESTRICTED.csv'):
         Subject IDs for all twins.
     not_twin_list : list of int
         Subject IDs for non-twin subjects.
-
-    Notes
-    -----
-    TODO:
     """
 
     # Check db, initialize if not provided
@@ -180,23 +178,187 @@ def rm_twin_pairs(all_pairs, twin_pairs):
 
     Returns
     -------
-    non_twins : list of tuple of (int, int)
+    list of tuple of (int, int)
         Subject ID pairs for all non-twins.
     """
 
     # Remove all pairs that are twin pairs
-    non_twins = list(set(all_pairs) - set(twin_pairs))
-
-    return non_twins
+    return list(set(all_pairs) - set(twin_pairs))
 
 
-def compare_spatial_pair(dat):
+def comp_peak_freq(pairs_dat, peak_type='band', avg='median'):
+    """Compares the peak frequencies, within oscillatory bands, between pairs of subjects.
+
+    Parameters
+    ----------
+    pairs_dat : list of list of [MegSubj, MegSubj]
+        List of subject pairs to compare.
+    peak_type : {'bands', 'all'}
+        What data to use to compute the peak frequency.
+    avg : {'median', 'mean'}
+        Which type of averaging to use.
+
+    Returns
+    -------
+    peak_avg : 1d array
+        Average peak frequency differences, length = n_bands.
+    peak_dat : 2d array
+        All data for all subjects, [n_subjects, n_bands].
+    """
+
+    # Compare peak frequency between pairs and take average across all pairs
+    peak_dat = np.asarray([_comp_pf_pair(pair, peak_type=peak_type, avg=avg) for pair in pairs_dat])
+    peak_avg = np.mean(peak_dat, axis=0)
+
+    return peak_avg, peak_dat
+
+
+def comp_osc_space(pairs_dat):
+    """Compares the spatial overlap of oscillation bands between pairs of subjects.
+
+    Parameters
+    ----------
+    pairs_dat : list of list of [MegSubj, MegSubj]
+        List of subject pairs to compare.
+
+    Returns
+    -------
+    space_avg : 1d array
+        Average percent spatial overlap across all pairs.
+    space_dat : 2d array
+        Spatial overlap results for all pairs.
+    """
+
+    # Compare spatial overlap of oscillation bands between pairs and take average across all pairs
+    space_dat = np.asarray([_comp_space_pair(pair) for pair in pairs_dat])
+    space_avg = np.mean(space_dat, axis=0)
+
+    return space_avg, space_dat
+
+
+def comp_osc_param(pairs_dat, osc_param):
+    """Compares oscillatory band parameters between pairs of subjects.
+
+    Parameters
+    ----------
+    pairs_dat : list of list of [MegSubj, MegSubj]
+        List of subject pairs to compare.
+
+    Returns
+    -------
+    param_avg : 1d array
+        Average correlation between oscillation parameters across all pairs.
+    param_dat : 2d array
+        Oscillation parameter correlation data for all pairs.
+    """
+
+    # Compare oscillatory band parameters between pairs and take average across all pairs
+    param_dat = np.asarray([_comp_osc_pair(pair, osc_param) for pair in pairs_dat])
+    param_avg = np.mean(param_dat, axis=0)
+
+    return param_avg, param_dat
+
+
+def comp_slope(pairs_dat):
+    """Compares slope values between pairs of subjects.
+
+    Parameters
+    ----------
+    pairs_dat : list of list of [MegSubj, MegSubj]
+        List of subject pairs to compare.
+
+    Returns
+    -------
+    slope_avg : 1d array
+        Average slope corrlation across all pairs.
+    slope_dat : 2d array
+        Slope correlation data data for all pairs.
+    """
+
+    # Compare slope values between pairs and take average across all pairs
+    slope_dat = np.asarray([_comp_sl_pair(pair) for pair in pairs_dat])
+    slope_avg = np.mean(slope_dat, axis=0, keepdims=True)
+
+    return slope_avg, slope_dat
+
+
+def print_twin_results_corr(corr_dat, labels):
+    """Print out correlation results.
+
+    Parameters
+    ----------
+    corr_dat : 2d array
+        Matrix of correlation data to print out.
+    labels : list of str
+        Labels for what data each row corresponds to.
+    """
+
+    for ind, label in enumerate(labels):
+        print('\t', label, '\t : ', '{:5.4f}'.format(corr_dat[ind, 0]))
+
+
+def print_twin_results_vec(vec_dat, labels):
+    """Print out comparison results, stored in 1d vector.
+
+    Parameters
+    ----------
+    vec_dat : 1d array
+        Vector of data to print out.
+    labels : list of str
+        Labels for what data each row corresponds to.
+    """
+
+    for ind, label in enumerate(labels):
+        print('\t', label, '\t : ', '{:5.4f}'.format(vec_dat[ind]))
+
+###################################################################################################
+###################################################################################################
+###################################################################################################
+
+@CheckBands
+def _comp_pf_pair(dat, bands, peak_type='band', avg='median'):
+    """Compare peak frequencies between a pair of MEG subjects.
+
+    Parameters
+    ----------
+    dat : list of [MegSubj, MegSubj]
+        Pair of subjects to compare.
+    bands : dict()
+        Oscillation band definitions.
+    peak_type : {'bands', 'all'}, optional
+        What data to use to compute the peak frequency.
+    avg : {'median', 'mean'}, optional
+        Which type of averaging to use.
+
+    Returns
+    -------
+    peak_dists : 1d array
+        Distance (in Hz) between oscillatory band peak frequencies of pair.
+    """
+
+    # Calculate peak freqs for subjects
+    for subj in dat:
+        subj.peak_freq(peak_type, avg)
+
+    peak_dists = np.zeros([len(bands)])
+
+    # Calculate distance between peak freqs
+    for ind, band in enumerate(bands):
+        peak_dists[ind] = abs(dat[1].peaks[band] - dat[0].peaks[band])
+
+    return peak_dists
+
+
+@CheckBands
+def _comp_space_pair(dat, bands):
     """Compare the spatial overlap of oscillatory bands between two subjects.
 
     Parameters
     ----------
-    dat : list of MegData() objects
-        Pair of subjects to compare, loaded in MegData objects and collected into a list.
+    dat : list of [MegSubj, MegSubj]
+        Pair of subjects to compare.
+    bands : dict()
+        Oscillation band definitions.
 
     Returns
     -------
@@ -205,11 +367,8 @@ def compare_spatial_pair(dat):
 
     NOTE:
     - Update hard coded value for number of vertices.
-        - Add to MegData object as an attribute?
+        - Add to MegSubj object as an attribute?
     """
-
-    # Check that oscillation band definitions are consistent
-    bands = check_oscs([dat[0].bands, dat[1].bands])
 
     # Initialize variable to store output data
     res = np.zeros([len(bands)])
@@ -224,24 +383,24 @@ def compare_spatial_pair(dat):
     return res
 
 
-def compare_osc_param_pair(dat, osc_param):
-    """Compares center frequency data for a pairing of MEG subjects.
+@CheckBands
+def _comp_osc_pair(dat, osc_param, bands):
+    """Compares oscillation band parameters for a pair of MEG subjects.
 
     Parameters
     ----------
-    dat : list of MegData() objects
-        Pair of subjects to compare, loaded in MegData objects and collected into a list.
+    dat : list of [MegSubj, MegSubj]
+        Pair of subjects to compare.
     osc_param : {0, 1, 2}
         Which oscillatory parameter to compare: {0: CF, 1: Power, 2: BW}.
+    bands : dict()
+        Oscillation band definitions.
 
     Returns
     -------
     corr_dat : 2d array, shape=(n_bands, 2), row = [r-val, p-val]
         Results of the correlation within each band between subjects.
     """
-
-    # Check that oscillation band definitions are consistent
-    bands = check_oscs([dat[0].bands, dat[1].bands])
 
     # Initialize to store correlation results
     corr_dat = np.zeros([len(bands), 2])
@@ -254,13 +413,13 @@ def compare_osc_param_pair(dat, osc_param):
     return corr_dat
 
 
-def compare_slope_pair(dat):
+def _comp_sl_pair(dat):
     """Compares slope value data for a pair of MEG subjects.
 
     Parameters
     ----------
-    dat : list of MegData() objects
-        Pair of subjects to compare, loaded in MegData objects and collected into a list.
+    dat : list of [MegSubj, MegSubj]
+        Pair of subjects to compare.
 
     Returns
     -------
@@ -275,18 +434,3 @@ def compare_slope_pair(dat):
     corr_dat[0], corr_dat[1] = pearsonr(dat[0].slopes, dat[1].slopes)
 
     return corr_dat
-
-
-def print_twin_results(corr_dat, labels):
-    """Print out correlation results.
-
-    Parameters
-    ----------
-    corr_dat : 2d array
-        xx
-    labels : list of str
-        xx
-    """
-
-    for ind, label in enumerate(labels):
-        print('\t', label, '\t : ', '{:5.4f}'.format(corr_dat[ind, 0]))
