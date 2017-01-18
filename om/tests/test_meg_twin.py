@@ -1,4 +1,4 @@
-"""DOCSTRING"""
+"""Testing of twin analysis functions from om.meg."""
 
 from om.core.osc import Osc
 from om.tests.utils import TestDB as TDB
@@ -49,39 +49,62 @@ def test_rm_twin_pairs():
     assert len(non_twins) == 2
     assert set([(111, 112) , (112, 113)]) == set(non_twins)
 
-def test_compare_spatial_pair():
-    """   """
+def test_comp_peak_freq():
+    """Tests the comp_peak_freq() function.
+
+    Note: this calls (and tests) sub-function _comp_pf_pair().
+    """
 
     dat = load_test_meg_pair(osc_bands_vert=True)
 
-    res = compare_spatial_pair(dat)
+    out = comp_peak_freq([dat, dat])
 
-    assert np.any(res)
+    assert out
 
-def test_compare_osc_param_pair():
-    """   """
+def test_comp_osc_space():
+    """Tests the comp_osc_space() function.
 
-    dat = load_test_meg_pair(osc_bands_vert=True)
-
-    corr_dat = compare_osc_param_pair(dat, 0)
-
-    assert np.any(corr_dat)
-
-def test_compare_slope_pair():
-    """   """
+    Note: this calls (and tests) sub-function _comp_space_pair().
+    """
 
     dat = load_test_meg_pair(osc_bands_vert=True)
 
-    corr_dat = compare_slope_pair(dat)
+    out = comp_osc_space([dat, dat])
 
-    assert np.any(corr_dat)
+    assert out
 
-def test_print_twin_results():
-    """   """
+def test_comp_osc_param():
+    """Tests the comp_osc_param() function.
 
+    Note: this calls (and tests) sub-function _comp_osc_pair().
+    """
+
+    dat = load_test_meg_pair(osc_bands_vert=True)
+
+    out = comp_osc_param([dat, dat], 0)
+
+    assert out
+
+def test_comp_slope():
+    """Tests the comp_slope() function.
+
+    Note: this calls (and tests) sub-function _comp_sl_pair().
+    """
+
+    dat = load_test_meg_pair()
+
+    out = comp_slope([dat, dat])
+
+    assert out
+
+def test_print_funcs():
+    """Tests the functions to print out results run."""
+
+    vec_dat = np.array([1, 2])
     corr_dat = np.array([[1, 1], [2, 2]])
     labels = ['aa', 'bb']
 
-    print_twin_results(corr_dat, labels)
+    print_twin_results_vec(vec_dat, labels)
+    print_twin_results_corr(corr_dat, labels)
 
     assert True
