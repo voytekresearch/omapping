@@ -1,3 +1,5 @@
+# Ignore Apple Desktop Services Files
+*DS_Store*
 # Ignore compiled py files
 *.pyc
 # Ignore ipynb checkpoint files
