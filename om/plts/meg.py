@@ -423,6 +423,13 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
 
+def plot_peak_boxplot_all():
+    """
+    TODO: Make version of plot above that plots boxplots for all defined oscillation bands.
+    """
+    pass
+
+
 def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
     """Creats a scatter plot for the rolling frequency correlation.
 
@@ -676,3 +683,98 @@ def plot_osc_profiles(centers_hist, save_out=False):
         save_name = f_info.save_path + '111-OscillationProf_infoles' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
+
+def plot_space_comp(group, verts, band, subj=0, osc_param=0, space_param=1):
+    """
+
+    Parameters
+    ----------
+    group : ?
+        xx
+    verts : ?
+        xx
+    band : ?
+        xx
+    subj : ?
+        xx
+    osc_param : ?
+        xx
+    space_param : ?
+        xx
+    """
+
+    # Get FigInfo
+    f_info = FigInfo()
+
+    # Plot settings
+    t_fs = f_info.t_fs
+    ax_fs = f_info.ax_fs
+
+    #
+    space = verts[:, space_param]
+    sort_inds = np.argsort(space)
+    freqs = [dat if dat > 0 else None for dat in group.gr_oscs[band][sort_inds, osc_param, subj]]
+
+    # Initialize Figure
+    fig = plt.figure()
+
+    #
+    plt.plot(space, freqs, '.', ms=3.5, alpha=0.75)
+
+    # Set plotting limits
+    plt.xlim([space.min()-4, space.max()+4])
+
+    #
+    plt.title(band, {'fontsize': t_fs, 'fontweight': 'bold'})
+
+    #
+    plt.xlabel('Posterior -> Anterior', {'fontsize': ax_fs, 'fontweight': 'bold'})
+    plt.ylabel('Center Frequency', {'fontsize': ax_fs, 'fontweight': 'bold'})
+
+
+def plot_space_comp_all():
+    """   """
+    pass
+
+
+def plot_osc_space_corr_boxplot(dat, labels):
+    """
+
+    Parameters
+    ----------
+    dat : ?
+        xx
+    labels : ?
+        xx
+    """
+
+    # Get FigInfo
+    f_info = FigInfo()
+
+    # Plot settings
+    t_fs = f_info.t_fs
+    ax_fs = f_info.ax_fs
+    ti_fs = f_info.ti_fs         # Axis ticks font size
+    ax_lw = f_info.ax_lw
+
+    #
+    fig, ax = plt.subplots()
+    ax.boxplot(dat[:, :, 0], widths = 0.40)
+
+    #
+    ax.set_xticklabels(labels)
+    ax.set_xlabel('Oscillation Bands', {'fontsize': ax_fs, 'fontweight': 'bold'})
+    ax.set_ylabel('Correlation Value', {'fontsize': ax_fs, 'fontweight': 'bold'})
+
+    # Set the top and right side frame & ticks off
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+
+    # Set linewidth of remaining spines
+    ax.spines['left'].set_linewidth(ax_lw)
+    ax.spines['bottom'].set_linewidth(ax_lw)
+
+    # Add title to plot
+    plt.title('Spatial Analysis', {'fontsize': t_fs, 'fontweight': 'bold'})
