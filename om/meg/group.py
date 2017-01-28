@@ -672,6 +672,45 @@ class MegGroup(MegSubj):
 
         return dat
 
+#########################################################################################################
+################################## OMEGAMAPPIN - MEG GROUP - FUNCTIONS ##################################
+#########################################################################################################
+
+def osc_space_group(group, verts, osc_param=0, space_param=1):
+    """
+
+    Parameters
+    ----------
+    group : ?
+        xx
+    verts : ?
+        xx
+
+    Returns
+    -------
+    dat_out : ?
+        xx
+    labels : ?
+        xx
+    """
+
+    space = verts[:, space_param]
+    sort_inds = np.argsort(space)
+
+    dat_out = np.zeros(shape=(group.n_subjs, len(group.bands), 2))
+    labels = group.bands.keys()
+
+    for subj in range(group.n_subjs):
+
+        for ind, band in enumerate(group.bands):
+
+            freqs = np.array([dat if dat > 0 else None for dat in group.gr_oscs[band][sort_inds, osc_param, subj]])
+            inds = [i for i, e in enumerate(freqs) if e is not None]
+
+            dat_out[subj, ind, :] = pearsonr(freqs[inds], space[inds])
+
+    return dat_out, labels
+
 #################################################################################################
 ############################ OMEGAMAPPIN - OM_MD - PRIVATE FUNCTIONS ############################
 #################################################################################################
