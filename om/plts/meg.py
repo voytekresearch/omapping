@@ -423,11 +423,59 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
 
-def plot_peak_boxplot_all():
+def plot_peak_boxplot_all(peaks, bands):
     """
-    TODO: Make version of plot above that plots boxplots for all defined oscillation bands.
+
+    Parameters
+    ----------
+    peaks : ?
+        xx
+    bands : ?
+        xx
     """
-    pass
+
+    # Get FigInto
+    f_info = FigInfo()
+
+    # Plot Settings
+    t_fs = f_info.sp_fs             # Title Font Size
+    ti_fs = f_info.ti_fs            # Axis ticks font size
+    ax_lw = f_info.ax_lw            # Axis line weight
+
+    n_bands = len(bands)
+    f, ax = plt.subplots(1, n_bands, figsize=(10, 6))
+
+    for ind, band in enumerate(bands):
+        ax[ind].boxplot(peaks[band], widths=0.45)
+
+        # Add title and set y lims using bands and data
+        ax[ind].set_title(band, fontsize=t_fs, fontweight='bold', y=1.04)
+        ax[ind].set_ylim([peaks[band].min()-0.2, peaks[band].max()+0.2])
+
+    for ai in ax:
+
+        # Set the top and right side frame & ticks off
+        ai.spines['right'].set_visible(False)
+        ai.spines['top'].set_visible(False)
+        ai.xaxis.set_ticks_position('bottom')
+        ai.yaxis.set_ticks_position('left')
+
+        # Set linewidth of remaining spines
+        ai.spines['left'].set_linewidth(ax_lw)
+        ai.spines['bottom'].set_linewidth(ax_lw)
+
+        # Set ticks font size
+        ai.tick_params(axis='both', which='major', labelsize=ti_fs)
+
+        # Remove x ticks
+        ai.set_xticks([])
+
+    # Save out (if requested)
+    if save_out:
+
+        # Set up save name & save out
+        save_name = f_info.save_path + 'XXX-PeakFreqs_All' + '.' + f_info.format
+        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
 
 def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
