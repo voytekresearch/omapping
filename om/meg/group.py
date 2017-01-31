@@ -676,37 +676,47 @@ class MegGroup(MegSubj):
 ################################## OMEGAMAPPIN - MEG GROUP - FUNCTIONS ##################################
 #########################################################################################################
 
-def osc_space_group(group, verts, osc_param=0, space_param=1):
+def osc_space_group(oscs, bands, verts, osc_param=0, space_param=1):
     """
 
     Parameters
     ----------
-    group : ?
+    oscs : dict()
         xx
-    verts : ?
+    bands : ?
         xx
+    verts : 2d array
+        Spatial coordinates for all vertices [n_verts, 3].
 
     Returns
     -------
-    dat_out : ?
-        xx
-    labels : ?
-        xx
+    dat_out : 3d array
+        Correlation data for all subjects, all bands.
+            [n_subjs, n_bands, 2], where last dimension is [R-val, p-val].
+    labels : list of str
+        Labels of oscillation bands that were analyzed in dat_out.
     """
 
+    # Get labels and data size
+    labels = bands.keys()
+    n_verts, n_bands, n_subjs = oscs[labels[0]].shape
+
+    # Sort vertex data by requested direction
     space = verts[:, space_param]
     sort_inds = np.argsort(space)
 
-    dat_out = np.zeros(shape=(group.n_subjs, len(group.bands), 2))
-    labels = group.bands.keys()
+    # Initialize data matrix to fill and return
+    dat_out = np.zeros(shape=(n_subjs, len(bands), 2))
 
-    for subj in range(group.n_subjs):
+    # Loop through each band in each subject, computing correlation between space and oscillation param
+    for subj in range(n_subjs):
+        for ind, band in enumerate(bands):
 
-        for ind, band in enumerate(group.bands):
-
-            freqs = np.array([dat if dat > 0 else None for dat in group.gr_oscs[band][sort_inds, osc_param, subj]])
+            # Pull out osc data in spatial order, and get inds for which oscillation is defined
+            freqs = np.array([dat if dat > 0 else None for dat in oscs[band][sort_inds, osc_param, subj]])
             inds = [i for i, e in enumerate(freqs) if e is not None]
 
+            # Calculate the correlation between osc data and spatial dimension
             dat_out[subj, ind, :] = pearsonr(freqs[inds], space[inds])
 
     return dat_out, labels
