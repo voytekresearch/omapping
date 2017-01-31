@@ -423,8 +423,8 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
 
-def plot_peak_boxplot_all(peaks, bands):
-    """
+def plot_peak_boxplot_all(peaks, bands, save_out=False):
+    """Plot boxplots of peak frequencies for all oscillation bands.
 
     Parameters
     ----------
@@ -432,6 +432,8 @@ def plot_peak_boxplot_all(peaks, bands):
         xx
     bands : ?
         xx
+
+    TODO: Figure out how to space out subplots a little
     """
 
     # Get FigInto
@@ -446,7 +448,7 @@ def plot_peak_boxplot_all(peaks, bands):
     f, ax = plt.subplots(1, n_bands, figsize=(10, 6))
 
     for ind, band in enumerate(bands):
-        ax[ind].boxplot(peaks[band], widths=0.45)
+        ax[ind].boxplot(peaks[band], widths=0.40)
 
         # Add title and set y lims using bands and data
         ax[ind].set_title(band, fontsize=t_fs, fontweight='bold', y=1.04)
@@ -732,12 +734,12 @@ def plot_osc_profiles(centers_hist, save_out=False):
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
 
-def plot_space_comp(group, verts, band, subj=0, osc_param=0, space_param=1):
+def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1):
     """
 
     Parameters
     ----------
-    group : ?
+    oscs : dict()
         xx
     verts : ?
         xx
@@ -761,7 +763,7 @@ def plot_space_comp(group, verts, band, subj=0, osc_param=0, space_param=1):
     #
     space = verts[:, space_param]
     sort_inds = np.argsort(space)
-    freqs = [dat if dat > 0 else None for dat in group.gr_oscs[band][sort_inds, osc_param, subj]]
+    freqs = [dat if dat > 0 else None for dat in oscs[band][sort_inds, osc_param, subj]]
 
     # Initialize Figure
     fig = plt.figure()
