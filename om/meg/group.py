@@ -465,69 +465,6 @@ class MegGroup(MegSubj):
         return corrs_mat, ps_mat, sorted_bands
 
 
-    def freq_corr(self, f_win):
-        """Calculates the correlation between adjacent frequency bands.
-
-        Uses oscillation probabilities.
-
-        NOTE: ADD CHECKS THAT REQUIRED DATA HAS BEEN COMPUTED.
-
-        Parameters
-        ----------
-        f_win : float
-            Size of frequency window to use.
-
-        Returns
-        -------
-        corr_vec : 1d array
-            Vector of the correlation coefficients between all adjacent frequency bands.
-        p_vec : 1d array
-            Vector of the p-values for the correlations between adjacent frequency bands.
-        """
-
-        # Get # vertices, # of subjects to loop through
-        [n_vertex, n_slots, n_subj] = np.shape(self.centers)
-
-        # Initialize variables for # of freqs, and matrix to store probability
-        n_freqs = len(range(3, 40-f_win))
-        prob_mat = np.zeros([n_vertex, n_freqs])
-
-        # Loop through all vertices
-        for vertex in range(n_vertex):
-
-            # Loop through all subjects
-            for subj in range(n_subj):
-
-                # Store centers for current vertex, current subj in temp vector
-                cens_temp = self.centers[vertex, :, subj]
-
-                # Loop through freq-ranges, counting when oscillations occur
-                i = 0
-                for freq in range(3, 40-f_win):
-
-                    # Get the oscillation centers
-                    cens_fwin = _get_all_osc(cens_temp, freq, freq + f_win)
-
-                    # If there is an osc in range, add to prob_mat count
-                    if len(cens_fwin) != 0:
-                        prob_mat[vertex, i] += 1
-
-                    i += 1
-
-        # Divide by # of subjects to get probability per freq-range
-        prob_mat = prob_mat/n_subj
-
-        # Initialize vectors to store correlations and p-values
-        corr_vec = np.zeros([n_freqs-1])
-        p_vec = np.zeros([n_freqs-1])
-
-        # Compute corr between f and f+f_win start windows
-        for f_ind in range(n_freqs-f_win):
-            corr_vec[f_ind], p_vec[f_ind] = pearsonr(prob_mat[:, f_ind], prob_mat[:, f_ind+f_win])
-
-        return corr_vec, p_vec
-
-
     def save_gr_slope(self, file_name):
         """Saves out the average group slope results.
 
@@ -675,6 +612,76 @@ class MegGroup(MegSubj):
 #########################################################################################################
 ################################## OMEGAMAPPIN - MEG GROUP - FUNCTIONS ##################################
 #########################################################################################################
+
+def freq_corr_group(centers, f_win):
+    """Calculates the correlation between adjacent frequency bands.
+
+    Uses oscillation probabilities.
+
+    NOTE: ADD CHECKS THAT REQUIRED DATA HAS BEEN COMPUTED.
+
+    Parameters
+    ----------
+    centers : ?
+        xx
+    f_win : float
+        Size of frequency window to use.
+
+    Returns
+    -------
+    corr_vec : 1d array
+        Vector of the correlation coefficients between all adjacent frequency bands.
+    p_vec : 1d array
+        Vector of the p-values for the correlations between adjacent frequency bands.
+    fs : 1d array
+        xx
+    """
+
+    # Get # vertices, # of subjects to loop through
+    [n_vertex, n_slots, n_subj] = np.shape(centers)
+
+    # Initialize variables for # of freqs, and matrix to store probability
+    n_freqs = len(range(3, 40-f_win))
+    prob_mat = np.zeros([n_vertex, n_freqs])
+
+    # Loop through all vertices
+    for vertex in range(n_vertex):
+
+        # Loop through all subjects
+        for subj in range(n_subj):
+
+            # Store centers for current vertex, current subj in temp vector
+            cens_temp = centers[vertex, :, subj]
+
+            # Loop through freq-ranges, counting when oscillations occur
+            i = 0
+            for freq in range(3, 40-f_win):
+
+                # Get the oscillation centers
+                cens_fwin = _get_all_osc(cens_temp, freq, freq + f_win)
+
+                # If there is an osc in range, add to prob_mat count
+                if len(cens_fwin) != 0:
+                    prob_mat[vertex, i] += 1
+
+                i += 1
+
+    # Divide by # of subjects to get probability per freq-range
+    prob_mat = prob_mat/n_subj
+
+    # Initialize vectors to store correlations and p-values
+    corr_vec = np.zeros([n_freqs-1])
+    p_vec = np.zeros([n_freqs-1])
+
+    # Compute corr between f and f+f_win start windows
+    for f_ind in range(n_freqs-f_win):
+        corr_vec[f_ind], p_vec[f_ind] = pearsonr(prob_mat[:, f_ind], prob_mat[:, f_ind+f_win])
+
+    # Create the frequency vector of correlations calculated to return
+    fs = np.transpose(range(3, 40-f_win-1))
+
+    return corr_vec, p_vec, fs
+
 
 def osc_space_group(oscs, bands, verts, osc_param=0, space_param=1):
     """
