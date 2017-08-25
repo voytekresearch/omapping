@@ -1,7 +1,6 @@
 """Testing of database functions and classes for OM."""
 
 import os
-from types import ListType
 
 from om.core.db import OMDB
 
@@ -55,8 +54,8 @@ def test_check_dat_files_foof():
 
     sub_nums, source = db.check_dat_files('foof', verbose=True)
 
-    assert isinstance(sub_nums, ListType)
-    assert isinstance(source, ListType)
+    assert isinstance(sub_nums, list)
+    assert isinstance(source, list)
     assert len(sub_nums) == len(source)
 
     sub_nums, source = db.check_dat_files('foof', 'OMEGA', verbose=True)
@@ -69,7 +68,7 @@ def test_check_res_files_meg():
 
     files = db.check_res_files('meg', verbose=True)
 
-    assert isinstance(files, ListType)
+    assert isinstance(files, list)
 
 def test_check_res_files_maps():
     """Test that OMDB() check_res_files method runs properly, for MAPS files."""
@@ -78,7 +77,7 @@ def test_check_res_files_maps():
 
     files = db.check_res_files('maps', verbose=True)
 
-    assert isinstance(files, ListType)
+    assert isinstance(files, list)
 
 def test_check_map_files():
     """Test that OMDB() check_maps_files method runs properly."""
@@ -87,7 +86,7 @@ def test_check_map_files():
 
     osc, sl, gene, term = db.check_map_files(verbose=True, return_files=True)
 
-    assert isinstance(osc, ListType)
-    assert isinstance(sl, ListType)
-    assert isinstance(gene, ListType)
-    assert isinstance(term, ListType)
+    assert isinstance(osc, list)
+    assert isinstance(sl, list)
+    assert isinstance(gene, list)
+    assert isinstance(term, list)

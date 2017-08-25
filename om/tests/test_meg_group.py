@@ -157,16 +157,6 @@ def test_calc_osc_peak_age():
     # TODO: ADD TESTING OF THIS
     assert True
 
-def test_freq_corr():
-    """   """
-
-    meg_group = load_test_meg_gr(vertex_osc=True)
-
-    r, p = meg_group.freq_corr(1)
-
-    # TODO: ADD TESTING OF THIS
-    assert True
-
 def test_save_gr_slope():
     """   """
 
@@ -204,6 +194,24 @@ def test_set_map_viz():
 
     meg_group.set_map_viz('prob', 'test_prob_viz_save')
     meg_group.set_map_viz('score', 'test_score_viz_save')
+
+#########################################################################################
+##################### TESTS - OMEGAMAPPIN - MEG - GROUP - FUNCTIONS #####################
+#########################################################################################
+
+def test_freq_corr_group():
+    """ """
+
+    meg_group = load_test_meg_gr(vertex_osc=True)
+
+    f_win = 3
+    corrs, ps, fs = freq_corr_group(meg_group.centers, f_win)
+
+    assert np.all(fs)
+
+def test_osc_space_group():
+    """   """
+    pass
 
 #########################################################################################
 ################# TESTS - OMEGAMAPPIN - MEG - GROUP - PRIVATE FUNCTIONS #################

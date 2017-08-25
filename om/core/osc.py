@@ -8,7 +8,6 @@ More information here: https://docs.python.org/2/library/collections.html#collec
 """
 from __future__ import print_function
 
-from types import StringType
 from collections import OrderedDict
 import numpy as np
 
@@ -188,7 +187,7 @@ def _check_band(band_name, band_limits):
     """
 
     # Check that band name is a string
-    if not isinstance(band_name, StringType):
+    if not isinstance(band_name, str):
         raise InconsistentDataError('Band name definition is not a string.')
 
     # Check that band limits has the right size
