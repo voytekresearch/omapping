@@ -10,7 +10,7 @@ import numpy as np
 import scipy.io as sio
 
 # Import FOOF (use sys to add location to path, then import)
-sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
+#sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
 
 from om.tests.utils import TestDB
 from om.core.osc import Osc
@@ -96,7 +96,7 @@ def make_fake_csvs():
 
     for ind, f in enumerate(f_names):
 
-        out_file = open(os.path.join(tdb.csvs_path, f), 'wb')
+        out_file = open(os.path.join(tdb.csvs_path, f), 'w')
         out_writer = csv.writer(out_file)
 
         for dat in f_dat[ind]:
@@ -147,7 +147,7 @@ def make_fake_gene_data():
     dat_f_name = os.path.join(tdb.maps_path, 'Genes', 'test_gene_estimations',
                               'test_gene_dat_r10.csv')
 
-    _mc_dat(gene_dat, dat_f_name, gene_names, names_f_name)
+    _mk_dat(gene_dat, dat_f_name, gene_names, names_f_name)
 
 def make_fake_bad_gene_data():
     """Creates 'bad' gene data, with 2 genes, that mis-matches the 3 defined in the names file."""
@@ -159,7 +159,7 @@ def make_fake_bad_gene_data():
     bad_dat_f_name = os.path.join(tdb.maps_path, 'Genes', 'bad_test_gene_estimations',
                                   'bad_test_gene_dat_r10.csv')
 
-    _mc_dat(bad_gene_dat, bad_dat_f_name)
+    _mk_dat(bad_gene_dat, bad_dat_f_name)
 
 def make_fake_term_data():
     """Create fake term data for testing, for 2 terms at 5 vertices."""
@@ -173,7 +173,7 @@ def make_fake_term_data():
     names_f_name = os.path.join(tdb.maps_path, 'Terms', '00-test_term_names.csv')
     dat_f_name = os.path.join(tdb.maps_path, 'Terms', 'test_term_dat.csv')
 
-    _mc_dat(term_dat, dat_f_name, term_names, names_f_name)
+    _mk_dat(term_dat, dat_f_name, term_names, names_f_name)
 
 def make_fake_bad_term_data():
     """Creates 'bad' term data, with 1 term, that mis-matches the 2 defined in the names file."""
@@ -184,7 +184,7 @@ def make_fake_bad_term_data():
 
     bad_dat_f_name = os.path.join(tdb.maps_path, 'Terms', 'bad_test_term_dat.csv')
 
-    _mc_dat(bad_term_dat, bad_dat_f_name)
+    _mk_dat(bad_term_dat, bad_dat_f_name)
 
 def make_fake_anat_data():
     """Create anatomical connectivity data, for two ROIs."""
@@ -262,20 +262,31 @@ def create_other():
 
     make_fake_csvs()
 
-#######################################################################################
-#######################################################################################
-#######################################################################################
+#################################################################################################
+#################################################################################################
 
-def _mc_dat(data, dat_f_name, names=None, name_f_name=None):
-    """???"""
+def _mk_dat(data, dat_f_name, names=None, name_f_name=None):
+    """Save out data to file. Optionally, also save out a corresponding names file.
+
+    Parameters
+    ----------
+    data : list
+        Data to save out to data file.
+    dat_f_name : str
+        File name for data file.
+    names : list
+        Names to save out to names file.
+    name_f_name : str, optional
+        File name for names file.
+    """
 
     if names:
-        names_file = open(name_f_name, 'wb')
+        names_file = open(name_f_name, 'w')
         names_writer = csv.writer(names_file)
         names_writer.writerow(names)
         names_file.close()
 
-    dat_file = open(dat_f_name, 'wb')
+    dat_file = open(dat_f_name, 'w')
     dat_writer = csv.writer(dat_file)
 
     for dat in data:
@@ -283,9 +294,8 @@ def _mc_dat(data, dat_f_name, names=None, name_f_name=None):
 
     dat_file.close()
 
-#######################################################################################
-#######################################################################################
-#######################################################################################
+#################################################################################################
+#################################################################################################
 
 if __name__ == "__main__":
 

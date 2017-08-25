@@ -250,4 +250,4 @@ def test_band_sort():
 
     assert len(ord_bands) == 3
     assert ord_bands == ['a', 'b', 'c']
-    assert [osc.bands.keys()[i] for i in sort_inds]
+    assert [list(osc.bands.keys())[i] for i in sort_inds] == ord_bands

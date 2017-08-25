@@ -328,7 +328,7 @@ def avg_csv_files(f_in, f_out, avg='mean'):
     """
 
     # Open out file object
-    out_file = open(f_out, 'wb')
+    out_file = open(f_out, 'w')
     out_writer = csv.writer(out_file)
 
     # Check how many input files there are
@@ -359,9 +359,8 @@ def avg_csv_files(f_in, f_out, avg='mean'):
 
         #
         for f_ind in range(1, n_in):
-
             # Load row of data into the temporary array
-            temp[f_ind, :] = np.array([float(i) for i in in_readers[f_ind].next()])
+            temp[f_ind, :] = np.array([float(i) for i in next(in_readers[f_ind])])
 
         # Take average
         if avg is 'mean':

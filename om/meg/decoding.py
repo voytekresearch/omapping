@@ -74,7 +74,7 @@ def split_inds(n_oscs, n_train, n_test):
         raise InconsistentDataError('Number of data points is insufficient for requested split.')
 
     # Get a shuffled list of possible indices
-    inds = range(n_oscs)
+    inds = list(range(n_oscs))
     random.shuffle(inds)
 
     # Pull out random indices for train and test set

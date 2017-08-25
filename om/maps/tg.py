@@ -572,7 +572,7 @@ def _get_map_names(names_file, path):
     csv_path = os.path.join(path, names_file)
 
     # Open csv file
-    with open(csv_path, 'rb') as f_name:
+    with open(csv_path, 'r') as f_name:
         reader = csv.reader(f_name, delimiter=',')
 
         # Get list of names from first row in csv
