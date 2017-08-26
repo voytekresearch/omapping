@@ -13,3 +13,5 @@
 **/.coverage
 # Ignore test files
 **/tests/data/**
+# Ignore pylint file
+*_lint*
