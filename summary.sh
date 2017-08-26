@@ -21,7 +21,10 @@ printf "\n\n\n RUN TESTS & CHECK COVERAGE: \n"
 coverage run --source om --omit="*/plts/*","*/fake_data.py" -m py.test
 coverage report
 
-# Find a way to get summary from pylint?
+# Run pylint and print summary
+printf "\n\n\n RUN PYLINT ACROSS MODULE: \n"
+pylint om --ignore tests -> _lint.txt
+tail -n5 _lint.txt
 
 # Print out some new lines
 printf "\n\n\n\n"
