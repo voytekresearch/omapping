@@ -1,7 +1,5 @@
-"""MEG-DATA (MD) Analysis Module - Single Subject
+"""MEG-DATA Analysis Module - Single Subject"""
 
-This code...
-"""
 from __future__ import print_function, division
 
 import os
@@ -197,8 +195,8 @@ class MegSubj(object):
         # Load data file
         if load_type is 'pickle':
             results = _load_foof_pickle(cur_subj_path)
-        #elif load_type is 'csv': # NOTE: not yet implemented
-        #    results = _load_foof_csv(cur_subj_path)
+        elif load_type is 'csv': # NOTE: not yet implemented
+            results = _load_foof_csv(cur_subj_path)
 
         # Pull out data from results, and update that this data is loaded
         self.centers, self.powers, self.bws, self.slopes, self.n_psds \
@@ -669,7 +667,7 @@ def _load_foof_pickle(file_name):
 
     Parameters
     ----------
-    filename : str
+    file_name : str
         Full path, including filename, to file to be loaded.
 
     Returns
@@ -679,13 +677,24 @@ def _load_foof_pickle(file_name):
     """
 
     # Load from pickle file
-    return pickle.load(open(file_name, 'rb'))
+    with open(file_name, 'rb') as pickle_file:
+        results = pickle.load(pickle_file)
 
-"""
+    return results
+
+
 def _load_foof_csv(file_name):
-    ""
-    NOTE: not yet implemented
-    "
+    """Loads FOOF data from a csv file.
 
-    pass
-"""
+    Parameters
+    ----------
+    file_name : str
+        Full path, including filename, to file to be loaded.
+
+    Returns
+    -------
+    results : ?
+        xx
+    """
+
+    raise NotImplementedError('Bad Tom.')
