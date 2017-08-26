@@ -70,7 +70,10 @@ def save_foof_pickle(results, save_path, sub_num):
     foof_save_path = os.path.join(save_path, 'pickle', save_name)
 
     # Save out data to pickle file
-    pickle.dump(results, open(foof_save_path, 'wb'))
+    with open(foof_save_path, 'wb') as pickle_file:
+        pickle.dump(results, pickle_file)
+
+    #pickle.dump(results, open(foof_save_path, 'wb'))
 
 
 def save_foof_csv(results, save_path, sub_num):
@@ -151,8 +154,11 @@ def load_foof_pickle(dat_path, sub_num):
     cur_subj_file = get_cur_subj(sub_num, files)
     subj_path = os.path.join(dat_path, 'pickle', cur_subj_file)
 
+    #results = pickle.load(open(subj_path, 'rb'))
+
     # Load file
-    results = pickle.load(open(subj_path, 'rb'))
+    with open(subj_path, 'rb') as pickle_file:
+        results = pickle.load(pickle_file)
 
     return results
 
@@ -162,7 +168,7 @@ def load_foof_csv():
     NOTE: Not yet implemented.
     """
 
-    pass
+    raise NotImplementedError('Bad Tom.')
 
 
 def save_obj_pickle(obj, dat_type, save_name, db=None):
@@ -191,7 +197,10 @@ def save_obj_pickle(obj, dat_type, save_name, db=None):
     save_name = dat_type + '_' + save_name + '_' + datetime.datetime.now().strftime("%Y-%m-%d") + '.p'
 
     # Save out data to pickle file
-    pickle.dump(obj, open(os.path.join(db.save_path, dat_type, save_name), 'wb'))
+    with open(os.path.join(db.save_path, dat_type, save_name), 'wb') as pickle_file:
+        pickle.dump(obj, pickle_file)
+
+    #pickle.dump(obj, open(os.path.join(db.save_path, dat_type, save_name), 'wb'))
 
 
 def load_obj_pickle(dat_type, file_name, db=None):
@@ -231,7 +240,13 @@ def load_obj_pickle(dat_type, file_name, db=None):
     else:
         f_name = f_names[0]
 
-    return pickle.load(open(os.path.join(db.save_path, dat_type, f_name), 'rb'))
+    #return pickle.load(open(os.path.join(db.save_path, dat_type, f_name), 'rb'))
+
+    with open(os.path.join(db.save_path, dat_type, f_name), 'rb') as pickle_file:
+        results = pickle.load(pickle_file)
+
+    return results
+
 
 
 def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=None, dat_source=None):
