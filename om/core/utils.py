@@ -41,6 +41,18 @@ def clean_file_list(files_in, string):
     return files_out
 
 
+def update_file_name(path, front_str):
+    """Update file names - append string to beginning of file name."""
+
+    # Get list of files in directory
+    files = os.listdir(path)
+    files = [ff for ff in files if ff[0] is not '.']
+
+    # Rename the files, appending specified string to the front of the filename
+    for ff in files:
+        os.rename(os.path.join(path, ff), os.path.join(path, front_str + ff))
+
+
 def get_sub_nums(files_in, f_l):
     """Takes a list of files. Returns a list of subject numbers.
 
