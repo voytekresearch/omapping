@@ -1,4 +1,5 @@
 """Parallel functions for OM project."""
+
 from __future__ import print_function, division
 
 import os
@@ -25,16 +26,16 @@ class Par(object):
         Whether to print out status reports.
     client : Client()
         Parallel client.
-    workers : xx
+    workers : ?
         Parallel worker engines.
     """
 
-    def __init__(self):
+    def __init__(self, verbose=True):
         """Intialize parallel object."""
 
         self.active = False
         self.f_name = 'cluster.txt'
-        self.verbose = True
+        self.verbose = verbose
 
         self.client = None
         self.workers = None
@@ -134,7 +135,7 @@ class Par(object):
 
 @interactive
 def run_foof_par(psd_in):
-    """DOCSTRING
+    """Function to pass to run FOOF in parallel.
 
     Parameters
     ----------
@@ -145,6 +146,8 @@ def run_foof_par(psd_in):
     -----
     - FOOF has to be imported on workers.
     - min_p, freq_res, fmin, fmax have to be sent to workers.
+
+    NOTE: FOR OLD FOOF
     """
 
     # Initialize foof object
@@ -155,6 +158,36 @@ def run_foof_par(psd_in):
 
     # Store vals in tuple and return
     return (foof.chi_, foof.centers_, foof.powers_, foof.stdevs_)
+
+
+@interactive
+def run_fooof_par(psd_in):
+    """Function to pass to run FOOOF in parallel.
+
+    Parameters
+    ----------
+    psd_in : 1d array
+        PSD to run FOOOF on.
+
+    Returns
+    -------
+    tuple
+        FOOOF results.
+
+    Notes
+    -----
+    - FOOOF has to be imported on workers.
+    - freqs, freq_range have to be sent to workers.
+    """
+
+    # Initialize FOOOF object
+    fm = FOOOF(bandwidth_limits=bandwidth_limits, max_n_oscs=max_n_oscs)
+
+    # Fit the PSD model
+    fm.fit(freqs, psd_in, freq_range=freq_range)
+
+    # Return FOOOF model fit parameters
+    return (fm.get_params())
 
 
 @interactive
@@ -178,8 +211,6 @@ def run_corr_par(dat):
 
     # Get inds of data that contains numbers
     inds_non_nan = numpy.invert(numpy.isnan(dat))
-    # The following also works, used to be how it was run, but is super slow
-    #inds_non_nan = [i for i in range(len(dat)) if not numpy.isnan(dat[i])]
 
     # Calculate corr between data and MEG map
     [corr_vals, p_vals] = pearsonr(dat[inds_non_nan], meg_map[inds_non_nan])
