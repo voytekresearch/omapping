@@ -175,11 +175,13 @@ def run_fooof_par(psd_in):
     Notes
     -----
     - FOOOF has to be imported on workers.
-    - freqs, freq_range have to be sent to workers.
+    - Some settings and inputs have to be sent to workers:
+        - bandwidth_limits, max_n_oscs, & fit_knee for init
+        - freqs & freq_range for fit
     """
 
     # Initialize FOOOF object
-    fm = FOOOF(bandwidth_limits=bandwidth_limits, max_n_oscs=max_n_oscs)
+    fm = FOOOF(bandwidth_limits=bandwidth_limits, max_n_oscs=max_n_oscs, fit_knee=fit_knee)
 
     # Fit the PSD model
     fm.fit(freqs, psd_in, freq_range=freq_range)
