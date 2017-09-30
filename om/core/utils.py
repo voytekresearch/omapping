@@ -9,7 +9,7 @@ from om.core.errors import InconsistentDataError, UnknownDataSourceError
 ############################ OMEGAMAPPIN - CORE - UTILS ############################
 ####################################################################################
 
-def clean_file_list(files_in, string):
+def clean_file_list(files_in, string, verbose=False):
     """"Takes a list of files and returns only a specified set of files.
 
     Parameters
@@ -18,6 +18,8 @@ def clean_file_list(files_in, string):
         A list of strings, each one being a file name.
     string : str OR list
         A string to look for in file list, to keep those who have it.
+    verbose : bool, optional (default: false)
+        Whether to print out status.
 
     Returns
     -------
@@ -34,7 +36,7 @@ def clean_file_list(files_in, string):
             files_out.append(cur_file)
 
     # Check if list is empty
-    if not files_out:
+    if not files_out and verbose:
         print('No files found!')
 
     return files_out

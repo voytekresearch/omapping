@@ -83,7 +83,7 @@ class OMDB(object):
         self.viz_path = os.path.join(self.meg_path, 'Viz')
 
 
-    def check_dat_files(self, dat_type, dat_source='both', save_type='pickle', verbose=True):
+    def check_dat_files(self, dat_type, dat_source='both', save_type='pickle', verbose=False):
         """Checks what data files are available.
 
         Parameters
@@ -94,7 +94,7 @@ class OMDB(object):
             Which database to check files for.
         save_type : {'pickle', 'csv'}, optional (default = 'pickle')
             Which file type to check files for. Only used for fooof files.
-        verbose : boolean, optional (default = True)
+        verbose : boolean, optional (default = False)
             Whether to print out information during run.
 
         Returns
@@ -115,6 +115,8 @@ class OMDB(object):
             dat_path = self.fooof_path
             word = 'fooof'
             f_l = 'first'
+        else:
+            raise ValueError('Data type not understood.')
 
         # If looking for a particular database, find file, get subject numbers and source
         if dat_source is not 'both':
