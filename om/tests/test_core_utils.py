@@ -1,4 +1,4 @@
-"""   """
+"""Tests for OM - core utils."""
 
 import os
 from py.test import raises

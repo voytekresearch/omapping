@@ -1,4 +1,4 @@
-"""Test for the single subject functions from om.meg."""
+"""Test for OM - MEG single."""
 
 import numpy as np
 from py.test import raises
@@ -75,14 +75,14 @@ def test_set_bands_error():
     with raises(InconsistentDataError):
         meg_dat.set_bands(osc)
 
-def test_import_foof():
+def test_import_fooof():
     """   """
 
     tdb = TDB()
 
     meg_dat = MegSubj(tdb, '')
 
-    meg_dat.import_foof('test_v2', get_demo=False, load_type='pickle')
+    meg_dat.import_fooof('test_v2', get_demo=False, load_type='pickle')
 
     exp_osc_count = np.array([2, 3])
 
@@ -92,16 +92,16 @@ def test_import_foof():
     assert np.array_equal(meg_dat.osc_count, exp_osc_count)
     assert meg_dat.has_data
 
-def test_import_foof_error():
+def test_import_fooof_error():
     """   """
 
     tdb = TDB()
 
     meg_dat = MegSubj(tdb, '')
-    meg_dat.import_foof('test_v2', get_demo=False, load_type='pickle')
+    meg_dat.import_fooof('test_v2', get_demo=False, load_type='pickle')
 
     with raises(InconsistentDataError):
-        meg_dat.import_foof('test_v5', get_demo=False, load_type='pickle')
+        meg_dat.import_fooof('test_v5', get_demo=False, load_type='pickle')
 
 def test_all_oscs():
     """   """
@@ -214,14 +214,14 @@ def test_calc_osc_param_corrs_error():
     with raises(DataNotComputedError):
         meg_dat.calc_osc_param_corrs()
 
-def test_set_foof_viz():
+def test_set_fooof_viz():
     """   """
 
     meg_dat = load_test_meg_subj('test_v2')
 
     meg_dat.osc_bands_vertex()
 
-    meg_dat.set_foof_viz()
+    meg_dat.set_fooof_viz()
 
     assert True
 

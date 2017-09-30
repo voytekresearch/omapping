@@ -1,5 +1,4 @@
 """Database structure object for the OM project."""
-from __future__ import print_function, division
 
 import os
 
@@ -30,8 +29,8 @@ class OMDB(object):
         Path to MEG data.
     psd_path : str
         Path to PSD data.
-    foof_path : str
-        Path to FOOF data.
+    fooof_path : str
+        Path to FOOOF data.
     viz_path : str
         Path to vizualization data.
     """
@@ -40,10 +39,16 @@ class OMDB(object):
         """Initialize OMDB object."""
 
         # Initialize base paths
-        self.internal_path = ("/Users/thomasdonoghue/Documents/Research/"
+        self.internal_path = ("/Users/tom/Documents/Research/"
                               "1-Projects/OMEGA/2-Data/OMData/")
-        self.external_path = ("/Users/thomasdonoghue/Documents/Research/"
+        self.external_path = ("/Users/tom/Documents/Research/"
                               "1-Projects/OMEGA/2-Data/ExternalData/")
+
+        # TOMS OLD LAPTOP
+        #self.internal_path = ("/Users/thomasdonoghue/Documents/Research/"
+        #                      "1-Projects/OMEGA/2-Data/OMData/")
+        #self.external_path = ("/Users/thomasdonoghue/Documents/Research/"
+        #                      "1-Projects/OMEGA/2-Data/ExternalData/")
 
         # Initialize all internal paths
         self.maps_path = str()
@@ -53,7 +58,7 @@ class OMDB(object):
         # Initialize all external paths
         self.meg_path = str()
         self.psd_path = str()
-        self.foof_path = str()
+        self.fooof_path = str()
         self.viz_path = str()
 
         # Generate project paths
@@ -74,7 +79,7 @@ class OMDB(object):
         # Set up external data paths
         self.meg_path = os.path.join(self.external_path, 'MEG')
         self.psd_path = os.path.join(self.meg_path, 'PSDs')
-        self.foof_path = os.path.join(self.meg_path, 'FOOF')
+        self.fooof_path = os.path.join(self.meg_path, 'FOOOF')
         self.viz_path = os.path.join(self.meg_path, 'Viz')
 
 
@@ -83,12 +88,12 @@ class OMDB(object):
 
         Parameters
         ----------
-        dat_type : {'PSD', 'foof'}
+        dat_type : {'PSD', 'fooof'}
             Which data type to check files for.
         dat_source : {'OMEGA', 'HCP', 'both'}
             Which database to check files for.
         save_type : {'pickle', 'csv'}, optional (default = 'pickle')
-            Which file type to check files for. Only used for foof files.
+            Which file type to check files for. Only used for fooof files.
         verbose : boolean, optional (default = True)
             Whether to print out information during run.
 
@@ -106,9 +111,9 @@ class OMDB(object):
             word = 'subject_'
             save_type = ''
             f_l = 'last'
-        elif dat_type is 'foof':
-            dat_path = self.foof_path
-            word = 'foof'
+        elif dat_type is 'fooof':
+            dat_path = self.fooof_path
+            word = 'fooof'
             f_l = 'first'
 
         # If looking for a particular database, find file, get subject numbers and source
@@ -130,7 +135,7 @@ class OMDB(object):
         # If requested, print out the list of subject numbers
         if verbose:
             print('\nNumber of Subjects available: ' + str(len(sub_nums)) + '\n')
-            print('Subject numbers with FOOF data available: \n' + str(sub_nums) + '\n')
+            print('Subject numbers with FOOOF data available: \n' + str(sub_nums) + '\n')
 
         return sub_nums, source
 
@@ -262,7 +267,7 @@ def make_file_directory_external(base_path):
     # MEG Data
     os.mkdir(os.path.join(base_path, 'MEG'))
 
-    meg_data = ['FOOF', 'PSDs', 'Viz']
+    meg_data = ['FOOOF', 'PSDs', 'Viz']
     for meg_dat in meg_data:
         os.mkdir(os.path.join(base_path, 'MEG', meg_dat))
 

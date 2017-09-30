@@ -1,4 +1,4 @@
-"""Testing of twin analysis functions from om.meg."""
+"""Tests for OM - meg twin."""
 
 from om.core.osc import Osc
 from om.tests.utils import TestDB as TDB

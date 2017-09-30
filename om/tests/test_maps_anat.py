@@ -1,4 +1,4 @@
-"""   """
+"""Tests for OM - maps anat"""
 
 import numpy as np
 from py.test import raises

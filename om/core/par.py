@@ -1,7 +1,5 @@
 """Parallel functions for OM project."""
 
-from __future__ import print_function, division
-
 import os
 import time
 from ipyparallel import Client

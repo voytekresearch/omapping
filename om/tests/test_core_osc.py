@@ -1,4 +1,4 @@
-"""   """
+"""Tests for OM - osc class & functions."""
 
 from py.test import raises
 
@@ -39,9 +39,8 @@ def test_rm_band():
     with raises(KeyError):
         assert osc.bands['test']
 
-##
-##
-##
+#########################################################################################
+#########################################################################################
 
 def test_check_band():
     """Test that _check_band returns errors appropriately."""

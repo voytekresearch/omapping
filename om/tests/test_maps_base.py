@@ -1,4 +1,4 @@
-"""MODULE DOCSTRING - TO FILL IN"""
+"""Tests for OM - maps base."""
 
 from om.maps.base import *
 from om.maps.base import _init_meg_map_dict

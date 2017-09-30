@@ -1,6 +1,5 @@
 """Basic utilites for the OM project."""
 
-from __future__ import print_function, division
 import csv
 import numpy as np
 
@@ -151,8 +150,8 @@ def rm_files_ext(files_in):
     return files_out
 
 
-def check_file_status(subjs, db, dat_source, verbose=True,):
-    """Checks, for a list of subjects, if FOOF data is available.
+def check_file_status(subjs, db, dat_source, verbose=True):
+    """Checks, for a list of subjects, if FOOOF data is available.
 
     Parameters
     ----------
@@ -166,17 +165,18 @@ def check_file_status(subjs, db, dat_source, verbose=True,):
     Returns
     -------
     dat : list of int
-        List of subject IDs for which FOOF data is available.
+        List of subject IDs for which FOOOF data is available.
     no_dat : list of int
-        List of subject IDs for which FOOF data is not available.
+        List of subject IDs for which FOOOF data is not available.
     """
 
-    # Check all FOOFed files from the HCP database
-    foof_files, _ = db.check_dat_files('foof', dat_source=dat_source, verbose=False)
+    # Check all FOOOFed files from the HCP database
+    fooof_files, _ = db.check_dat_files('fooof', dat_source=dat_source, verbose=verbose)
+    print(fooof_files)
 
-    # Check which subjects listed in the demographic information are not yet FOOFed
-    dat = list(set(subjs) & set(foof_files))
-    no_dat = list(set(subjs) - set(foof_files))
+    # Check which subjects listed in the demographic information are not yet FOOOFed
+    dat = list(set(subjs) & set(fooof_files))
+    no_dat = list(set(subjs) - set(fooof_files))
 
     # If requested, print out number of files
     if verbose:
@@ -281,13 +281,13 @@ def extract_psd(psd, freqs, f_low, f_high):
     return psd_ext, freqs_ext
 
 
-def extract_foof_pickle(results):
-    """Pull out the foof data from list.
+def extract_fooof_pickle(results):
+    """Pull out the FOOOF data from list.
 
     Parameters
     ----------
     results : list of tuple
-        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        FOOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
 
     Returns
     -------
@@ -318,6 +318,50 @@ def extract_foof_pickle(results):
         centers[i, 0:len(results[i][1])] = results[i][1]
         powers[i, 0:len(results[i][2])] = results[i][2]
         bws[i, 0:len(results[i][3])] = results[i][3]
+
+    return centers, powers, bws, slopes, n_psds
+
+
+def extract_fooof_pickle_new(results):
+    """Pull out the FOOOF data from list.
+
+    Parameters
+    ----------
+    results : list of tuple
+        FOOOF results - ??
+
+    Returns
+    -------
+    centers : 2d array
+        Matrix of all centers for all PSDs.
+    powers : 2d array
+        Matrix of all powers for all PSDs.
+    bws : 2d array
+        Matrix of all bws for all PSDs.
+    slopes : 1d array
+        Slope value for each PSD.
+    n_psds : int
+        The number of PSDs.
+    """
+
+    # Check how many PSDs there are
+    n_psds = len(results)
+
+    # Initialize numpy arrays to pull out data into
+    slopes = np.zeros([n_psds, 3])
+    centers = np.zeros([n_psds, 8])
+    powers = np.zeros([n_psds, 8])
+    bws = np.zeros([n_psds, 8])
+
+    # Pull out the data from each vertex
+    for i in range(n_psds):
+        slopes[i, :] = results[i][0]
+
+        n_oscs = len(results[i][1])
+
+        centers[i, 0:n_oscs] = results[i][1][:, 0]
+        powers[i, 0:n_oscs] = results[i][1][:, 1]
+        bws[i, 0:n_oscs] = results[i][1][:, 2]
 
     return centers, powers, bws, slopes, n_psds
 

@@ -1,7 +1,5 @@
 """Create fake data for testing OM."""
 
-from __future__ import print_function, division
-
 import os
 import sys
 import csv
@@ -9,14 +7,13 @@ import pickle
 import numpy as np
 import scipy.io as sio
 
-# Import FOOF (use sys to add location to path, then import)
+# Import fooof (use sys to add location to path, then import)
 #sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
 
 from om.tests.utils import TestDB
 from om.core.osc import Osc
-from om.core.io import save_foof_pickle
+from om.core.io import save_fooof_pickle
 
-#####################################################################################
 #####################################################################################
 #####################################################################################
 
@@ -26,7 +23,7 @@ def clear_fake_dat():
     tdb = TestDB()
 
     for key, val in vars(tdb).items():
-        if '_path' in key and val:
+        if '_path' in key and val and os.path.exists(val):
             _rm_test_files(val)
 
 
@@ -52,8 +49,41 @@ def _rm_test_files(path):
 ########################## OMEGAMAPPIN - GENERATE FAKE DATA FOR TESTING ##########################
 ##################################################################################################
 
-def make_fake_foof_dat_v2():
-    """Creates a file with 2 vertices of FOOF MEG data."""
+def make_fake_fooof_dat_v2():
+    """   """
+
+    tdb = TestDB()
+
+    v1 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([5, 1.0e-22, 1.0]), np.array([10, 1.0e-22, 1.0])]))
+    v2 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([5, 1.0e-22, 1.0]), np.array([10, 1.0e-22, 1.0]),
+                                          np.array([15, 1.0e-22, 1.0])]))
+
+    fake_fooof_dat = [v1, v2]
+
+    save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v2')
+
+def make_fake_fooof_dat_v5():
+    """   """
+
+    tdb = TestDB()
+
+    v1 = (np.array([0.0, 0.0, 0.0]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
+                                          np.array([30, 2.0e-22, 1.5])]))
+    v2 = (np.array([0.5, 0.5, 0.5]), np.array([np.array([10, 1.0e-22, 0.5]), np.array([11, 1.5e-22, 1.0]),
+                                          np.array([30, 2.0e-22, 1.5])]))
+    v3 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
+                                          np.array([30, 2.0e-22, 1.5])]))
+    v4 = (np.array([1.5, 1.5, 1.5]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
+                                          np.array([30, 2.0e-22, 1.5])]))
+    v5 = (np.array([2.0, 2.0, 2.0]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
+                                          np.array([30, 2.0e-22, 1.5])]))
+
+    fake_fooof_dat = [v1, v2, v3, v4, v5]
+
+    save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v5')
+
+def make_fake_fooof_dat_v2_old():
+    """Creates a file with 2 vertices of FOOOF MEG data."""
 
     tdb = TestDB()
 
@@ -61,12 +91,12 @@ def make_fake_foof_dat_v2():
     v2 = (1.0, np.array([5, 10, 15]), np.array([1.0e-22, 1.0e-22, 1.0e-22]),
           np.array([1.0, 1.0, 1.0]))
 
-    fake_foof_dat = [v1, v2]
+    fake_fooof_dat = [v1, v2]
 
-    save_foof_pickle(fake_foof_dat, tdb.foof_path, 'test_v2')
+    save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v2')
 
-def make_fake_foof_dat_v5():
-    """Creates a file with 5 vertices of FOOF MEG data."""
+def make_fake_fooof_dat_v5_old():
+    """Creates a file with 5 vertices of FOOOF MEG data."""
 
     tdb = TestDB()
 
@@ -81,9 +111,9 @@ def make_fake_foof_dat_v5():
     v5 = (2.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
           np.array([0.5, 1.0, 1.5]))
 
-    fake_foof_dat = [v1, v2, v3, v4, v5]
+    fake_fooof_dat = [v1, v2, v3, v4, v5]
 
-    save_foof_pickle(fake_foof_dat, tdb.foof_path, 'test_v5')
+    save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v5')
 
 def make_fake_csvs():
     """Creates two test csv files, with 4 lines of data. Both files are the same."""
@@ -230,11 +260,11 @@ def make_fake_scout_data():
 ############################################################################
 ############################################################################
 
-def create_foof_data():
-    """Creates FOOF data for testing."""
+def create_fooof_data():
+    """Creates fooof data for testing."""
 
-    make_fake_foof_dat_v2()
-    make_fake_foof_dat_v5()
+    make_fake_fooof_dat_v2()
+    make_fake_fooof_dat_v5()
 
 def create_meg_data():
     """Creates MEG data for testing."""
@@ -302,7 +332,7 @@ if __name__ == "__main__":
     clear_fake_dat()
     print('\n\tPrevious test files removed.')
 
-    create_foof_data()
+    create_fooof_data()
     create_meg_data()
     create_gene_term_data()
     create_anat_data()

@@ -1,12 +1,8 @@
-"""MODULE DOCSTING - TO FILL IN"""
-
-# Import required libraries/functions
-from __future__ import print_function
+"""OM - plots for MEG data."""
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-#from om.gen import FigInfo, UnknownDataTypeError
 from om.plts.fig_info import FigInfo
 from om.core.errors import UnknownDataTypeError
 
@@ -121,7 +117,7 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
     f_info = FigInfo()
 
     # Plot Settings
-    n_bins = 160             # Number of bins for histograms
+    n_bins = 160                 # Number of bins for histograms
     st_fs = f_info.t_fs          # Super Title Font Size
     sp_fs = f_info.sp_fs         # Subplot Title Font Size
     ax_fs = f_info.ax_fs         # Axis Label Font Size
@@ -236,6 +232,9 @@ def plot_all_oscs_single(data, dat_type, title, n_bins=160, size=(15, 5), save_o
     # Set linewidth of remaining spines
     ax.spines['left'].set_linewidth(ax_lw)
     ax.spines['bottom'].set_linewidth(ax_lw)
+
+    # Hard code x-lims
+    #plt.xlim(3, max(data)+0.2)
 
     # Save out (if requested)
     if save_out:
@@ -664,13 +663,15 @@ def plot_age_n_oscs(ages, n_oscs, save_out=False):
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
 
-def plot_osc_profiles(centers_hist, save_out=False):
+def plot_osc_profiles(centers_hist, n_subj='all', save_out=False):
     """Creates a plot showing all subjects oscillation profiles.
 
     Parameters
     ----------
     centers_hist : list of list
         Contains the oscillation profile for each subject.
+    n_subj : 'all' or int
+        If all: plots all subj. If int, plots n_sing random individual subjects.
     save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
@@ -685,9 +686,9 @@ def plot_osc_profiles(centers_hist, save_out=False):
     ax_lw = f_info.ax_lw
 
     # xx
-    ind_lw = 0.5
-    avg_lw = 2.5
-    alpha = 0.45
+    ind_lw = 1.0
+    avg_lw = 3.5
+    alpha = 0.80
 
     # Initialize plot
     fig, ax = plt.subplots(figsize=(18, 5))
@@ -695,9 +696,16 @@ def plot_osc_profiles(centers_hist, save_out=False):
     # Initialize a frequency vector for the x-axis
     freqs = np.arange(3.125, 40.125, 0.25)
 
+    # Set inds to plot
+    if n_subj is 'all':
+        subj_inds = np.range(len(centers_hist))
+    else:
+        subj_inds = np.random.choice(range(len(centers_hist)), n_subj, replace=False)
+
     # Loop through all subjects, adding profile to plot
-    for hist in centers_hist:
-        ax.plot(freqs, hist, linewidth=ind_lw, alpha=alpha)
+    for ind, hist in enumerate(centers_hist):
+        if ind in subj_inds:
+            ax.plot(freqs, hist, linewidth=ind_lw, alpha=alpha)
 
     # Add the average profile
     ax.plot(freqs, np.median(centers_hist, 0), 'k', linewidth=avg_lw)
@@ -724,17 +732,17 @@ def plot_osc_profiles(centers_hist, save_out=False):
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
     # Set the x axis limits
-    plt.xlim([3, 40])
+    plt.xlim([3, 30])
 
     # Save out (if requested)
     if save_out:
 
         # Set up save name & save out
-        save_name = f_info.save_path + '111-OscillationProf_infoles' + '.' + f_info.format
+        save_name = f_info.save_path + '111-OscillationProfiles' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
 
-def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1):
+def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1, save_out=False):
     """
 
     Parameters
@@ -781,13 +789,20 @@ def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1):
     plt.xlabel('Posterior -> Anterior', {'fontsize': ax_fs, 'fontweight': 'bold'})
     plt.ylabel('Center Frequency', {'fontsize': ax_fs, 'fontweight': 'bold'})
 
+    # Save out (if requested)
+    if save_out:
+
+        # Set up save name & save out
+        save_name = f_info.save_path + '1XX-OscillationSpaceSingleSubject' + '.' + f_info.format
+        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+
 
 def plot_space_comp_all():
     """   """
     pass
 
 
-def plot_osc_space_corr_boxplot(dat, labels):
+def plot_osc_space_corr_boxplot(dat, labels, save_out=False):
     """
 
     Parameters
@@ -828,3 +843,10 @@ def plot_osc_space_corr_boxplot(dat, labels):
 
     # Add title to plot
     plt.title('Spatial Analysis', {'fontsize': t_fs, 'fontweight': 'bold'})
+
+    # Save out (if requested)
+    if save_out:
+
+        # Set up save name & save out
+        save_name = f_info.save_path + '1XX-OscillationSpaceCorrs' + '.' + f_info.format
+        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)

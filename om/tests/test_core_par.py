@@ -1,4 +1,4 @@
-"""   """
+"""Tests for OM - par."""
 
 from om.core.par import Par
 
@@ -13,7 +13,6 @@ def test_par():
 
 """
 def test_launch_stop():
-    """   """
 
     par = Par()
 

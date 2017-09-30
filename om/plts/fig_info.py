@@ -54,8 +54,10 @@ class FigInfo(object):
         self.vis_opac = 0.005
 
         # Save Information
-        self.save_path = ("/Users/thomasdonoghue/Documents/Research/"
+        self.save_path = ("/Users/tom/Documents/Research/"
                           "1-Projects/OMEGA/4-Figures/MegAnalysis/")
-        self.format = 'svg'
+        #self.save_path = ("/Users/thomasdonoghue/Documents/Research/"
+        #                  "1-Projects/OMEGA/4-Figures/MegAnalysis/")
+        self.format = 'png'
         self.bbox = 'tight'
         self.dpi = 150

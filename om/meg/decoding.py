@@ -1,7 +1,5 @@
 """Decoding subject ID from magnetophysiological data."""
 
-from __future__ import division
-
 import random
 import numpy as np
 

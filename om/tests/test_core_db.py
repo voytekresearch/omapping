@@ -47,19 +47,19 @@ def test_check_dat_files_psd():
     sub_nums, source = db.check_dat_files('PSD', 'OMEGA', verbose=True)
     sub_nums, source = db.check_dat_files('PSD', 'HCP', verbose=True)
 
-def test_check_dat_files_foof():
-    """Test that OMDB() check_dat_files method runs properly, for FOOF files."""
+def test_check_dat_files_fooof():
+    """Test that OMDB() check_dat_files method runs properly, for FOOOF files."""
 
     db = OMDB()
 
-    sub_nums, source = db.check_dat_files('foof', verbose=True)
+    sub_nums, source = db.check_dat_files('fooof', verbose=True)
 
     assert isinstance(sub_nums, list)
     assert isinstance(source, list)
     assert len(sub_nums) == len(source)
 
-    sub_nums, source = db.check_dat_files('foof', 'OMEGA', verbose=True)
-    sub_nums, source = db.check_dat_files('foof', 'HCP', verbose=True)
+    sub_nums, source = db.check_dat_files('fooof', 'OMEGA', verbose=True)
+    sub_nums, source = db.check_dat_files('fooof', 'HCP', verbose=True)
 
 def test_check_res_files_meg():
     """Test that OMDB() check_res_files method runs properly, for MEG files."""

@@ -1,4 +1,4 @@
-"""Tests for the group analysis functions from om.meg."""
+"""Tests for OM - meg group."""
 
 import numpy as np
 from py.test import raises

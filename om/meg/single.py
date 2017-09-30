@@ -1,7 +1,5 @@
 """MEG-DATA Analysis Module - Single Subject"""
 
-from __future__ import print_function, division
-
 import os
 import csv
 import pickle
@@ -11,7 +9,7 @@ import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
 # Import custom om code
-from om.core.utils import clean_file_list, get_cur_subj, extract_foof_pickle
+from om.core.utils import clean_file_list, get_cur_subj, extract_fooof_pickle_new #extract_fooof_pickle
 from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
 ###########################################################################################
@@ -19,7 +17,7 @@ from om.core.errors import DataNotComputedError, UnknownDataSourceError, Inconsi
 ###########################################################################################
 
 class MegSubj(object):
-    """Class for a single subject of FOOF results for MEG Source PSDs.
+    """Class for a single subject of fooof results for MEG Source PSDs.
 
     Attributes
     ----------
@@ -163,8 +161,8 @@ class MegSubj(object):
             self.bands = osc.bands
 
 
-    def import_foof(self, subnum, get_demo=True, load_type='pickle'):
-        """Import FOOF results to MegSubj object.
+    def import_fooof(self, subnum, get_demo=True, load_type='pickle'):
+        """Import fooof results to MegSubj object.
 
         Parameters
         ----------
@@ -185,22 +183,22 @@ class MegSubj(object):
         self.comment = 'S-' + str(self.subnum)
 
         # Set up paths, get list of files for available subjects
-        files = os.listdir(os.path.join(self.db.foof_path, self.dat_source, load_type))
-        files = clean_file_list(files, 'Foof_Vertex')
+        files = os.listdir(os.path.join(self.db.fooof_path, self.dat_source, load_type))
+        files = clean_file_list(files, 'fooof_Vertex')
 
         # Get specific file name, and set up full file path for specified subject
         cur_subj_file = get_cur_subj(subnum, files)
-        cur_subj_path = os.path.join(self.db.foof_path, self.dat_source, load_type, cur_subj_file)
+        cur_subj_path = os.path.join(self.db.fooof_path, self.dat_source, load_type, cur_subj_file)
 
         # Load data file
         if load_type is 'pickle':
-            results = _load_foof_pickle(cur_subj_path)
+            results = _load_fooof_pickle(cur_subj_path)
         elif load_type is 'csv': # NOTE: not yet implemented
-            results = _load_foof_csv(cur_subj_path)
+            results = _load_fooof_csv(cur_subj_path)
 
         # Pull out data from results, and update that this data is loaded
         self.centers, self.powers, self.bws, self.slopes, self.n_psds \
-            = extract_foof_pickle(results)
+            = extract_fooof_pickle_new(results)
         self.has_vertex_oscs = True
         self.has_vertex_slopes = True
 
@@ -239,13 +237,14 @@ class MegSubj(object):
         self.bws_all = self.bws.flatten('C')
 
         # Flattened vectors will have lots of zeros. Get only non-zero indices.
-        non_zeros = np.nonzero(self.centers_all)
+        # TODO: note - currently checks based on powers : hack for dropping 0 amplitudes
+        non_zeros = np.nonzero(self.powers_all)
         self.centers_all = self.centers_all[non_zeros]
         self.powers_all = self.powers_all[non_zeros]
         self.bws_all = self.bws_all[non_zeros]
 
         # Check for nans in BW estimation
-        # NOTE: Updated FOOF sometimes returns NaN for bw. Check and discard those.
+        # NOTE: Updated fooof sometimes returns NaN for bw. Check and discard those.
         nans = np.isnan(self.bws_all)
         n_nans = sum(nans)
 
@@ -390,7 +389,7 @@ class MegSubj(object):
         return corrs_mat, ps_mat, labels
 
 
-    def set_foof_viz(self):
+    def set_fooof_viz(self):
         """Saves a matfile of freq info to be loaded with Brainstorm for visualization.
 
         Notes
@@ -399,7 +398,7 @@ class MegSubj(object):
         """
 
         # Set up paths to save to
-        save_name = str(self.subnum) + '_Foof_Viz'
+        save_name = str(self.subnum) + '_fooof_Viz'
         save_file = os.path.join(self.db.viz_path, save_name)
 
         # Initialize dictionary, save basic information and slope data
@@ -662,8 +661,8 @@ def _osc_peak_all(centers, osc_low, osc_high, avg='mean'):
     return peak
 
 
-def _load_foof_pickle(file_name):
-    """Loads FOOF data from a pickle file.
+def _load_fooof_pickle(file_name):
+    """Loads fooof data from a pickle file.
 
     Parameters
     ----------
@@ -683,8 +682,8 @@ def _load_foof_pickle(file_name):
     return results
 
 
-def _load_foof_csv(file_name):
-    """Loads FOOF data from a csv file.
+def _load_fooof_csv(file_name):
+    """Loads fooof data from a csv file.
 
     Parameters
     ----------

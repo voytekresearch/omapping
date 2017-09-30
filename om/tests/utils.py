@@ -50,7 +50,7 @@ def load_test_meg_subj(sub, all_oscs=False, bands_vertex=False):
 
     dat = MegSubj(tdb, '', osc)
 
-    dat.import_foof(sub, get_demo=False, load_type='pickle')
+    dat.import_fooof(sub, get_demo=False, load_type='pickle')
 
     if all_oscs:
         dat.all_oscs()
@@ -61,7 +61,7 @@ def load_test_meg_subj(sub, all_oscs=False, bands_vertex=False):
     return dat
 
 def load_test_meg_gr(bands_vertex=False, all_osc=False, peaks=False, calc_maps=False, vertex_osc=False):
-    """Loads a test group object of MD_GR data."""
+    """Loads a test group object of MegGroup data."""
 
     tdb = TestDB()
     osc = Osc(default=True)

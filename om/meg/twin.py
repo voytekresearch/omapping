@@ -1,5 +1,4 @@
 """Heritability analysis, using the twin data from the HCP data."""
-from __future__ import print_function, division
 
 import os
 import csv

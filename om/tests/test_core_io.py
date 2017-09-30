@@ -1,4 +1,4 @@
-"""   """
+"""Test for OM - core IO functions."""
 
 import numpy as np
 from py.test import raises
@@ -18,39 +18,39 @@ def test_load_meg_psds():
     tdb = TDB()
     pass
 
-def test_save_foof_pickle():
+def test_save_fooof_pickle():
     """   """
 
     tdb = TDB()
 
-    foof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
+    fooof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
                 (1.5, np.array([10., 15.]), np.array([1., 2.]), np.array([1., 1.]))]
 
-    save_foof_pickle(foof_dat, tdb.foof_path, 999)
+    save_fooof_pickle(fooof_dat, tdb.fooof_path, 999)
 
-    assert os.path.exists(os.path.join(tdb.foof_path, 'pickle', '999_Foof_Vertex.p'))
+    assert os.path.exists(os.path.join(tdb.fooof_path, 'pickle', '999_fooof_Vertex.p'))
 
-def test_load_foof_pickle():
+def test_load_fooof_pickle():
     """   """
 
     tdb = TDB()
 
-    results = load_foof_pickle(tdb.foof_path, 999)
+    results = load_fooof_pickle(tdb.fooof_path, 999)
 
     assert results
 
-def test_save_foof_csv():
+def test_save_fooof_csv():
     """   """
 
     tdb = TDB()
 
-    foof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
+    fooof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
                 (1.5, np.array([10., 15.]), np.array([1., 2.]), np.array([1., 1.]))]
 
-    save_foof_csv(foof_dat, tdb.foof_path, 999)
+    save_fooof_csv(fooof_dat, tdb.fooof_path, 999)
 
-    assert os.path.exists(os.path.join(tdb.foof_path, 'csv', '999_Slopes.csv'))
-    assert os.path.exists(os.path.join(tdb.foof_path, 'csv', '999_Oscs.csv'))
+    assert os.path.exists(os.path.join(tdb.fooof_path, 'csv', '999_Slopes.csv'))
+    assert os.path.exists(os.path.join(tdb.fooof_path, 'csv', '999_Oscs.csv'))
 
 def test_save_obj_pickle():
 

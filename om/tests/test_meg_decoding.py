@@ -1,4 +1,4 @@
-"""DOCSTRING"""
+"""Tests for OM - MEG decoding."""
 
 from py.test import raises
 

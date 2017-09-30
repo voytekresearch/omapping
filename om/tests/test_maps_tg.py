@@ -1,4 +1,4 @@
-"""   """
+"""Tests for OM - maps tg."""
 
 import os
 import csv

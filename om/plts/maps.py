@@ -1,6 +1,4 @@
-""" MODULE DOCSTRING - TO FILL IN"""
-
-from __future__ import print_function, division
+"""OM - Plots for maps data."""
 
 import matplotlib.pyplot as plt
 import numpy as np

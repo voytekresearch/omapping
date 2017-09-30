@@ -6,7 +6,6 @@ Notes
 which enforces and ensures a consistent order of items within the dictionary.
 More information here: https://docs.python.org/2/library/collections.html#collections.OrderedDict
 """
-from __future__ import print_function
 
 from collections import OrderedDict
 import numpy as np

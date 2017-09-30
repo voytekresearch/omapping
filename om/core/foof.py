@@ -1,10 +1,11 @@
 """Functions to run FOOF for the OM project."""
 
+import sys
 import numpy as np
 
 # Import FOOF (use sys to add location to path, then import)
-sys.path.append('/Users/thomasdonoghue/Documents/GitCode/')
-from foof.fit import FOOF
+#sys.path.append('/Users/tom/Documents/GitCode/')
+#from foof.fit import FOOF
 
 ###################################################################################
 ################################ OM_FOOF Functions ################################

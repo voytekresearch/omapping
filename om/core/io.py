@@ -39,7 +39,8 @@ def load_meg_psds(dat_source, meg_path, subj_num):
     if dat_source is 'OMEGA':
         mat_file = 'psd_source_median_' + str(subj_num)
     elif dat_source is 'HCP':
-        mat_file = 'PSD_Source_Median_' + str(subj_num)
+        #mat_file = 'PSD_Source_Median_' + str(subj_num)
+        mat_file = 'PSD_Source_' + str(subj_num)
     file_name = os.path.join(meg_path, dat_source, ('Subject_' + str(subj_num)), mat_file)
 
     # Load MEG PSD data from matfile
@@ -52,13 +53,13 @@ def load_meg_psds(dat_source, meg_path, subj_num):
     return psd, freqs
 
 
-def save_foof_pickle(results, save_path, sub_num):
-    """Save out the FOOF results as a pickle file.
+def save_fooof_pickle(results, save_path, sub_num):
+    """Save out the fooof results as a pickle file.
 
     Parameters
     ----------
     results : list of tuple
-        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        fooof results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     save_path: str
         Filepath of where to save out the file.
     sub_num : int
@@ -66,23 +67,21 @@ def save_foof_pickle(results, save_path, sub_num):
     """
 
     # Set save name and path
-    save_name = str(sub_num) + '_Foof_Vertex.p'
-    foof_save_path = os.path.join(save_path, 'pickle', save_name)
+    save_name = str(sub_num) + '_fooof_Vertex.p'
+    fooof_save_path = os.path.join(save_path, 'pickle', save_name)
 
     # Save out data to pickle file
-    with open(foof_save_path, 'wb') as pickle_file:
+    with open(fooof_save_path, 'wb') as pickle_file:
         pickle.dump(results, pickle_file)
 
-    #pickle.dump(results, open(foof_save_path, 'wb'))
 
-
-def save_foof_csv(results, save_path, sub_num):
-    """Save out the FOOF results as a csv file.
+def save_fooof_csv(results, save_path, sub_num):
+    """Save out the fooof results as a csv file.
 
     Parameters
     ----------
     results : list of tuple
-        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        fooof results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     save_path : str
         Filepath of where to save out the file.
     sub_num : int
@@ -130,8 +129,8 @@ def save_foof_csv(results, save_path, sub_num):
     osc_file.close()
 
 
-def load_foof_pickle(dat_path, sub_num):
-    """Load FOOF data from pickle file.
+def load_fooof_pickle(dat_path, sub_num):
+    """Load fooof data from pickle file.
 
     Parameters
     ----------
@@ -143,18 +142,16 @@ def load_foof_pickle(dat_path, sub_num):
     Returns
     -------
     results : list of tuple
-        FOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
+        fooof results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
     """
 
     # Get list of available files to load
     files = os.listdir(os.path.join(dat_path, 'pickle'))
-    files = clean_file_list(files, 'Foof_Vertex')
+    files = clean_file_list(files, 'fooof_Vertex')
 
     # Get specific subject file
     cur_subj_file = get_cur_subj(sub_num, files)
     subj_path = os.path.join(dat_path, 'pickle', cur_subj_file)
-
-    #results = pickle.load(open(subj_path, 'rb'))
 
     # Load file
     with open(subj_path, 'rb') as pickle_file:
@@ -163,7 +160,7 @@ def load_foof_pickle(dat_path, sub_num):
     return results
 
 
-def load_foof_csv():
+def load_fooof_csv():
     """
     NOTE: Not yet implemented.
     """
@@ -199,8 +196,6 @@ def save_obj_pickle(obj, dat_type, save_name, db=None):
     # Save out data to pickle file
     with open(os.path.join(db.save_path, dat_type, save_name), 'wb') as pickle_file:
         pickle.dump(obj, pickle_file)
-
-    #pickle.dump(obj, open(os.path.join(db.save_path, dat_type, save_name), 'wb'))
 
 
 def load_obj_pickle(dat_type, file_name, db=None):
@@ -240,8 +235,6 @@ def load_obj_pickle(dat_type, file_name, db=None):
     else:
         f_name = f_names[0]
 
-    #return pickle.load(open(os.path.join(db.save_path, dat_type, f_name), 'rb'))
-
     with open(os.path.join(db.save_path, dat_type, f_name), 'rb') as pickle_file:
         results = pickle.load(pickle_file)
 
@@ -280,9 +273,9 @@ def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=N
     dat_out = []
     for subj_id in sub_nums:
 
-        # Initialize MegSubj, load foof dat
+        # Initialize MegSubj, load fooof dat
         temp = MegSubj(db, dat_source, osc)
-        temp.import_foof(subj_id, get_demo=False)
+        temp.import_fooof(subj_id, get_demo=False)
 
         # Convert to oscillation vertex bands, if requested
         if osc_bands_vert:

@@ -1,9 +1,5 @@
-"""MEG-DATA (MD) Analysis Module - Group
+"""MEG-DATA Analysis Module - Group"""
 
-This code...
-"""
-
-from __future__ import print_function, division
 import os
 import pickle
 import datetime
@@ -18,15 +14,15 @@ from om.core.errors import DataNotComputedError, InconsistentDataError, UnknownD
 
 # TODO: work through whether sort_bands is still needed with OrderedDict
 
-##########################################################################################
-############################  OMEGAMAPPIN - MD_GROUP CLASSES  ############################
-##########################################################################################
+###########################################################################################
+############################  OMEGAMAPPIN - MEG GROUP CLASSES  ############################
+###########################################################################################
 
 class MegGroup(MegSubj):
     """A class to store OMEGA data from multiple subjects.
 
     Holds all oscillations, regardless of spatial location.
-    Note: Class derived from MegSubj()v=b
+    Note: Class derived from MegSubj()
 
     Attributes
     ----------
@@ -788,7 +784,7 @@ def _osc_pow_ratio(osc_mat):
     """Calculate the power ratio of an oscillation.
 
     Power ratio is a score, bounded between [0, 1], reflecting power
-    in a given freqeuncy band, relative to the max power in that
+    in a given frequency band, relative to the max power in that
     frequency band. Max power is ...
 
     Parameters
