@@ -9,7 +9,7 @@ import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
 # Import custom om code
-from om.core.utils import clean_file_list, get_cur_subj, extract_fooof_pickle_new #extract_fooof_pickle
+from om.core.utils import clean_file_list, get_cur_subj, extract_fooof_pickle_new
 from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
 ###########################################################################################
@@ -170,7 +170,7 @@ class MegSubj(object):
             Number of the subject to import.
         get_demo : boolean, optional (default = True)
             Whether to load demographic data from csv file.
-        load_type : {'pickle', 'csv'}, optional
+        load_type : {'pickle', 'json', 'csv'}, optional
             What type of file to load data from.
         """
 
@@ -193,8 +193,6 @@ class MegSubj(object):
         # Load data file
         if load_type is 'pickle':
             results = _load_fooof_pickle(cur_subj_path)
-        elif load_type is 'csv': # NOTE: not yet implemented
-            results = _load_fooof_csv(cur_subj_path)
 
         # Pull out data from results, and update that this data is loaded
         self.centers, self.powers, self.bws, self.slopes, self.n_psds \
@@ -680,20 +678,3 @@ def _load_fooof_pickle(file_name):
         results = pickle.load(pickle_file)
 
     return results
-
-
-def _load_fooof_csv(file_name):
-    """Loads fooof data from a csv file.
-
-    Parameters
-    ----------
-    file_name : str
-        Full path, including filename, to file to be loaded.
-
-    Returns
-    -------
-    results : ?
-        xx
-    """
-
-    raise NotImplementedError('Bad Tom.')
