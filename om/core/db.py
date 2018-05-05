@@ -40,15 +40,9 @@ class OMDB(object):
 
         # Initialize base paths
         self.internal_path = ("/Users/tom/Documents/Research/"
-                              "1-Projects/OMEGA/2-Data/OMData/")
+                              "1-Projects/MEGmapping/2-Data/OMData/")
         self.external_path = ("/Users/tom/Documents/Research/"
-                              "1-Projects/OMEGA/2-Data/ExternalData/")
-
-        # TOMS OLD LAPTOP
-        #self.internal_path = ("/Users/thomasdonoghue/Documents/Research/"
-        #                      "1-Projects/OMEGA/2-Data/OMData/")
-        #self.external_path = ("/Users/thomasdonoghue/Documents/Research/"
-        #                      "1-Projects/OMEGA/2-Data/ExternalData/")
+                              "1-Projects/MEGmapping/2-Data/ExternalData/")
 
         # Initialize all internal paths
         self.maps_path = str()
