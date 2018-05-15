@@ -174,7 +174,6 @@ def check_file_status(subjs, db, dat_source, verbose=True):
 
     # Check all FOOOFed files from the HCP database
     fooof_files, _ = db.check_dat_files('fooof', dat_source=dat_source, verbose=verbose)
-    print(fooof_files)
 
     # Check which subjects listed in the demographic information are not yet FOOOFed
     dat = list(set(subjs) & set(fooof_files))
@@ -350,20 +349,66 @@ def extract_fooof_pickle_new(results):
     n_psds = len(results)
 
     # Initialize numpy arrays to pull out data into
-    slopes = np.zeros([n_psds, 3])
     centers = np.zeros([n_psds, 8])
     powers = np.zeros([n_psds, 8])
     bws = np.zeros([n_psds, 8])
+    # NOTE: currently hacked for new FOOOF slope.
+    slopes = np.zeros([n_psds, 1])
 
     # Pull out the data from each vertex
     for i in range(n_psds):
-        slopes[i, :] = results[i][0]
+        slopes[i, :] = results[i][0][1]
 
         n_oscs = len(results[i][1])
 
         centers[i, 0:n_oscs] = results[i][1][:, 0]
         powers[i, 0:n_oscs] = results[i][1][:, 1]
         bws[i, 0:n_oscs] = results[i][1][:, 2]
+
+    return centers, powers, bws, slopes, n_psds
+
+
+def extract_fooof_group(fg):
+    """Pull out data from FOOOFGroup object.
+
+    Parameters
+    ----------
+    fg : FOOOFGroup
+        xx
+
+    Returns
+    -------
+    centers : 2d array
+        Matrix of all centers for all PSDs.
+    powers : 2d array
+        Matrix of all powers for all PSDs.
+    bws : 2d array
+        Matrix of all bws for all PSDs.
+    slopes : 1d array
+        Slope value for each PSD.
+    n_psds : int
+        The number of PSDs.
+    """
+
+    # Check how many psds there are
+    n_psds = len(fg)
+
+    # Initialize numpy arrays to pull out different result parameters
+    slopes = np.zeros([n_psds])
+    centers = np.zeros([n_psds, 8])
+    powers = np.zeros([n_psds, 8])
+    bws = np.zeros([n_psds, 8])
+
+    # Pull out the data from each vertex
+    for ind, f_res in enumerate(fg):
+        slopes[ind] = f_res.background_params[1]
+        centers[ind, 0:len(f_res.peak_params[:, 0])] = f_res.peak_params[:, 0]
+        powers[ind, 0:len(f_res.peak_params[:, 1])] = f_res.peak_params[:, 1]
+        bws[ind, 0:len(f_res.peak_params[:, 2])] = f_res.peak_params[:, 2]
+
+    # Replace any nan slope values with the mean, and then source to be 2D
+    slopes[np.isnan(slopes)] = np.nanmean(slopes)
+    slopes = slopes[:, np.newaxis]
 
     return centers, powers, bws, slopes, n_psds
 
