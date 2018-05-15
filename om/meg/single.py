@@ -9,7 +9,7 @@ import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
 # Import custom om code
-from om.core.utils import clean_file_list, get_cur_subj, extract_fooof_pickle_new
+from om.core.utils import clean_file_list, get_cur_subj, extract_fooof_pickle_new, extract_fooof_group
 from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
 ###########################################################################################
@@ -190,13 +190,23 @@ class MegSubj(object):
         cur_subj_file = get_cur_subj(subnum, files)
         cur_subj_path = os.path.join(self.db.fooof_path, self.dat_source, load_type, cur_subj_file)
 
-        # Load data file
+        # Load data file - pickle file
         if load_type is 'pickle':
             results = _load_fooof_pickle(cur_subj_path)
 
-        # Pull out data from results, and update that this data is loaded
-        self.centers, self.powers, self.bws, self.slopes, self.n_psds \
-            = extract_fooof_pickle_new(results)
+            # Pull out data from results
+            self.centers, self.powers, self.bws, self.slopes, self.n_psds \
+                = extract_fooof_pickle_new(results)
+
+        # Load data file - json file (FOOOF format)
+        if load_type is 'json':
+            from fooof import FOOOFGroup
+            fg = FOOOFGroup()
+            fg.load(cur_subj_path)
+            self.centers, self.powers, self.bws, self.slopes, self.n_psds \
+                = extract_fooof_group(fg)
+
+        # Update which data is loaded
         self.has_vertex_oscs = True
         self.has_vertex_slopes = True
 

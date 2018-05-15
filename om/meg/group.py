@@ -306,14 +306,18 @@ class MegGroup(MegSubj):
     def check_consistency(self):
         """Check for consistency of data loaded in group object."""
 
+        n_vertices = 7501
+
         if self.n_subjs != len(self.subjs):
             raise InconsistentDataError('Discrepancy in subject numbers.')
 
         if self.has_vertex_oscs:
-            pass
+            assert self.centers.shape == (n_vertices, self.n_subjs)
+            assert self.powers.shape == (n_vertices, self.n_subjs)
+            assert self.bws.shape == (n_vertices, self.n_subjs)
 
         if self.has_vertex_slopes:
-            pass
+            assert self.vert_slopes.shape == (n_vertices, self.n_subjs)
 
         if self.has_all_osc:
             pass
@@ -339,9 +343,9 @@ class MegGroup(MegSubj):
 
         # Calculate the average slope value per vertex
         if avg is 'mean':
-            self.slopes_gr_avg = np.mean(self.vert_slopes)
+            self.slopes_gr_avg = np.mean(self.vert_slopes, 1)
         elif avg is 'median':
-            self.slopes_gr_avg = np.median(self.vert_slopes)
+            self.slopes_gr_avg = np.median(self.vert_slopes, 1)
 
 
     def osc_prob(self):
@@ -612,14 +616,10 @@ class MegGroup(MegSubj):
 def freq_corr_group(centers, f_win):
     """Calculates the correlation between adjacent frequency bands.
 
-    Uses oscillation probabilities.
-
-    NOTE: ADD CHECKS THAT REQUIRED DATA HAS BEEN COMPUTED.
-
     Parameters
     ----------
-    centers : ?
-        xx
+    centers : 3d array [n_verts, n_slots, n_subjs]
+        Center frequencies of oscillations across all vertices & subjects.
     f_win : float
         Size of frequency window to use.
 
@@ -650,8 +650,8 @@ def freq_corr_group(centers, f_win):
             cens_temp = centers[vertex, :, subj]
 
             # Loop through freq-ranges, counting when oscillations occur
-            i = 0
-            for freq in range(3, 40-f_win):
+            #i = 0
+            for i, freq in enumerate(range(3, 40-f_win)):
 
                 # Get the oscillation centers
                 cens_fwin = _get_all_osc(cens_temp, freq, freq + f_win)
@@ -660,7 +660,7 @@ def freq_corr_group(centers, f_win):
                 if len(cens_fwin) != 0:
                     prob_mat[vertex, i] += 1
 
-                i += 1
+                #i += 1
 
     # Divide by # of subjects to get probability per freq-range
     prob_mat = prob_mat/n_subj
@@ -690,6 +690,10 @@ def osc_space_group(oscs, bands, verts, osc_param=0, space_param=1):
         xx
     verts : 2d array
         Spatial coordinates for all vertices [n_verts, 3].
+    osc_param : ?
+        xx
+    space_param : ?
+        xx
 
     Returns
     -------
@@ -701,7 +705,8 @@ def osc_space_group(oscs, bands, verts, osc_param=0, space_param=1):
     """
 
     # Get labels and data size
-    labels = bands.keys()
+    # HACK: type force to list - check this is working properly
+    labels = list(bands.keys())
     n_verts, n_bands, n_subjs = oscs[labels[0]].shape
 
     # Sort vertex data by requested direction
