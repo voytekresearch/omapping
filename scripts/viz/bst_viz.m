@@ -10,64 +10,70 @@
 load('var_names.mat')
 
 % Set paths
-datapath = '/Users/thomasdonoghue/Documents/Research/1-Projects/OMEGA/2-Data/MEG/4-Viz/';
-bst_path = '/Users/thomasdonoghue/Documents/brainstorm_db/om_viz/data/om_viz_subj/Visualizing-MEG-FOOF/';
+datapath = '/Users/tom/Documents/Research/1-Projects/MEGmapping/2-Data/ExternalData/MEG/Viz/';
+bst_path = '/Users/tom/brainstorm_db/om_viz/data/om_viz_subj/Visualizing-MEG-FOOF/';
 
-%% Load FOOF Data - Oscillation Frequencies
+%% Load FOOOF Data - Oscillation Frequencies
 
 subj = 559176;
 filename = [num2str(subj), '_Foof_Viz.mat'];
 
-% Load FOOF Data
+% Load FOOOF Data
 load([datapath, filename]);
 %clear filename datapath
 
 %
-foof_dat = {slopes, theta, alpha, beta, lowgamma};
-foof_labels = {['Slopes_', num2str(subj)], ['Thetas_', num2str(subj)], ...
-    ['Alphas_', num2str(subj)], ['Betas_', num2str(subj)], ['LowGammas_', num2str(subj)]};
+fooof_dat = {slopes, theta, alpha, beta, lowgamma};
+fooof_labels = {['Slopes_', num2str(subj)], ['Thetas_', num2str(subj)], ...
+    ['Alphas_', num2str(subj)], ['Betas_', num2str(subj)]};
 
 disp('Data Loaded')
 
-%% Load FOOF Data - Group Probability
+%% Load FOOOF Data - Group Probability
 
 % Set filename
-filename = 'Group_Osc_Prob_Viz.mat';
+%filename = 'Group_Osc_Prob_Viz.mat';
+filename = 'json_group_osc_prob_viz.mat';
 
 % Load Group osc-prob data
 load([datapath, filename])
-foof_dat = {[], theta_prob', alpha_prob', beta_prob', lowgamma_prob'};
-foof_labels = {'xx', 'Theta_Prob', 'Alpha_Prob', 'Beta_Prob', 'LowGamma_Prob'};
+fooof_dat = {[], theta_prob', alpha_prob', beta_prob'};
+fooof_labels = {'xx', 'Theta_Prob', 'Alpha_Prob', 'Beta_Prob'};
 
 disp('Data Loaded')
 
-%% Load FOOF Data - Osc Score
+%% Load FOOOF Data - Osc Score
 
 % Set filename
-filename = '85_Group_Osc_Score_viz.mat';
+filename = 'json_group_osc_score_viz.mat';
+%filename = 'diff_group_osc_score_viz.mat';
 
 % Load Grop osc-score data
 load([datapath, filename])
-foof_dat = {[], theta_score', alpha_score', beta_score', lowgamma_score'};
-foof_labels = {'xx', 'Theta_Score', 'Alpha_Score', 'Beta_Score', 'LowGamma_Score'};
+fooof_dat = {[], theta_score', alpha_score', beta_score'};
+fooof_labels = {'xx', 'Theta_Score', 'Alpha_Score', 'Beta_Score'};
 
 disp('Data Loaded')
 
-%% Load FOOF Data - Slopes
+%% Load FOOOF Data - Slopes
 
 % Set filename
 filename = 'Group_Slopes.mat';
+%filename = 'Slopes_Age_Corr.mat';
 
 % Load Slope data
 load([datapath, filename]);
-foof_dat = {slopes};
-foof_labels = {'Slopes'};
+
+slopes = slopes';
+
+fooof_dat = {slopes};
+fooof_labels = {'Slopes'};
 
 disp('Data Loaded');
 
-%% Set FOOF Data
+%% Set FOOOF Data
 
-for i = 1:length(foof_dat)
+for i = 1:length(fooof_dat)
     
     % Load BST dat file to use
     file_name = ['results_wMNE_MEG_KERNEL_160423_210', num2str(3+i), '.mat'];
@@ -75,8 +81,8 @@ for i = 1:length(foof_dat)
     
     % Set data
     Time = 0;
-    ImageGridAmp = foof_dat{i};
-    Comment = foof_labels{i};
+    ImageGridAmp = fooof_dat{i};
+    Comment = fooof_labels{i};
 
     % Save bst 
     save([bst_path, file_name], var_names{:});
