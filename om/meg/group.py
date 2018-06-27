@@ -50,6 +50,8 @@ class MegGroup(MegSubj):
         Average slope values across subjects for each vertex.
     osc_prob_done : boolean
         Whether oscillation probability has been calculated.
+    osc_power_done : boolean
+        Whether oscillation power ratio has been calculated.
     osc_score_done : boolean
         Whether oscillation score has been calculated.
     """
@@ -103,6 +105,7 @@ class MegGroup(MegSubj):
 
         # Set booleans for what has been run
         self.osc_prob_done = False
+        self.osc_pow_done = False
         self.osc_score_done = False
 
 
@@ -312,9 +315,10 @@ class MegGroup(MegSubj):
             raise InconsistentDataError('Discrepancy in subject numbers.')
 
         if self.has_vertex_oscs:
-            assert self.centers.shape == (n_vertices, self.n_subjs)
-            assert self.powers.shape == (n_vertices, self.n_subjs)
-            assert self.bws.shape == (n_vertices, self.n_subjs)
+            if self.n_subjs > 1:
+                assert self.centers.shape == (n_vertices, 8, self.n_subjs)
+                assert self.powers.shape == (n_vertices, 8,self.n_subjs)
+                assert self.bws.shape == (n_vertices, 8,self.n_subjs)
 
         if self.has_vertex_slopes:
             assert self.vert_slopes.shape == (n_vertices, self.n_subjs)
@@ -366,20 +370,33 @@ class MegGroup(MegSubj):
         self.osc_prob_done = True
 
 
+    def osc_power(self):
+        """Calculate the oscillation power ratio for each frequency band."""
+
+        # Check if vertex data is set
+        if not self.has_vertex_bands:
+            raise DataNotComputedError('Vertex oscillation bands data not available.')
+
+        # Compute power ratio for each oscillation band
+        for band in self.bands:
+            self.osc_pow_ratios[band] = _osc_pow_ratio(self.gr_oscs[band])
+
+        # Set boolean that oscillation score has been computed.
+        self.osc_power_done = True
+
+
     def osc_score(self):
         """Calculate the oscillation score for each frequency band.
 
         The oscillation score is ....
         """
 
-        # Check if oscillation probability is calculated. Can't proceed if it isnt.
+        # Check if oscillation probability & power ratios are calculated.
+        #  Can not proceed if they are not.
         _ = self._get_map_type('prob')
+        _ = self._get_map_type('power')
 
-        # Compute power ratio for each oscillation band - NEW
-        for band in self.bands:
-            self.osc_pow_ratios[band] = _osc_pow_ratio(self.gr_oscs[band])
-
-        # Compute oscillation score for each oscillation band - NEW
+        # Compute oscillation score for each oscillation band
         for band in self.bands:
             self.osc_scores[band] = self.osc_pow_ratios[band] * self.osc_probs[band]
 
@@ -392,7 +409,7 @@ class MegGroup(MegSubj):
 
         Parameters
         ----------
-        map_type : {'prob', 'score'}
+        map_type : {'prob', 'score', 'power'}
             Which map data type to save out.
 
         Returns
@@ -496,7 +513,7 @@ class MegGroup(MegSubj):
 
         Parameters
         ----------
-        map_type : {'prob', 'score'}
+        map_type : {'prob', 'score', 'power'}
             Which map data type to save out.
         file_name : str
             String to add to the file name.
@@ -547,7 +564,7 @@ class MegGroup(MegSubj):
 
         Parameters
         ----------
-        map_type : {'prob', 'score'}
+        map_type : {'prob', 'score', 'power'}
             Which map data type to set as viz.
         file_name : str
             Label to attach to file name to be saved out.
@@ -581,7 +598,7 @@ class MegGroup(MegSubj):
 
         Parameters
         ----------
-        map_type : {'prob', 'score'}
+        map_type : {'prob', 'score', 'power'}
             Oscillation map type to pull out.
         """
 
@@ -590,7 +607,7 @@ class MegGroup(MegSubj):
 
             # Check if oscillation probabilities have been calculated.
             if not self.osc_prob_done:
-                raise DataNotComputedError("Oscillation probability not computed - can't proceed.")
+                raise DataNotComputedError("Oscillation probability not computed - can not proceed.")
 
             dat = self.osc_probs
 
@@ -599,9 +616,18 @@ class MegGroup(MegSubj):
 
             # Check if oscillation score has been calculated.
             if not self.osc_score_done:
-                raise DataNotComputedError("Oscillation probability not computed - can't proceed.")
+                raise DataNotComputedError("Oscillation probability not computed - can not proceed.")
 
             dat = self.osc_scores
+
+        # Check if requested map is power ratio, and if it is calculated
+        elif map_type is 'power':
+
+            # Check if oscillation power map has been calculated.
+            if not self.osc_power_done:
+                raise DataNotComputedError("Oscillation power map not computed - can not proceed.")
+
+            dat = self.osc_pow_ratios
 
         # Raise an error if requested type doensn't match a known map type
         else:
@@ -613,7 +639,7 @@ class MegGroup(MegSubj):
 ################################## OMEGAMAPPIN - MEG GROUP - FUNCTIONS ##################################
 #########################################################################################################
 
-def freq_corr_group(centers, f_win):
+def freq_corr_group(centers, f_win, f_step=1):
     """Calculates the correlation between adjacent frequency bands.
 
     Parameters
@@ -622,6 +648,8 @@ def freq_corr_group(centers, f_win):
         Center frequencies of oscillations across all vertices & subjects.
     f_win : float
         Size of frequency window to use.
+    f_step : float
+        Increment to step by.
 
     Returns
     -------
@@ -629,38 +657,36 @@ def freq_corr_group(centers, f_win):
         Vector of the correlation coefficients between all adjacent frequency bands.
     p_vec : 1d array
         Vector of the p-values for the correlations between adjacent frequency bands.
-    fs : 1d array
-        xx
+    freqs : 1d array
+        Vector of frequencies of the correlations (each value is first frequency of first bin).
+            Each frequency 'f' reflects the correlation of [f:f+f_win, f+f_win:f+2*f_win].
     """
 
     # Get # vertices, # of subjects to loop through
+    ind_step = int(f_win / f_step)
     [n_vertex, n_slots, n_subj] = np.shape(centers)
 
-    # Initialize variables for # of freqs, and matrix to store probability
-    n_freqs = len(range(3, 40-f_win))
+    # Initialize variables for freqs, # of freqs, and matrix to store probability
+    freqs = np.arange(3, 40-f_win, f_step)
+    n_freqs = len(freqs)
     prob_mat = np.zeros([n_vertex, n_freqs])
 
-    # Loop through all vertices
+    # Loop across all vertices and subjects
     for vertex in range(n_vertex):
-
-        # Loop through all subjects
         for subj in range(n_subj):
 
             # Store centers for current vertex, current subj in temp vector
             cens_temp = centers[vertex, :, subj]
 
             # Loop through freq-ranges, counting when oscillations occur
-            #i = 0
-            for i, freq in enumerate(range(3, 40-f_win)):
+            for ind, freq in enumerate(freqs):
 
                 # Get the oscillation centers
-                cens_fwin = _get_all_osc(cens_temp, freq, freq + f_win)
+                cens_fwin = _get_all_osc(cens_temp, freq, freq+f_win)
 
                 # If there is an osc in range, add to prob_mat count
                 if len(cens_fwin) != 0:
-                    prob_mat[vertex, i] += 1
-
-                #i += 1
+                    prob_mat[vertex, ind] += 1
 
     # Divide by # of subjects to get probability per freq-range
     prob_mat = prob_mat/n_subj
@@ -670,13 +696,13 @@ def freq_corr_group(centers, f_win):
     p_vec = np.zeros([n_freqs-1])
 
     # Compute corr between f and f+f_win start windows
-    for f_ind in range(n_freqs-f_win):
-        corr_vec[f_ind], p_vec[f_ind] = pearsonr(prob_mat[:, f_ind], prob_mat[:, f_ind+f_win])
+    for f_ind in range(n_freqs-ind_step):
+        corr_vec[f_ind], p_vec[f_ind] = pearsonr(prob_mat[:, f_ind], prob_mat[:, f_ind+ind_step])
 
-    # Create the frequency vector of correlations calculated to return
-    fs = np.transpose(range(3, 40-f_win-1))
+    # Select frequency range that represents the start of each correlation
+    freqs = freqs[:-1]
 
-    return corr_vec, p_vec, fs
+    return corr_vec, p_vec, freqs
 
 
 def osc_space_group(oscs, bands, verts, osc_param=0, space_param=1):
@@ -790,7 +816,7 @@ def _osc_pow_ratio(osc_mat):
 
     Power ratio is a score, bounded between [0, 1], reflecting power
     in a given frequency band, relative to the max power in that
-    frequency band. Max power is ...
+    frequency band.
 
     Parameters
     ----------
