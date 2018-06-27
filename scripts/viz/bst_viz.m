@@ -32,7 +32,6 @@ disp('Data Loaded')
 %% Load FOOOF Data - Group Probability
 
 % Set filename
-%filename = 'Group_Osc_Prob_Viz.mat';
 filename = 'json_group_osc_prob_viz.mat';
 
 % Load Group osc-prob data
@@ -42,11 +41,22 @@ fooof_labels = {'xx', 'Theta_Prob', 'Alpha_Prob', 'Beta_Prob'};
 
 disp('Data Loaded')
 
-%% Load FOOOF Data - Osc Score
+%% Load FOOOF Data - Group Power Ratio
+
+% Set filename
+filename = 'json_group_osc_power_viz.mat';
+
+% Load Group osc-prob data
+load([datapath, filename])
+fooof_dat = {[], theta_power', alpha_power', beta_power'};
+fooof_labels = {'xx', 'Theta_Pow', 'Alpha_Pow', 'Beta_Pow'};
+
+disp('Data Loaded')
+
+%% Load FOOOF Data - Group Oscillation Score
 
 % Set filename
 filename = 'json_group_osc_score_viz.mat';
-%filename = 'diff_group_osc_score_viz.mat';
 
 % Load Grop osc-score data
 load([datapath, filename])
