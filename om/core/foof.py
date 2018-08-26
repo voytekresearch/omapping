@@ -1,4 +1,7 @@
-"""Functions to run FOOF for the OM project."""
+"""Functions to run FOOF for the OM project.
+
+NOTE: This code is old (unused - totally outdated.)
+"""
 
 import sys
 import numpy as np
