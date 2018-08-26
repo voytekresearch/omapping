@@ -5,9 +5,8 @@ import numpy as np
 
 from om.core.errors import InconsistentDataError, UnknownDataSourceError
 
-####################################################################################
-############################ OMEGAMAPPIN - CORE - UTILS ############################
-####################################################################################
+###################################################################################################
+###################################################################################################
 
 def clean_file_list(files_in, string, verbose=False):
     """"Takes a list of files and returns only a specified set of files.
@@ -87,7 +86,10 @@ def get_sub_nums(files_in, f_l):
         try:
             subnums.append(int(str_split[ind]))
         except ValueError:
-            print('WARNING: found a file for which subject number could not be extracted')
+            if 'settings' in f_name:
+                continue
+            else:
+                print('WARNING: found a file for which subject number could not be extracted')
 
     return subnums
 
@@ -282,99 +284,13 @@ def extract_psd(psd, freqs, f_low, f_high):
     return psd_ext, freqs_ext
 
 
-def extract_fooof_pickle(results):
-    """Pull out the FOOOF data from list.
-
-    Parameters
-    ----------
-    results : list of tuple
-        FOOOF results - (slope (float), centers (1d array), amps (1d array), bws (1d array)).
-
-    Returns
-    -------
-    centers : 2d array
-        Matrix of all centers for all PSDs.
-    powers : 2d array
-        Matrix of all powers for all PSDs.
-    bws : 2d array
-        Matrix of all bws for all PSDs.
-    slopes : 1d array
-        Slope value for each PSD.
-    n_psds : int
-        The number of PSDs.
-    """
-
-    # Check how many psds there are
-    n_psds = len(results)
-
-    # Initialize numpy arrays to pull out different result parameters
-    slopes = np.zeros([n_psds])
-    centers = np.zeros([n_psds, 8])
-    powers = np.zeros([n_psds, 8])
-    bws = np.zeros([n_psds, 8])
-
-    # Pull out the data from each vertex
-    for i in range(n_psds):
-        slopes[i] = results[i][0]
-        centers[i, 0:len(results[i][1])] = results[i][1]
-        powers[i, 0:len(results[i][2])] = results[i][2]
-        bws[i, 0:len(results[i][3])] = results[i][3]
-
-    return centers, powers, bws, slopes, n_psds
-
-
-def extract_fooof_pickle_new(results):
-    """Pull out the FOOOF data from list.
-
-    Parameters
-    ----------
-    results : list of tuple
-        FOOOF results - ??
-
-    Returns
-    -------
-    centers : 2d array
-        Matrix of all centers for all PSDs.
-    powers : 2d array
-        Matrix of all powers for all PSDs.
-    bws : 2d array
-        Matrix of all bws for all PSDs.
-    slopes : 1d array
-        Slope value for each PSD.
-    n_psds : int
-        The number of PSDs.
-    """
-
-    # Check how many PSDs there are
-    n_psds = len(results)
-
-    # Initialize numpy arrays to pull out data into
-    centers = np.zeros([n_psds, 8])
-    powers = np.zeros([n_psds, 8])
-    bws = np.zeros([n_psds, 8])
-    # NOTE: currently hacked for new FOOOF slope.
-    slopes = np.zeros([n_psds, 1])
-
-    # Pull out the data from each vertex
-    for i in range(n_psds):
-        slopes[i, :] = results[i][0][1]
-
-        n_oscs = len(results[i][1])
-
-        centers[i, 0:n_oscs] = results[i][1][:, 0]
-        powers[i, 0:n_oscs] = results[i][1][:, 1]
-        bws[i, 0:n_oscs] = results[i][1][:, 2]
-
-    return centers, powers, bws, slopes, n_psds
-
-
 def extract_fooof_group(fg):
     """Pull out data from FOOOFGroup object.
 
     Parameters
     ----------
     fg : FOOOFGroup
-        xx
+        FOOOFGroup object containing data to extract.
 
     Returns
     -------
@@ -457,13 +373,9 @@ def avg_csv_files(f_in, f_out, avg='mean'):
         # Initialize a temporary array to store
         temp = np.zeros([n_in, n_col])
 
-        # Add first row to
-        temp[0, :] = np.array([float(i) for i in row])
-
-        #
+        temp[0, :] = np.array([float(ind) for ind in row])
         for f_ind in range(1, n_in):
-            # Load row of data into the temporary array
-            temp[f_ind, :] = np.array([float(i) for i in next(in_readers[f_ind])])
+            temp[f_ind, :] = np.array([float(ind) for ind in next(in_readers[f_ind])])
 
         # Take average
         if avg is 'mean':
