@@ -158,7 +158,7 @@ def load_meg_list(sub_nums, osc_bands_vert=False, all_oscs=False, osc=None, db=N
 
         # Initialize MegSubj, load fooof dat
         temp = MegSubj(db, dat_source, osc)
-        temp.import_fooof(subj_id, get_demo=True, load_type='json')
+        temp.import_fooof(subj_id, get_demo=True)
 
         # Convert to oscillation vertex bands, if requested
         if osc_bands_vert:
