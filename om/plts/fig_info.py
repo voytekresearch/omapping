@@ -47,7 +47,7 @@ class FigInfo(object):
         self.ax_lw = 2.5
 
         # Default Settings - what to add to plot
-        self.add_title = True
+        self.add_title = False
 
         # Plot Information
         self.title = 'Group'
@@ -55,9 +55,7 @@ class FigInfo(object):
 
         # Save Information
         self.save_path = ("/Users/tom/Documents/Research/"
-                          "1-Projects/OMEGA/4-Figures/MegAnalysis/")
-        #self.save_path = ("/Users/thomasdonoghue/Documents/Research/"
-        #                  "1-Projects/OMEGA/4-Figures/MegAnalysis/")
+                          "1-Projects/MEGmapping/4-Figures/MegAnalysis/")
         self.format = 'png'
         self.bbox = 'tight'
         self.dpi = 150
