@@ -2,19 +2,19 @@
 
 import os
 import csv
-import pickle
 import datetime
+
 import numpy as np
 import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
-# Import custom om code
-from om.core.utils import clean_file_list, get_cur_subj, extract_fooof_pickle_new, extract_fooof_group
+from fooof import FOOOFGroup
+
+from om.core.utils import clean_file_list, get_cur_subj, extract_fooof_group
 from om.core.errors import DataNotComputedError, UnknownDataSourceError, InconsistentDataError
 
-###########################################################################################
-###########################  OMEGAMAPPIN - MD_SINGLE - CLASSES  ###########################
-###########################################################################################
+###################################################################################################
+###################################################################################################
 
 class MegSubj(object):
     """Class for a single subject of fooof results for MEG Source PSDs.
@@ -161,7 +161,7 @@ class MegSubj(object):
             self.bands = osc.bands
 
 
-    def import_fooof(self, subnum, get_demo=True, load_type='pickle'):
+    def import_fooof(self, subnum, get_demo=True):
         """Import fooof results to MegSubj object.
 
         Parameters
@@ -170,8 +170,6 @@ class MegSubj(object):
             Number of the subject to import.
         get_demo : boolean, optional (default = True)
             Whether to load demographic data from csv file.
-        load_type : {'pickle', 'json', 'csv'}, optional
-            What type of file to load data from.
         """
 
         # Check if object already has data
@@ -183,28 +181,17 @@ class MegSubj(object):
         self.comment = 'S-' + str(self.subnum)
 
         # Set up paths, get list of files for available subjects
-        files = os.listdir(os.path.join(self.db.fooof_path, self.dat_source, load_type))
+        files = os.listdir(os.path.join(self.db.fooof_path, self.dat_source))
         files = clean_file_list(files, 'fooof_Vertex')
 
         # Get specific file name, and set up full file path for specified subject
         cur_subj_file = get_cur_subj(subnum, files)
-        cur_subj_path = os.path.join(self.db.fooof_path, self.dat_source, load_type, cur_subj_file)
+        cur_subj_path = os.path.join(self.db.fooof_path, self.dat_source, cur_subj_file)
 
-        # Load data file - pickle file
-        if load_type is 'pickle':
-            results = _load_fooof_pickle(cur_subj_path)
-
-            # Pull out data from results
-            self.centers, self.powers, self.bws, self.slopes, self.n_psds \
-                = extract_fooof_pickle_new(results)
-
-        # Load data file - json file (FOOOF format)
-        if load_type is 'json':
-            from fooof import FOOOFGroup
-            fg = FOOOFGroup()
-            fg.load(cur_subj_path)
-            self.centers, self.powers, self.bws, self.slopes, self.n_psds \
-                = extract_fooof_group(fg)
+        # Load FOOOF data file
+        fg = FOOOFGroup()
+        fg.load(cur_subj_path)
+        self.centers, self.powers, self.bws, self.slopes, self.n_psds = extract_fooof_group(fg)
 
         # Update which data is loaded
         self.has_vertex_oscs = True
@@ -593,9 +580,9 @@ def _get_demo_csv(subnum, meg_path, dat_source, use_restricted=True):
     elif dat_source is 'HCP':
         if use_restricted:
             num_ind = 0
-            sex_ind = None
+            sex_ind = 6
             age_ind = 1
-            res = '_RESTRICTED'
+            res = '_RESTRICTED_wgender'
         else:
             res = ''
             num_ind = 0
@@ -628,7 +615,7 @@ def _get_demo_csv(subnum, meg_path, dat_source, use_restricted=True):
                     age = (int(age_temp[0]) + int(age_temp[1]))/2
 
                 else:
-                    sex = None
+                    sex = row[sex_ind]
                     age = int(row[age_ind])
 
                 break
@@ -667,24 +654,3 @@ def _osc_peak_all(centers, osc_low, osc_high, avg='mean'):
         peak = np.median(osc_cens)
 
     return peak
-
-
-def _load_fooof_pickle(file_name):
-    """Loads fooof data from a pickle file.
-
-    Parameters
-    ----------
-    file_name : str
-        Full path, including filename, to file to be loaded.
-
-    Returns
-    -------
-    results : ?
-        xx
-    """
-
-    # Load from pickle file
-    with open(file_name, 'rb') as pickle_file:
-        results = pickle.load(pickle_file)
-
-    return results
