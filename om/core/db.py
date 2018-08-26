@@ -4,9 +4,8 @@ import os
 
 from om.core.utils import clean_file_list, get_sub_nums
 
-#####################################################################################
-############################## OMEGAMAPPIN - CORE - DB ##############################
-#####################################################################################
+###################################################################################################
+###################################################################################################
 
 class OMDB(object):
     """Class to hold database information for MEG project.
@@ -77,7 +76,7 @@ class OMDB(object):
         self.viz_path = os.path.join(self.meg_path, 'Viz')
 
 
-    def check_dat_files(self, dat_type, dat_source='both', save_type='pickle', verbose=False):
+    def check_dat_files(self, dat_type, dat_source='both', save_type='', verbose=False):
         """Checks what data files are available.
 
         Parameters
@@ -86,8 +85,6 @@ class OMDB(object):
             Which data type to check files for.
         dat_source : {'OMEGA', 'HCP', 'both'}
             Which database to check files for.
-        save_type : {'pickle', 'csv'}, optional (default = 'pickle')
-            Which file type to check files for. Only used for fooof files.
         verbose : boolean, optional (default = False)
             Whether to print out information during run.
 
@@ -103,7 +100,6 @@ class OMDB(object):
         if dat_type is 'PSD':
             dat_path = self.psd_path
             word = 'subject_'
-            save_type = ''
             f_l = 'last'
         elif dat_type is 'fooof':
             dat_path = self.fooof_path
@@ -114,15 +110,15 @@ class OMDB(object):
 
         # If looking for a particular database, find file, get subject numbers and source
         if dat_source is not 'both':
-            sub_nums = _check_files(os.path.join(dat_path, dat_source, save_type), word, f_l)
+            sub_nums = _check_files(os.path.join(dat_path, dat_source), word, f_l)
             source = [dat_source] * len(sub_nums)
 
         # If looking across both databases, get info from each database and then combine
         else:
-            sub_nums_omega = _check_files(os.path.join(dat_path, 'OMEGA', save_type), word, f_l)
+            sub_nums_omega = _check_files(os.path.join(dat_path, 'OMEGA'), word, f_l)
             n_omega = len(sub_nums_omega)
 
-            sub_nums_hcp = _check_files(os.path.join(dat_path, 'HCP', save_type), word, f_l)
+            sub_nums_hcp = _check_files(os.path.join(dat_path, 'HCP'), word, f_l)
             n_hcp = len(sub_nums_hcp)
 
             sub_nums = sub_nums_omega + sub_nums_hcp
@@ -274,9 +270,8 @@ def make_test_file_directory_other(base_path):
     # Other directory
     os.mkdir(os.path.join(base_path, 'csvs'))
 
-#################################################################################
-################## OMEGAMAPPIN - CORE - DB - PRIVATE FUNCTIONS ##################
-#################################################################################
+###################################################################################################
+###################################################################################################
 
 def _check_files(path, word, f_l):
     """Checks a directory, getting desired files and returning subject numbers.
