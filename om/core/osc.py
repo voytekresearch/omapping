@@ -1,20 +1,13 @@
-"""Oscillation band defintion object for OM.
-
-Notes
------
- - The Osc object uses the OrderedDict object, which is a special dictionary object
-which enforces and ensures a consistent order of items within the dictionary.
-More information here: https://docs.python.org/2/library/collections.html#collections.OrderedDict
-"""
+"""Oscillation band defintion object for OM."""
 
 from collections import OrderedDict
+
 import numpy as np
 
 from om.core.errors import InconsistentDataError
 
-######################################################################################
-############################## OMEGAMAPPIN - CORE - OSC ##############################
-######################################################################################
+###################################################################################################
+###################################################################################################
 
 class Osc(object):
     """Class to hold definitions of oscillation bands.
@@ -53,10 +46,9 @@ class Osc(object):
 
         # If requested use the default oscillation bands
         if default:
-            self.add_band('Theta', (3, 8))
-            self.add_band('Alpha', (8, 13))
-            self.add_band('Beta', (13, 30))
-            self.add_band('LowGamma', (30, 40))
+            self.add_band('Theta', (3, 7))
+            self.add_band('Alpha', (7, 14))
+            self.add_band('Beta', (15, 30))
 
         # If supplied, use the given dictionary of oscillation bands
         if input_bands:
@@ -104,7 +96,7 @@ class Osc(object):
         self.n_bands += 1
 
         # Update labels
-        self.labels = self.bands.keys()
+        self.labels = list(self.bands.keys())
 
 
     def rm_band(self, rm_band):
@@ -120,9 +112,8 @@ class Osc(object):
         self.bands.pop(rm_band)
         self.n_bands -= 1
 
-##################################################################################################
-##################################################################################################
-##################################################################################################
+###################################################################################################
+###################################################################################################
 
 def check_bands(osc_lst):
     """Check that a list of oscillation band definitions are all the same. If so, return bands.
