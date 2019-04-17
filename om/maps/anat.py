@@ -4,12 +4,21 @@ import os
 import numpy as np
 import scipy.io as sio
 import scipy.stats.stats as sps
+import matplotlib.pyplot as plt
 
 # Import custom om code
 from om.maps.base import MapCompBase, _init_meg_map_dict
 from om.maps.roi import ROI
 from om.core.utils import get_section
 from om.core.errors import DataNotComputedError
+
+# Other metrics:
+#  Absolute value of the difference
+#  Ratio, normalized to be below 1
+
+# Note:
+#  Look into Sphere models for null distribution in permutation tests
+#    For dealing with spatially correlated data.
 
 ####################################################################################
 #################### OMEGAMAPPIN - MAP COMPARE - ANAT - CLASSES ####################
@@ -70,7 +79,7 @@ class MapCompAnat(MapCompBase):
 
 
     def load_anat_maps(self, anat_file_name, anat_type):
-        """Load the spatial maps of anatomilcal data.
+        """Load the spatial maps of anatomical data.
 
         Parameters
         ----------
@@ -124,7 +133,7 @@ class MapCompAnat(MapCompBase):
 
         # Set default scouts file, if an alternative was not provided
         if not roi_file_name:
-            roi_file_name = 'scout_Desikan-Killiany_68.mat'
+            roi_file_name = 'scout_Desikan-Killiany_68_7501.mat'
 
         # Load roi dat from mat file
         dat = sio.loadmat(os.path.join(self.db.maps_path, 'Scouts', roi_file_name),
@@ -144,7 +153,7 @@ class MapCompAnat(MapCompBase):
             sc_names.append(str(scout[3]))
 
             # Drop brackets in scout name
-            sc_names[ind] = sc_names[ind][3:-2]
+            sc_names[ind] = sc_names[ind][2:-2]
 
         # Extract L/R data from names
         labels, lrs = _extract_lr(sc_names, 'elec')
@@ -245,7 +254,7 @@ class MapCompAnat(MapCompBase):
             self.meg_con[key] = _mat_mult(self.meg_roi_maps[key])
 
 
-    def comp_meg_anat(self, section='all', print_out=True):
+    def comp_meg_anat(self, section='all', plot=True, print_out=True):
         """Compare anatomical connectivity to oscillation data.
 
         Parameters
@@ -275,9 +284,23 @@ class MapCompAnat(MapCompBase):
 
             meg_dat = self.meg_con[key][ind_st:ind_en, ind_st:ind_en]
 
-            stats[key][0], stats[key][1] = sps.pearsonr(
-                meg_dat[np.triu_indices(n_rois_used, 1)],
-                anat_dat[np.triu_indices(n_rois_used, 1)])
+            d1 = meg_dat[np.triu_indices(n_rois_used, 1)]
+            d2 = anat_dat[np.triu_indices(n_rois_used, 1)]
+
+            if True:
+                inds_d2 = d2 > 0
+                d1 = d1[inds_d2]
+                d2 = d2[inds_d2]
+                inds_d1 = d1 > 0.01
+                d1 = d1[inds_d1]
+                d2 = d2[inds_d1]
+
+            stats[key][0], stats[key][1] = sps.pearsonr(d1, d2)
+
+            if plot:
+                plt.figure()
+                plt.plot(d1, d2, '.')
+                plt.title(key)
 
         # Attach the stats dictionary to object
         self.stats_section = section

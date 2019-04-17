@@ -7,17 +7,16 @@ import pandas as pd
 from py.test import raises
 
 from om.maps.tg import *
-from om.maps.tg import _get_map_names, _get_gene_files, _init_stat_dict, _make_list, _pull_out_results
+from om.maps.tg import _get_map_names, _get_gene_files, _init_stat_dict
+from om.maps.tg import _make_list, _pull_out_results
 
 from om.core.db import OMDB
 from om.tests.utils import TestDB as TDB
 
-#####################################################################################
-#################### TESTS - OMEGAMAPPIN - MAPS - TG - FUNCTIONS ####################
-#####################################################################################
+###################################################################################################
+###################################################################################################
 
 def test_calc_avg_gene_map():
-    """   """
 
     pass
     #tdb = TDB()
@@ -26,19 +25,13 @@ def test_calc_avg_gene_map():
 
     #calc_avg_gene_map(subj_list, 'test_avg')
 
-###################################################################################
-######################### TESTS - OMEGAMAPPIN - MAPS - TG #########################
-###################################################################################
-
 def test_mc_tg():
-    """   """
 
     db = OMDB()
 
     assert MapCompTG(db)
 
 def test_load_gene_maps():
-    """   """
 
     tdb = TDB()
 
@@ -106,7 +99,7 @@ def test_calc_corrs_errors():
     map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
 
     with raises(DataNotComputedError):
-        map_comp.calc_corrs('Genes', 'Slopes')
+        map_comp.calc_corrs('Genes', 'Exponents')
 
     with raises(DataNotComputedError):
         map_comp.calc_corrs('Genes', 'a')
@@ -133,7 +126,7 @@ def test_calc_corrs_genes_meg_l():
         assert np.all(map_comp.corrs['Genes'][osc])
         assert np.all(map_comp.p_vals['Genes'][osc])
 
-def test_calc_corrs_genes_slope_l():
+def test_calc_corrs_genes_exponent_l():
     """   """
 
     tdb = TDB()
@@ -141,12 +134,12 @@ def test_calc_corrs_genes_slope_l():
     map_comp = MapCompTG(tdb)
 
     map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
-    map_comp.load_slope_map('test_slopes')
+    map_comp.load_exponent_map('test_exponents')
 
-    map_comp.calc_corrs('Genes', 'Slopes', method='linear')
+    map_comp.calc_corrs('Genes', 'Exponents', method='linear')
 
-    assert np.all(map_comp.corrs['Genes']['Slopes'])
-    assert np.all(map_comp.p_vals['Genes']['Slopes'])
+    assert np.all(map_comp.corrs['Genes']['Exponents'])
+    assert np.all(map_comp.p_vals['Genes']['Exponents'])
 
 def test_calc_corrs_terms_meg_l():
     """   """
@@ -165,7 +158,7 @@ def test_calc_corrs_terms_meg_l():
         assert np.all(map_comp.corrs['Terms'][osc])
         assert np.all(map_comp.p_vals['Terms'][osc])
 
-def test_calc_corrs_terms_slope_l():
+def test_calc_corrs_terms_exponent_l():
     """   """
 
     tdb = TDB()
@@ -173,37 +166,35 @@ def test_calc_corrs_terms_slope_l():
     map_comp = MapCompTG(tdb)
 
     map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
-    map_comp.load_slope_map('test_slopes')
+    map_comp.load_exponent_map('test_exponents')
 
-    map_comp.calc_corrs('Terms', 'Slopes', method='linear')
+    map_comp.calc_corrs('Terms', 'Exponents', method='linear')
 
-    assert np.all(map_comp.corrs['Terms']['Slopes'])
-    assert np.all(map_comp.p_vals['Terms']['Slopes'])
+    assert np.all(map_comp.corrs['Terms']['Exponents'])
+    assert np.all(map_comp.p_vals['Terms']['Exponents'])
 
-"""
-def test_calc_corrs_par():
-    """   """
+# def test_calc_corrs_par():
+#     """   """
 
-    tdb = TDB()
+#     tdb = TDB()
 
-    map_comp = MapCompTG(tdb)
+#     map_comp = MapCompTG(tdb)
 
-    map_comp.load_meg_maps('test_meg')
-    map_comp.load_slope_map('test_slopes')
+#     map_comp.load_meg_maps('test_meg')
+#     map_comp.load_exponent_map('test_exponents')
 
-    map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
-    map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
+#     map_comp.load_term_maps('test_term_dat.csv', names_file='00-test_term_names.csv')
+#     map_comp.load_gene_maps('test', names_file='00-test_gene_names.csv')
 
-    for osc in map_comp.bands:
-        map_comp.calc_corrs('Genes', osc, method='parallel', stop_par=False)
+#     for osc in map_comp.bands:
+#         map_comp.calc_corrs('Genes', osc, method='parallel', stop_par=False)
 
-    map_comp.calc_corrs('Terms', 'Slopes', method='parallel', stop_par=True)
+#     map_comp.calc_corrs('Terms', 'Exponents', method='parallel', stop_par=True)
 
-    for osc in map_comp.bands:
-        assert np.all(map_comp.corrs['Terms'][osc])
+#     for osc in map_comp.bands:
+#         assert np.all(map_comp.corrs['Terms'][osc])
 
-    assert np.all(map_comp.corrs['Genes']['Slopes'])
-"""
+#     assert np.all(map_comp.corrs['Genes']['Exponents'])
 
 def test_check_corrs():
     """   """
@@ -314,54 +305,49 @@ def test_save_corrs():
 ################ TESTS - OMEGAMAPPIN - MAPS - TG - PRIVATE FUNCTIONS ################
 #####################################################################################
 
-def test_get_map_names_terms():
-    """   """
+# def test_get_map_names_terms():
 
-    db = OMDB()
+#     db = OMDB()
 
-    names_file = '00-ns_terms.csv'
-    names = _get_map_names(names_file, os.path.join(db.maps_path, 'Terms'))
+#     names_file = '00-ns_terms.csv'
+#     names = _get_map_names(names_file, os.path.join(db.maps_path, 'Terms'))
 
-    assert names
-    assert isinstance(names, list)
-    assert isinstance(names[0], str)
+#     assert names
+#     assert isinstance(names, list)
+#     assert isinstance(names[0], str)
 
-def test_get_map_names_genes():
-    """   """
+# def test_get_map_names_genes():
 
-    db = OMDB()
+#     db = OMDB()
 
-    names_file = '00-real_gene_names.csv'
-    names = _get_map_names(names_file, os.path.join(db.maps_path, 'Genes'))
+#     names_file = '00-real_gene_names.csv'
+#     names = _get_map_names(names_file, os.path.join(db.maps_path, 'Genes'))
 
-    assert names
-    assert isinstance(names, list)
-    assert isinstance(names[0], str)
+#     assert names
+#     assert isinstance(names, list)
+#     assert isinstance(names[0], str)
 
-def test_get_gene_files():
-    """   """
+# def test_get_gene_files():
 
-    db = OMDB()
+#     db = OMDB()
 
-    genes_files_path = _get_gene_files('sub1', db)
+#     genes_files_path = _get_gene_files('sub1', db)
 
-    assert genes_files_path
-    assert isinstance(genes_files_path, list)
-    for path in genes_files_path:
-        assert os.path.exists(path)
+#     assert genes_files_path
+#     assert isinstance(genes_files_path, list)
+#     for path in genes_files_path:
+#         assert os.path.exists(path)
 
 def test_init_stat_dict():
-    """   """
 
     bands = ['a', 'b', 'c']
     d = _init_stat_dict(bands)
 
     assert d
-    bands.append('Slopes')
+    bands.append('Exponents')
     assert set(d.keys()) == set(bands)
 
 def test_make_list():
-    """   """
 
     df = pd.DataFrame(np.array([[1, 2], [1, 2]]))
 
@@ -372,7 +358,6 @@ def test_make_list():
     assert np.array_equal(l[1], np.array([2, 2]))
 
 def test_pull_out_results():
-    """   """
 
     dat = [(1, 2), (1, 2)]
 

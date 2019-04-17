@@ -1,17 +1,16 @@
 """Decoding subject ID from magnetophysiological data."""
 
 import random
-import numpy as np
 
+import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 
 from om.core.db import OMDB, check_db
 from om.meg.single import MegSubj
 from om.core.errors import InconsistentDataError
 
-##########################################################################################
-##########################################################################################
-##########################################################################################
+###################################################################################################
+###################################################################################################
 
 def arrange_dat(subjs):
     """Arrange data from subjects to be able to run decoding on them.

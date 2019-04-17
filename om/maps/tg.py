@@ -2,14 +2,14 @@
 
 import os
 import csv
+
 import numpy as np
 import pandas as pd
-import scipy.stats.stats as sps
+from scipy import stats
 
-# Import custom om code
 from om.maps.base import MapCompBase
 from om.core.db import OMDB, check_db
-from om.core.par import Par, run_corr_par
+#from om.core.par import Par, run_corr_par
 from om.core.utils import clean_file_list, avg_csv_files
 from om.core.errors import DataNotComputedError, UnknownDataTypeError, InconsistentDataError
 
@@ -61,7 +61,7 @@ class MapCompTG(MapCompBase):
         MapCompBase.__init__(self, db)
 
         #
-        self.par = Par()
+        #self.par = Par()
 
         # Import the vectors of gene & term names
         self.term_names = list()
@@ -183,7 +183,7 @@ class MapCompTG(MapCompBase):
         dat_type : {'Terms', 'Genes'}
             Type of data to correlate with meg data.
         meg_dat : str
-            Specific type of meg data to correlate, osc_band of 'Slopes' only.
+            Specific type of meg data to correlate, osc_band of 'Exponents' only.
         method : {'linear', 'parallel'}, optional
             Run method (linear or parallel) to use.
         stop_par : boolean, optional (default: True)
@@ -210,12 +210,12 @@ class MapCompTG(MapCompBase):
             raise UnknownDataTypeError('Data Type not understood.')
 
         # Get the specified meg map
-        if meg_dat is 'Slopes':
+        if meg_dat is 'Exponents':
 
-            # Check that slopes are loaded
-            if not self.slopes_loaded:
-                raise DataNotComputedError('Slope data has not been loaded.')
-            meg_map = self.slope_map[meg_dat]
+            # Check that exponents are loaded
+            if not self.exponents_loaded:
+                raise DataNotComputedError('Exponent data has not been loaded.')
+            meg_map = self.exponent_map[meg_dat]
 
         # Otherwise, use the specified oscillation band
         else:
@@ -251,7 +251,7 @@ class MapCompTG(MapCompBase):
             for comp in range(n_comps):
 
                 # Pull out specific data (single term or gene)
-                dat = np.array(dat_df.ix[:, comp])
+                dat = np.array(dat_df.iloc[:, comp])
 
                 # Get inds of data that contains numbers
                 inds_non_nan = np.invert(np.isnan(dat))
@@ -259,7 +259,7 @@ class MapCompTG(MapCompBase):
                 #inds_non_nan = [i for i in range(len(dat)) if not np.isnan(dat[i])]
 
                 # Calculate correlation between data and meg map
-                [corr_vals[comp], p_vals[comp]] = sps.pearsonr(
+                [corr_vals[comp], p_vals[comp]] = stats.pearsonr(
                     dat[inds_non_nan], meg_map[inds_non_nan])
 
         # Run in parallel
@@ -626,7 +626,7 @@ def _init_stat_dict(bands):
     Returns
     -------
     out : dict
-        Dictionary with keys of all oscillation bands and slopes.
+        Dictionary with keys of all oscillation bands and exponents.
     """
 
     # Initialize dictionary to return
@@ -636,8 +636,8 @@ def _init_stat_dict(bands):
     for band in bands:
         out[band] = np.array([])
 
-    # Add a field for slope correlations
-    out['Slopes'] = np.array([])
+    # Add a field for exponent correlations
+    out['Exponents'] = np.array([])
 
     return out
 
@@ -664,7 +664,7 @@ def _make_list(dat_df):
 
     # Pull each data column into a list entry
     for i in range(n_dat):
-        out_list.append(np.array(dat_df.ix[:, i]))
+        out_list.append(np.array(dat_df.iloc[:, i]))
 
     return out_list
 

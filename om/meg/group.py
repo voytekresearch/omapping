@@ -22,7 +22,6 @@ class MegGroup(MegSubj):
     """A class to store OMEGA data from multiple subjects.
 
     Holds all oscillations, regardless of spatial location.
-    Note: Class derived from MegSubj()
 
     Attributes
     ----------
@@ -44,10 +43,10 @@ class MegGroup(MegSubj):
         Oscillation power ratios for each oscillation band, for each vertex.
     osc_scores : dict
         Oscillation scores for each oscillation band, for each vertex.
-    vert_slopes : 2d array
-        Slope values for each subject, at each vertex [n_verts, n_subjs].
-    slopes_gr_avg : 1d array
-        Average slope values across subjects for each vertex.
+    vert_exponents : 2d array
+        Aperiodic exponent values for each subject, at each vertex [n_verts, n_subjs].
+    exponent_gr_avg : 1d array
+        Average aperiodic exponent values across subjects for each vertex.
     osc_prob_done : boolean
         Whether oscillation probability has been calculated.
     osc_power_done : boolean
@@ -99,17 +98,22 @@ class MegGroup(MegSubj):
         # Initialize to store oscillation scores
         self.osc_scores = dict()
 
-        # Initialize vars to store slope values
-        self.vert_slopes = np.array([])
-        self.slopes_gr_avg = np.array([])
+        # Initialize vars to store exponent values
+        self.vert_exponents = np.array([])
+        self.exponent_gr_avg = np.array([])
 
         # Set booleans for what has been run
         self.osc_prob_done = False
-        self.osc_pow_done = False
+        self.osc_power_done = False
         self.osc_score_done = False
 
 
-    def add_subject(self, new_subj, add_vertex_oscs=False, add_vertex_slopes=False,
+    def __len__(self):
+
+        return self.n_subjs
+
+
+    def add_subject(self, new_subj, add_vertex_oscs=False, add_vertex_exponents=False,
                     add_all_oscs=False, add_vertex_bands=False, add_peak_freqs=False,
                     add_demo=False):
         """Adds a new subject to the MegGroup object.
@@ -120,8 +124,8 @@ class MegGroup(MegSubj):
             MEG subject (instance of MegSubj)
         add_vertex_oscs : boolean, optional (default: False)
             Whether to add all oscillations, across vertices.
-        add_vertex_slopes : boolean, optional (default: False)
-            Whether to add the slopes.
+        add_vertex_exponents : boolean, optional (default: False)
+            Whether to add the aperiodic exponents.
         add_all_oscs : boolean, optional (default: False)
             Whether to add the vectors of all oscillations, collapsed across vertices.
         add_vertex_bands : boolean, optional (default: False)
@@ -164,28 +168,28 @@ class MegGroup(MegSubj):
                 self.powers = np.dstack([self.powers, new_subj.powers])
                 self.bws = np.dstack([self.bws, new_subj.bws])
 
-        # Add slopes per vertex
-        if add_vertex_slopes:
+        # Add exponents per vertex
+        if add_vertex_exponents:
 
             # Check new subject has relevant data
-            if not new_subj.has_vertex_slopes:
-                raise DataNotComputedError('New subject does not have vertex slope data.')
+            if not new_subj.has_vertex_exponents:
+                raise DataNotComputedError('New subject does not have vertex exponent data.')
 
             if not self.has_data:
 
                 # Add data to group object
-                self.vert_slopes = new_subj.slopes
+                self.vert_exponents = new_subj.exponents
 
                 # Update that group contains this data
-                self.has_vertex_slopes = True
+                self.has_vertex_exponents = True
 
             else:
                 # Check that group has data defined
-                if not self.has_vertex_slopes:
-                    raise DataNotComputedError('MEG Group does not include vertex slope data.')
+                if not self.has_vertex_exponents:
+                    raise DataNotComputedError('MEG Group does not include vertex exponent data.')
 
                 # Add data to group object
-                self.vert_slopes = np.hstack([self.vert_slopes, new_subj.slopes])
+                self.vert_exponents = np.hstack([self.vert_exponents, new_subj.exponents])
 
         # Add All-Osc Data
         if add_all_oscs:
@@ -203,7 +207,7 @@ class MegGroup(MegSubj):
             self.centers_all = np.append(self.centers_all, new_subj.centers_all)
             self.bws_all = np.append(self.bws_all, new_subj.bws_all)
             self.powers_all = np.append(self.powers_all, new_subj.powers_all)
-            self.slopes = np.append(self.slopes, new_subj.slopes)
+            self.exponents = np.append(self.exponents, new_subj.exponents)
 
             # Add centers hist
             self.centers_hist.append(new_subj.centers_hist)
@@ -320,8 +324,8 @@ class MegGroup(MegSubj):
                 assert self.powers.shape == (n_vertices, 8,self.n_subjs)
                 assert self.bws.shape == (n_vertices, 8,self.n_subjs)
 
-        if self.has_vertex_slopes:
-            assert self.vert_slopes.shape == (n_vertices, self.n_subjs)
+        if self.has_vertex_exponents:
+            assert self.vert_exponents.shape == (n_vertices, self.n_subjs)
 
         if self.has_all_osc:
             pass
@@ -336,8 +340,8 @@ class MegGroup(MegSubj):
             pass
 
 
-    def group_slope(self, avg='mean'):
-        """Calculates the average slope value for each vertex, across subjects.
+    def group_exponent(self, avg='mean'):
+        """Calculates the average exponent value for each vertex, across subjects.
 
         Parameters
         ----------
@@ -345,11 +349,11 @@ class MegGroup(MegSubj):
             How to average across the group.
         """
 
-        # Calculate the average slope value per vertex
+        # Calculate the average exponent value per vertex
         if avg is 'mean':
-            self.slopes_gr_avg = np.mean(self.vert_slopes, 1)
+            self.exponent_gr_avg = np.mean(self.vert_exponents, 1)
         elif avg is 'median':
-            self.slopes_gr_avg = np.median(self.vert_slopes, 1)
+            self.exponent_gr_avg = np.median(self.vert_exponents, 1)
 
 
     def osc_prob(self):
@@ -482,25 +486,25 @@ class MegGroup(MegSubj):
         return corrs_mat, ps_mat, sorted_bands
 
 
-    def save_gr_slope(self, file_name):
-        """Saves out the average group slope results.
+    def save_gr_exponent(self, file_name):
+        """Saves out the average group exponent results.
 
         Parameters
         ----------
         file_name : str
-            File name to save group slope file as.
+            File name to save group exponent file as.
         """
 
         # Set up
         pickle_file_name = file_name + '.p'
-        pickle_save_name = os.path.join(self.db.maps_path, 'Slopes', pickle_file_name)
+        pickle_save_name = os.path.join(self.db.maps_path, 'Exponents', pickle_file_name)
 
         # Check current time for when file is saved
         cur_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         # Collect data together to save out
         dat_out = dict({'dat_source': self.dat_source,
-                        'slopes': self.slopes_gr_avg,
+                        'exponents': self.exponent_gr_avg,
                         'n_subjs': self.n_subjs,
                         'save_time': cur_time})
 
@@ -541,22 +545,31 @@ class MegGroup(MegSubj):
         pickle.dump(dat_out, open(pickle_save_name, 'wb'))
 
 
-    def set_slope_viz(self):
-        """Saves out a matfile, of the group average slope, for visualization."""
+    def set_exponent_viz(self):
+        """Saves out a matfile, of the group average exponent, for visualization."""
 
         # Set up paths to save to
-        save_name = 'Group_Slopes'
+        save_name = 'Group_Exponents'
         save_file = os.path.join(self.db.viz_path, save_name)
 
         # Save desired outputs into a dictionary
         save_dict = {}
-        save_dict['slopes'] = self.slopes_gr_avg
+        save_dict['exponents'] = self.exponent_gr_avg
         save_dict['dat_source'] = self.dat_source
         save_dict['n_subjs'] = self.n_subjs
         save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         # Save the dicionary out to a .mat file
         sio.savemat(save_file, save_dict)
+
+
+    def set_fooof_viz(self):
+        """Set FOOOF features to visualize.
+
+        TODO
+        """
+
+        pass
 
 
     def set_map_viz(self, map_type, file_name):
@@ -616,7 +629,7 @@ class MegGroup(MegSubj):
 
             # Check if oscillation score has been calculated.
             if not self.osc_score_done:
-                raise DataNotComputedError("Oscillation probability not computed - can not proceed.")
+                raise DataNotComputedError("Oscillation score not computed - can not proceed.")
 
             dat = self.osc_scores
 
@@ -730,28 +743,20 @@ def osc_space_group(oscs, bands, verts, osc_param=0, space_param=1):
         Labels of oscillation bands that were analyzed in dat_out.
     """
 
-    # Get labels and data size
-    # HACK: type force to list - check this is working properly
     labels = list(bands.keys())
     n_verts, n_bands, n_subjs = oscs[labels[0]].shape
 
-    # Sort vertex data by requested direction
     space = verts[:, space_param]
-    sort_inds = np.argsort(space)
 
-    # Initialize data matrix to fill and return
     dat_out = np.zeros(shape=(n_subjs, len(bands), 2))
 
-    # Loop through each band in each subject, computing correlation between space and oscillation param
     for subj in range(n_subjs):
         for ind, band in enumerate(bands):
 
-            # Pull out osc data in spatial order, and get inds for which oscillation is defined
-            freqs = np.array([dat if dat > 0 else None for dat in oscs[band][sort_inds, osc_param, subj]])
-            inds = [i for i, e in enumerate(freqs) if e is not None]
+            cur_dat = oscs[band][:, osc_param, subj]
+            keep_inds = cur_dat > 0
 
-            # Calculate the correlation between osc data and spatial dimension
-            dat_out[subj, ind, :] = pearsonr(freqs[inds], space[inds])
+            dat_out[subj, ind, :] = pearsonr(cur_dat[keep_inds], space[keep_inds])
 
     return dat_out, labels
 

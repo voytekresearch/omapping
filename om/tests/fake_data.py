@@ -4,15 +4,14 @@ import os
 import sys
 import csv
 import pickle
+
 import numpy as np
 import scipy.io as sio
 
-# Import fooof (use sys to add location to path, then import)
-#sys.path.append('/Users/thomasdonoghue/Documents/GitCode/omegamappin/')
+from om.core.osc import Osc
+#from om.core.io import save_fooof_pickle
 
 from om.tests.utils import TestDB
-from om.core.osc import Osc
-from om.core.io import save_fooof_pickle
 
 #####################################################################################
 #####################################################################################
@@ -46,74 +45,40 @@ def _rm_test_files(path):
         os.remove(path)
 
 ##################################################################################################
-########################## OMEGAMAPPIN - GENERATE FAKE DATA FOR TESTING ##########################
 ##################################################################################################
 
-def make_fake_fooof_dat_v2():
-    """   """
+# def make_fake_fooof_dat_v2():
+#     """Create some fake FOOOF data, for 2 vertices."""
 
-    tdb = TestDB()
+#     tdb = TestDB()
 
-    v1 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([5, 1.0e-22, 1.0]), np.array([10, 1.0e-22, 1.0])]))
-    v2 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([5, 1.0e-22, 1.0]), np.array([10, 1.0e-22, 1.0]),
-                                          np.array([15, 1.0e-22, 1.0])]))
+#     v1 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([5, 1.0, 1.0]), np.array([10, 1.0, 1.0])]))
+#     v2 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([5, 1.0, 1.0]), np.array([10, 1.0, 1.0]),
+#                                           np.array([15, 1.0, 1.0])]))
 
-    fake_fooof_dat = [v1, v2]
+#     fake_fooof_dat = [v1, v2]
 
-    save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v2')
+#     save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v2')
 
-def make_fake_fooof_dat_v5():
-    """   """
+# def make_fake_fooof_dat_v5():
+#     """Create some fake FOOOF data, for 5 vertices."""
 
-    tdb = TestDB()
+#     tdb = TestDB()
 
-    v1 = (np.array([0.0, 0.0, 0.0]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
-                                          np.array([30, 2.0e-22, 1.5])]))
-    v2 = (np.array([0.5, 0.5, 0.5]), np.array([np.array([10, 1.0e-22, 0.5]), np.array([11, 1.5e-22, 1.0]),
-                                          np.array([30, 2.0e-22, 1.5])]))
-    v3 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
-                                          np.array([30, 2.0e-22, 1.5])]))
-    v4 = (np.array([1.5, 1.5, 1.5]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
-                                          np.array([30, 2.0e-22, 1.5])]))
-    v5 = (np.array([2.0, 2.0, 2.0]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
-                                          np.array([30, 2.0e-22, 1.5])]))
+#     v1 = (np.array([0.0, 0.0, 0.0]), np.array([np.array([4, 1.0, 0.5]), np.array([12, 1.5, 1.0]),
+#                                           np.array([30, 2.0, 1.5])]))
+#     v2 = (np.array([0.5, 0.5, 0.5]), np.array([np.array([10, 1.0e-22, 0.5]), np.array([11, 1.5e-22, 1.0]),
+#                                           np.array([30, 2.0e-22, 1.5])]))
+#     v3 = (np.array([1.0, 1.0, 1.0]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
+#                                           np.array([30, 2.0e-22, 1.5])]))
+#     v4 = (np.array([1.5, 1.5, 1.5]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
+#                                           np.array([30, 2.0e-22, 1.5])]))
+#     v5 = (np.array([2.0, 2.0, 2.0]), np.array([np.array([4, 1.0e-22, 0.5]), np.array([12, 1.5e-22, 1.0]),
+#                                           np.array([30, 2.0e-22, 1.5])]))
 
-    fake_fooof_dat = [v1, v2, v3, v4, v5]
+#     fake_fooof_dat = [v1, v2, v3, v4, v5]
 
-    save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v5')
-
-def make_fake_fooof_dat_v2_old():
-    """Creates a file with 2 vertices of FOOOF MEG data."""
-
-    tdb = TestDB()
-
-    v1 = (1.0, np.array([5, 10]), np.array([1.0e-22, 1.0e-22]), np.array([1.0, 1.0]))
-    v2 = (1.0, np.array([5, 10, 15]), np.array([1.0e-22, 1.0e-22, 1.0e-22]),
-          np.array([1.0, 1.0, 1.0]))
-
-    fake_fooof_dat = [v1, v2]
-
-    save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v2')
-
-def make_fake_fooof_dat_v5_old():
-    """Creates a file with 5 vertices of FOOOF MEG data."""
-
-    tdb = TestDB()
-
-    v1 = (0.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
-          np.array([0.5, 1.0, 1.5]))
-    v2 = (0.5, np.array([10, 11, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
-          np.array([0.5, 1.0, 1.5]))
-    v3 = (1.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
-          np.array([0.5, 1.0, 1.5]))
-    v4 = (1.5, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
-          np.array([0.5, 1.0, 1.5]))
-    v5 = (2.0, np.array([4, 12, 30]), np.array([1.0e-22, 1.5e-22, 2.0e-22]),
-          np.array([0.5, 1.0, 1.5]))
-
-    fake_fooof_dat = [v1, v2, v3, v4, v5]
-
-    save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v5')
+#     save_fooof_pickle(fake_fooof_dat, tdb.fooof_path, 'test_v5')
 
 def make_fake_csvs():
     """Creates two test csv files, with 4 lines of data. Both files are the same."""
@@ -151,16 +116,16 @@ def make_fake_meg_map_data():
 
     pickle.dump(dat_out, open(pickle_name, 'wb'))
 
-def make_fake_slope_map_data():
-    """Creates group average slope data, for 5 vertices."""
+def make_fake_exponent_map_data():
+    """Creates group average exponent data, for 5 vertices."""
 
     tdb = TestDB()
 
-    pickle_name = os.path.join(tdb.maps_path, 'Slopes', 'test_slopes.p')
+    pickle_name = os.path.join(tdb.maps_path, 'Exponents', 'test_exponents.p')
 
-    test_slope_dat = np.array([1, 1, 1, 1, 1])
+    test_exponent_dat = np.array([1, 1, 1, 1, 1])
 
-    dat_out = dict({'slopes': test_slope_dat})
+    dat_out = dict({'exponents': test_exponent_dat})
 
     pickle.dump(dat_out, open(pickle_name, 'wb'))
 
@@ -270,7 +235,7 @@ def create_meg_data():
     """Creates MEG data for testing."""
 
     make_fake_meg_map_data()
-    make_fake_slope_map_data()
+    make_fake_exponent_map_data()
 
 def create_gene_term_data():
     """Creates gene and term data for testing."""
@@ -332,7 +297,7 @@ if __name__ == "__main__":
     clear_fake_dat()
     print('\n\tPrevious test files removed.')
 
-    create_fooof_data()
+    #create_fooof_data()
     create_meg_data()
     create_gene_term_data()
     create_anat_data()

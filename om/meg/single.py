@@ -29,8 +29,8 @@ class MegSubj(object):
         Subject number of the subject of MEG data that is loaded.
     n_psds : int
         Number of PSDs loaded, corresponds to number of vertices.
-    slopes : 1d array
-        Slope value for each vertex.
+    exponents : 1d array
+        Aperiodic exponent values for each vertex.
     centers : 2d array
         Oscillation centers, for each vertex [n_verts, n_oscs].
     powers : 2d array
@@ -65,8 +65,8 @@ class MegSubj(object):
         Whether or not data has been loaded to current object.
     has_vertex_oscs : boolean
         Whether data is defined for oscillations at each vertex (not in bands).
-    has_vertex_slopes : boolean
-        Whether slope values per vertex are loaded.
+    has_vertex_exponents : boolean
+        Whether aperiodic exponent values per vertex are loaded.
     has_all_osc : boolean
         Whether data has been flattened into all oscillations.
     has_vertex_bands : boolean
@@ -99,7 +99,7 @@ class MegSubj(object):
         self.n_psds = int()
 
         # Initialize data arrays
-        self.slopes = np.array([])
+        self.exponents = np.array([])
         self.centers = np.array([])
         self.powers = np.array([])
         self.bws = np.array([])
@@ -132,7 +132,7 @@ class MegSubj(object):
         # Set boolean for what has been run
         self.has_data = False
         self.has_vertex_oscs = False
-        self.has_vertex_slopes = False
+        self.has_vertex_exponents = False
         self.has_all_osc = False
         self.has_vertex_bands = False
         self.has_peak_freqs = False
@@ -191,11 +191,11 @@ class MegSubj(object):
         # Load FOOOF data file
         fg = FOOOFGroup()
         fg.load(cur_subj_path)
-        self.centers, self.powers, self.bws, self.slopes, self.n_psds = extract_fooof_group(fg)
+        self.centers, self.powers, self.bws, self.exponents, self.n_psds = extract_fooof_group(fg)
 
         # Update which data is loaded
         self.has_vertex_oscs = True
-        self.has_vertex_slopes = True
+        self.has_vertex_exponents = True
 
         # Check how many oscillations per vertex
         self.osc_count = np.zeros([self.n_psds])
@@ -396,12 +396,12 @@ class MegSubj(object):
         save_name = str(self.subnum) + '_fooof_Viz'
         save_file = os.path.join(self.db.viz_path, save_name)
 
-        # Initialize dictionary, save basic information and slope data
+        # Initialize dictionary, save basic information and exponent data
         save_dict = {}
         save_dict['subnum'] = self.subnum
         save_dict['dat_source'] = self.dat_source
         save_dict['save_time'] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        save_dict['slopes'] = self.slopes
+        save_dict['exponents'] = self.exponents
 
         # Save out oscillation data
         for band in self.bands:

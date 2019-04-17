@@ -27,12 +27,12 @@ class MapCompBase(object):
         self.meg_maps = dict()
         self.bands = dict()
 
-        # Initialize a dictionary to store slope map
-        self.slope_map = dict({'Slopes': np.array([])})
+        # Initialize a dictionary to store exponent map
+        self.exponent_map = dict({'Exponents': np.array([])})
 
         # Initialize booleans that keep track of what is loaded
         self.oscs_loaded = False
-        self.slopes_loaded = False
+        self.exponents_loaded = False
 
 
     def load_meg_maps(self, osc_file):
@@ -64,26 +64,26 @@ class MapCompBase(object):
         self.oscs_loaded = True
 
 
-    def load_slope_map(self, slope_file):
-        """Load the spatial map of MEG slope data.
+    def load_exponent_map(self, exponent_file):
+        """Load the spatial map of MEG exponent data.
 
         Parameters
         ----------
-        slope_file : str
-            File name of the pickle file with slope data.
+        exponent_file : str
+            File name of the pickle file with exponent data.
         """
 
         # Get the full path for the file name
-        slopes_map_file = os.path.join(self.db.maps_path, 'Slopes', slope_file + '.p')
+        exponents_map_file = os.path.join(self.db.maps_path, 'Exponents', exponent_file + '.p')
 
         # Load data from pickle file
-        dat_in = pickle.load(open(slopes_map_file, 'rb'))
+        dat_in = pickle.load(open(exponents_map_file, 'rb'))
 
-        # Pull out the slope data
-        self.slope_map['Slopes'] = dat_in['slopes']
+        # Pull out the exponent data
+        self.exponent_map['Exponents'] = dat_in['exponents']
 
-        # Update boolean that slopes are loaded
-        self.slopes_loaded = True
+        # Update boolean that exponents are loaded
+        self.exponents_loaded = True
 
 
 ################################################################################################

@@ -42,7 +42,7 @@ def test_cl_load_sl_map():
     tdb = TDB()
     mc_base = MapCompBase(tdb)
 
-    mc_base.load_slope_map('test_slopes')
+    mc_base.load_exponent_map('test_exponents')
 
     # TODO: ADD FULLER TESTING OF THIS
-    assert mc_base.slopes_loaded
+    assert mc_base.exponents_loaded

@@ -300,8 +300,8 @@ def extract_fooof_group(fg):
         Matrix of all powers for all PSDs.
     bws : 2d array
         Matrix of all bws for all PSDs.
-    slopes : 1d array
-        Slope value for each PSD.
+    exps : 1d array
+        Aperiodic exponent value for each PSD.
     n_psds : int
         The number of PSDs.
     """
@@ -310,23 +310,23 @@ def extract_fooof_group(fg):
     n_psds = len(fg)
 
     # Initialize numpy arrays to pull out different result parameters
-    slopes = np.zeros([n_psds])
+    exps = np.zeros([n_psds])
     centers = np.zeros([n_psds, 8])
     powers = np.zeros([n_psds, 8])
     bws = np.zeros([n_psds, 8])
 
     # Pull out the data from each vertex
     for ind, f_res in enumerate(fg):
-        slopes[ind] = f_res.background_params[1]
+        exps[ind] = f_res.aperiodic_params[1]
         centers[ind, 0:len(f_res.peak_params[:, 0])] = f_res.peak_params[:, 0]
         powers[ind, 0:len(f_res.peak_params[:, 1])] = f_res.peak_params[:, 1]
         bws[ind, 0:len(f_res.peak_params[:, 2])] = f_res.peak_params[:, 2]
 
-    # Replace any nan slope values with the mean, and then source to be 2D
-    slopes[np.isnan(slopes)] = np.nanmean(slopes)
-    slopes = slopes[:, np.newaxis]
+    # Replace any NaN exponent values with the mean, and then source to be 2D
+    exps[np.isnan(exps)] = np.nanmean(exps)
+    exps = exps[:, np.newaxis]
 
-    return centers, powers, bws, slopes, n_psds
+    return centers, powers, bws, exps, n_psds
 
 
 def avg_csv_files(f_in, f_out, avg='mean'):

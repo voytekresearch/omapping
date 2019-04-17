@@ -2,19 +2,24 @@
 
 import os
 import csv
+
 import numpy as np
-from scipy.stats.stats import pearsonr
+from scipy.stats.stats import pearsonr, spearmanr
 
 from om.core.io import load_meg_list
 from om.core.db import OMDB, check_db
-from om.core.osc import Osc, check_bands, CheckBands
+from om.core.osc import Osc, CheckBands
 from om.meg.single import MegSubj
 
-#TODO: Make check_bands functionality into a decorator?
+###################################################################################################
+###################################################################################################
 
-##################################################################################################
-##################################################################################################
-##################################################################################################
+# Settings
+#CORR_FUNC = pearsonr
+CORR_FUNC = spearmanr
+
+###################################################################################################
+###################################################################################################
 
 def get_twin_data(db=None, file_name='00-HCP_Subjects_RESTRICTED.csv'):
     """Extract twin status data from data file.
@@ -185,6 +190,28 @@ def rm_twin_pairs(all_pairs, twin_pairs):
     return list(set(all_pairs) - set(twin_pairs))
 
 
+def get_pair_ages(pairs_dat):
+    """Extract the ages for all subjects in a paired group.
+
+    Parameters
+    ----------
+    pairs_dat : list of [MegSubj, MegSubj]
+        Subject pairs to get ages from.
+
+    Returns
+    -------
+    ages : list of int
+        Ages for the subjet in the paired group.
+    """
+
+    ages = []
+    for pair in pairs_dat:
+        for dat in pair:
+            ages.append(dat.age)
+
+    return ages
+
+
 def comp_peak_freq(pairs_dat, peak_type='band', avg='median'):
     """Compares the peak frequencies, within oscillatory bands, between pairs of subjects.
 
@@ -258,8 +285,8 @@ def comp_osc_param(pairs_dat, osc_param):
     return param_avg, param_dat
 
 
-def comp_slope(pairs_dat):
-    """Compares slope values between pairs of subjects.
+def comp_exponent(pairs_dat):
+    """Compares exponent values between pairs of subjects.
 
     Parameters
     ----------
@@ -268,17 +295,17 @@ def comp_slope(pairs_dat):
 
     Returns
     -------
-    slope_avg : 1d array
-        Average slope corrlation across all pairs.
-    slope_dat : 2d array
-        Slope correlation data data for all pairs.
+    exponent_avg : 1d array
+        Average exponent correlation across all pairs.
+    exponent_dat : 2d array
+        Aperiodic exponent correlation data data for all pairs.
     """
 
-    # Compare slope values between pairs and take average across all pairs
-    slope_dat = np.asarray([_comp_sl_pair(pair) for pair in pairs_dat])
-    slope_avg = np.mean(slope_dat, axis=0, keepdims=True)
+    # Compare aperiodic exponent values between pairs and take average across all pairs
+    exponent_dat = np.asarray([_comp_exp_pair(pair) for pair in pairs_dat])
+    exponent_avg = np.mean(exponent_dat, axis=0, keepdims=True)
 
-    return slope_avg, slope_dat
+    return exponent_avg, exponent_dat
 
 
 def print_twin_results_corr(corr_dat, labels):
@@ -310,7 +337,6 @@ def print_twin_results_vec(vec_dat, labels):
     for ind, label in enumerate(labels):
         print('\t', label, '\t : ', '{:5.4f}'.format(vec_dat[ind]))
 
-###################################################################################################
 ###################################################################################################
 ###################################################################################################
 
@@ -377,7 +403,7 @@ def _comp_space_pair(dat, bands):
 
         # Create boolean arrays of vertices with oscillation, for each subject, then compare
         #   Use the number of vertices that are the same (have / don't have osc) divided by n_verts
-        res[ind] = sum((dat[0].oscs[band][:, 0] > 0) == (dat[1].oscs[band][:, 0] > 0)) / 7500
+        res[ind] = sum((dat[0].oscs[band][:, 0] > 0) == (dat[1].oscs[band][:, 0] > 0)) / 7501
 
     return res
 
@@ -406,14 +432,14 @@ def _comp_osc_pair(dat, osc_param, bands):
 
     # Compare center frequencies within oscillatory bands
     for ind, band in enumerate(bands):
-        corr_dat[ind, 0], corr_dat[ind, 1] = pearsonr(dat[0].oscs[band][:, osc_param],
+        corr_dat[ind, 0], corr_dat[ind, 1] = CORR_FUNC(dat[0].oscs[band][:, osc_param],
                                                       dat[1].oscs[band][:, osc_param])
 
     return corr_dat
 
 
-def _comp_sl_pair(dat):
-    """Compares slope value data for a pair of MEG subjects.
+def _comp_exp_pair(dat):
+    """Compares exponent value data for a pair of MEG subjects.
 
     Parameters
     ----------
@@ -426,10 +452,7 @@ def _comp_sl_pair(dat):
         Results of the correlation between subjects.
     """
 
-    # Initialize to store correlation results
     corr_dat = np.zeros(2)
-
-    # Compare slopes
-    corr_dat[0], corr_dat[1] = pearsonr(dat[0].slopes, dat[1].slopes)
+    corr_dat[0], corr_dat[1] = CORR_FUNC(dat[0].exponents, dat[1].exponents)
 
     return corr_dat

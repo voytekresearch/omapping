@@ -13,44 +13,44 @@ from om.meg.single import MegSubj
 ##########################################################################################
 
 def test_load_meg_psds():
-    """   """
 
-    tdb = TDB()
+    #tdb = TDB()
+
     pass
 
-def test_save_fooof_pickle():
-    """   """
+# def test_save_fooof_pickle():
+#     """   """
 
-    tdb = TDB()
+#     tdb = TDB()
 
-    fooof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
-                (1.5, np.array([10., 15.]), np.array([1., 2.]), np.array([1., 1.]))]
+#     fooof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
+#                 (1.5, np.array([10., 15.]), np.array([1., 2.]), np.array([1., 1.]))]
 
-    save_fooof_pickle(fooof_dat, tdb.fooof_path, 999)
+#     save_fooof_pickle(fooof_dat, tdb.fooof_path, 999)
 
-    assert os.path.exists(os.path.join(tdb.fooof_path, 'pickle', '999_fooof_Vertex.p'))
+#     assert os.path.exists(os.path.join(tdb.fooof_path, 'pickle', '999_fooof_Vertex.p'))
 
-def test_load_fooof_pickle():
-    """   """
+# def test_load_fooof_pickle():
+#     """   """
 
-    tdb = TDB()
+#     tdb = TDB()
 
-    results = load_fooof_pickle(tdb.fooof_path, 999)
+#     results = load_fooof_pickle(tdb.fooof_path, 999)
 
-    assert results
+#     assert results
 
-def test_save_fooof_csv():
-    """   """
+# def test_save_fooof_csv():
+#     """   """
 
-    tdb = TDB()
+#     tdb = TDB()
 
-    fooof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
-                (1.5, np.array([10., 15.]), np.array([1., 2.]), np.array([1., 1.]))]
+#     fooof_dat = [(1., np.array([5., 10.]), np.array([1., 2.]), np.array([1., 1.])),
+#                 (1.5, np.array([10., 15.]), np.array([1., 2.]), np.array([1., 1.]))]
 
-    save_fooof_csv(fooof_dat, tdb.fooof_path, 999)
+#     save_fooof_csv(fooof_dat, tdb.fooof_path, 999)
 
-    assert os.path.exists(os.path.join(tdb.fooof_path, 'csv', '999_Slopes.csv'))
-    assert os.path.exists(os.path.join(tdb.fooof_path, 'csv', '999_Oscs.csv'))
+#     assert os.path.exists(os.path.join(tdb.fooof_path, 'csv', '999_Exponents.csv'))
+#     assert os.path.exists(os.path.join(tdb.fooof_path, 'csv', '999_Oscs.csv'))
 
 def test_save_obj_pickle():
 
@@ -74,12 +74,12 @@ def test_load_obj_pickle():
     with raises(UnknownDataTypeError):
         load_obj_pickle('BAD', 'test', db=tdb)
 
-def test_load_meg_list():
+# def test_load_meg_list():
 
-    tdb = TDB()
-    osc = Osc(default=True)
+#     tdb = TDB()
+#     osc = Osc(default=True)
 
-    dat = load_meg_list(['test_v5', 'test_v5'], osc_bands_vert=True,
-                        all_oscs=True, osc=osc, db=tdb, dat_source='')
+#     dat = load_meg_list(['test_v5', 'test_v5'], osc_bands_vert=True,
+#                         all_oscs=True, osc=osc, db=tdb, dat_source='')
 
-    assert dat
+#     assert dat

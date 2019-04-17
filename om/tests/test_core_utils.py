@@ -55,7 +55,6 @@ def test_get_cur_subj():
     assert str(cur_subj) in out
 
 def test_rm_files_ext():
-    """   """
 
     subj_files = ['123_test.npz', '456_meg.csv', '12_3.aa', 'aa_231.ok']
     files_out = rm_files_ext(subj_files)
@@ -65,20 +64,18 @@ def test_rm_files_ext():
     assert not 'npz' in files_out[0]
     assert not '.ok' in files_out[3]
 
-def test_check_file_status():
-    """   """
+# def test_check_file_status():
 
-    tdb = TDB()
+#     tdb = TDB()
 
-    subj_list = [999, 1000]
+#     subj_list = [999, 1000]
 
-    dat, no_dat = check_file_status(subj_list, tdb, '', verbose=True)
+#     dat, no_dat = check_file_status(subj_list, tdb, '', verbose=True)
 
-    assert dat[0] == 999
-    assert no_dat[0] == 1000
+#     assert dat[0] == 999
+#     assert no_dat[0] == 1000
 
 def test_get_section():
-    """   """
 
     n_rois = 6
     roi_lr = ['L', 'L', 'L', 'R', 'R', 'R']

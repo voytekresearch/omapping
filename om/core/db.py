@@ -174,8 +174,8 @@ class OMDB(object):
         -------
         osc_files : list of str
             All available oscillation files.
-        slope_files : list of str
-            All available slope files.
+        exponent_files : list of str
+            All available exponent files.
         term_files : list of str
             All available terms files.
         gene_files : list of str
@@ -184,20 +184,20 @@ class OMDB(object):
 
         # Get lists of files from data directories
         osc_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Oscs')), 'osc')
-        slope_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Slopes')), 'slope')
+        exponent_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Exponents')), 'exponent')
         gene_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Genes')), 'gene')
         term_files = clean_file_list(os.listdir(os.path.join(self.maps_path, 'Terms')), 'terms')
 
         # If asked for, print out lists of files
         if verbose:
             print('Oscillation Files:\n', '\n'.join(osc_files), '\n')
-            print('Slope Files:\n', '\n'.join(slope_files), '\n')
+            print('Exponent Files:\n', '\n'.join(exponent_files), '\n')
             print('Terms Files:\n', '\n'.join(term_files), '\n')
             print('Genes Files:\n', '\n'.join(gene_files), '\n')
 
         # If asked for, return lists of files
         if return_files:
-            return osc_files, slope_files, term_files, gene_files
+            return osc_files, exponent_files, term_files, gene_files
 
 #################################################################################################
 ############################## OMEGAMAPPIN - CORE - DB - FUNCTIONS ##############################
@@ -242,7 +242,7 @@ def make_file_directory_internal(base_path):
 
     # Maps Data
     os.mkdir(os.path.join(base_path, 'Maps'))
-    maps_data = ['Genes', 'Oscs', 'Slopes', 'Terms', 'Anat', 'Scouts']
+    maps_data = ['Genes', 'Oscs', 'Exponents', 'Terms', 'Anat', 'Scouts']
     for maps_dat in maps_data:
         os.mkdir(os.path.join(base_path, 'Maps', maps_dat))
 
