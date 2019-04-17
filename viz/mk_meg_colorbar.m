@@ -15,6 +15,6 @@ set(gca, 'color', 'none');
 set(gca, 'FontSize', 16);
 
 % Save out colorbar
-print('beta-prob-colorbar','-dpdf')
+print('be-cf-colorbar','-dpdf')
 
 close all

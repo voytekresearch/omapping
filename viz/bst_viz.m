@@ -1,8 +1,14 @@
 % Load PSD data and set to visualize
-% TODO: 
-%   1) Currently assumes default oscillation bands. 
+% TODO:
+%   1) Currently assumes default oscillation bands.
 %       Should update to use whatever bands are found in load file.
 %   2) Figure out channel data plotting.
+
+%%
+
+% Quick line to save out a high res image of the current figure
+fig_name = 'Beta_CF_right';
+print(gcf,['figs/', fig_name, '.png'],'-dpng','-r300');
 
 %% Set Up
 
@@ -23,8 +29,8 @@ load([datapath, filename]);
 %clear filename datapath
 
 %
-fooof_dat = {slopes, theta, alpha, beta, lowgamma};
-fooof_labels = {['Slopes_', num2str(subj)], ['Thetas_', num2str(subj)], ...
+fooof_dat = {exps, theta, alpha, beta, lowgamma};
+fooof_labels = {['Exponents_', num2str(subj)], ['Thetas_', num2str(subj)], ...
     ['Alphas_', num2str(subj)], ['Betas_', num2str(subj)]};
 
 disp('Data Loaded')
@@ -65,36 +71,51 @@ fooof_labels = {'xx', 'Theta_Score', 'Alpha_Score', 'Beta_Score'};
 
 disp('Data Loaded')
 
-%% Load FOOOF Data - Slopes
+%% Load FOOOF Data - Oscillation Parameters
 
 % Set filename
-filename = 'Group_Slopes.mat';
-%filename = 'Slopes_Age_Corr.mat';
+filename = 'CF_viz.mat';
+%filename = 'PW_viz.mat';
+%filename = 'BW_viz.mat';
 
-% Load Slope data
+% Load Grop osc-score data
+load([datapath, filename])
+fooof_dat = {[], theta_score', alpha_score', beta_score'};
+fooof_labels = {'xx', 'Theta_CF', 'Alpha_CF', 'Beta_CF'};
+
+
+disp('Data Loaded')
+
+%% Load FOOOF Data - Exponents
+
+% Set filename
+filename = 'Group_Exponents.mat';
+%filename = 'Exponents_Age_Corr.mat';
+
+% Load Exponent data
 load([datapath, filename]);
 
-slopes = slopes';
+exponents = exponents';
 
-fooof_dat = {slopes};
-fooof_labels = {'Slopes'};
+fooof_dat = {exponents};
+fooof_labels = {'exponents'};
 
 disp('Data Loaded');
 
 %% Set FOOOF Data
 
 for i = 1:length(fooof_dat)
-    
+
     % Load BST dat file to use
     file_name = ['results_wMNE_MEG_KERNEL_160423_210', num2str(3+i), '.mat'];
     load([bst_path, file_name]);
-    
+
     % Set data
     Time = 0;
     ImageGridAmp = fooof_dat{i};
     Comment = fooof_labels{i};
 
-    % Save bst 
+    % Save bst
     save([bst_path, file_name], var_names{:});
     clear(var_names{:})
 
