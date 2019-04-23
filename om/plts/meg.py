@@ -1,6 +1,7 @@
 """OM - plots for MEG data."""
 
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 from om.plts.fig_info import FigInfo
@@ -63,10 +64,7 @@ def plot_exponents(exponents, title, save_out=False):
     # Set x-lims
     plt.xlim(0.0, 2.0)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '101-' + title + '_Exponents' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -105,10 +103,7 @@ def plot_hist_count(osc_count, save_out=False):
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '102-OscCount' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -172,10 +167,7 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
     # Adjust subplot spacing
     plt.subplots_adjust(hspace=0.4)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '103-AllOscs' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -254,10 +246,7 @@ def plot_all_oscs_single(data, dat_type, title, n_bins=160, size=(15, 5), save_o
     #plt.xlim(3, max(data)+0.2)
     plt.xlim(2.5, 32)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '104-' + dat_title + '_AllOscs'+ '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -323,10 +312,7 @@ def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '105-OscComparison' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -334,7 +320,6 @@ def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=
 ########################################################################################
 ############################ OM - PLTS - GROUPMEGDATA PLOTS ############################
 ########################################################################################
-
 
 def plot_corr_matrix(corr_dat, labels, save_out=False):
     """Plot correlation data.
@@ -380,12 +365,24 @@ def plot_corr_matrix(corr_dat, labels, save_out=False):
     # Add a colorbar - add padding to offset further from plot
     plt.colorbar(pad=0.15)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '106-CorrMat' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+
+
+def plot_corr_matrix_tri(corr_dat, labels, save_out=False):
+    """   """
+
+    # Generate a mask for the upper triangle
+    mask = np.zeros_like(corr_dat, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+
+    # Generate a custom diverging colormap
+    cmap = sns.color_palette("coolwarm", 7)
+
+    # Draw the heatmap with the mask and correct aspect ratio
+    sns.heatmap(corr_dat, mask=mask, cmap=cmap, annot=True, square=True,
+                vmin=-1, vmax=1, xticklabels=labels, yticklabels=labels)
 
 
 def plot_peak_boxplot(peaks, osc_band, save_out=False):
@@ -435,10 +432,7 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
     # Remove x ticks
     plt.xticks([])
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '107-' + osc_band + '_boxplot' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -492,10 +486,7 @@ def plot_peak_boxplot_all(peaks, bands, save_out=False):
         # Remove x ticks
         ai.set_xticks([])
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + 'XXX-PeakFreqs_All' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -568,10 +559,7 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
     ax.spines['left'].set_linewidth(ax_lw)
     ax.spines['bottom'].set_linewidth(ax_lw)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '108-FreqCorr' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -628,10 +616,7 @@ def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, save_out=False):
     # Set ticks font size
     #plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '109-AgePeak' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -671,10 +656,7 @@ def plot_scatter(d1, d2, labels=[None, None], title=None, save_out=False):
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '222' + title + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -750,10 +732,7 @@ def plot_osc_profiles(centers_hist, n_subj='all', save_out=False):
     # Set the x axis limits
     plt.xlim([3, 30])
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '111-OscillationProfiles' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -803,9 +782,7 @@ def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1, save_
     #plt.xlabel('Posterior -> Anterior', {'fontsize': ax_fs, 'fontweight': 'bold'})
     #plt.ylabel('Center Frequency', {'fontsize': ax_fs, 'fontweight': 'bold'})
 
-    # Save out (if requested)
     if save_out:
-
         save_name = f_info.save_path + '1XX-OscillationSpaceSingleSubject' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
 
@@ -854,9 +831,6 @@ def plot_osc_space_corr_boxplot(dat, labels, save_out=False):
 
     #plt.title('Spatial Analysis', {'fontsize': t_fs, 'fontweight': 'bold'})
 
-    # Save out (if requested)
     if save_out:
-
-        # Set up save name & save out
         save_name = f_info.save_path + '1XX-OscillationSpaceCorrs' + '.' + f_info.format
         plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
