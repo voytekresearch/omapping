@@ -112,53 +112,6 @@ class Osc(object):
         self.bands.pop(rm_band)
         self.n_bands -= 1
 
-###################################################################################################
-###################################################################################################
-
-def check_bands(osc_lst):
-    """Check that a list of oscillation band definitions are all the same. If so, return bands.
-
-    Parameters
-    ----------
-    osc_lst : dict
-        Oscillation band definitions to compare. Should be dict from Osc.bands.
-
-    Returns
-    -------
-    OrderedDict
-        Oscillation band oscillations.
-    """
-
-    # Check that all oscillation definitions provided are the same
-    if not all(x == osc_lst[0] for x in osc_lst):
-        raise InconsistentDataError('Oscillation definitions are inconsistent.')
-
-    return osc_lst[0]
-
-
-def CheckBands(func):
-    """Decorator function to check that all oscillation band definitions are consistent.
-
-    Notes
-    -----
-    - This decorator requires that 'dat', a variable with a list of MegData objects be
-        the first argument for any function it is wrapped around.
-    - It also requires the wrapped function to take an argument 'bands', but it need not
-        be given, as this decorator will provide it.
-    """
-
-    def wrapper(dat, *args, **kwargs):
-        """Wrapper that checks band definitions, and passes through given inputs & bands."""
-
-        bands = check_bands([subj.bands for subj in dat])
-
-        return func(dat, bands=bands, *args, **kwargs)
-
-    return wrapper
-
-###################################################################################################
-###################################################################################################
-###################################################################################################
 
 def _check_band(band_name, band_limits):
     """Check that a proposed band definition is properly formatted.
@@ -187,3 +140,47 @@ def _check_band(band_name, band_limits):
     # Safety check that limits are in correct order
     if not band_limits[0] < band_limits[1]:
         raise InconsistentDataError('Band limits are incorrect.')
+
+###################################################################################################
+###################################################################################################
+
+def CheckBands(func):
+    """Decorator function to check that all oscillation band definitions are consistent.
+
+    Notes
+    -----
+    - This decorator requires that 'dat', a variable with a list of MegData objects be
+        the first argument for any function it is wrapped around.
+    - It also requires the wrapped function to take an argument 'bands', but it need not
+        be given, as this decorator will provide it.
+    """
+
+    def wrapper(dat, *args, **kwargs):
+        """Wrapper that checks band definitions, and passes through given inputs & bands."""
+
+        bands = check_bands([subj.bands for subj in dat])
+
+        return func(dat, bands=bands, *args, **kwargs)
+
+    return wrapper
+
+
+def check_bands(osc_lst):
+    """Check that a list of oscillation band definitions are all the same. If so, return bands.
+
+    Parameters
+    ----------
+    osc_lst : dict
+        Oscillation band definitions to compare. Should be dict from Osc.bands.
+
+    Returns
+    -------
+    OrderedDict
+        Oscillation band oscillations.
+    """
+
+    # Check that all oscillation definitions provided are the same
+    if not all(x == osc_lst[0] for x in osc_lst):
+        raise InconsistentDataError('Oscillation definitions are inconsistent.')
+
+    return osc_lst[0]
