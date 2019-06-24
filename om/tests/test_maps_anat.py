@@ -1,7 +1,8 @@
 """Tests for OM - maps anat"""
 
-import numpy as np
 from py.test import raises
+
+import numpy as np
 
 from om.maps.anat import *
 from om.core.db import OMDB
@@ -10,9 +11,8 @@ from om.tests.utils import load_test_anat
 
 from om.maps.anat import _extract_lr, _clean_label, _mat_mult
 
-#####################################################################################
-######################### TESTS - OMEGAMAPPIN - MAPS - ANAT #########################
-#####################################################################################
+###################################################################################################
+###################################################################################################
 
 def test_mc_anat():
     """   """
@@ -182,4 +182,3 @@ def test_mat_mult():
 
     assert res.shape == (3, 3)
     assert np.all(res == exp)
-

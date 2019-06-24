@@ -1,10 +1,12 @@
 """Tests for OM - maps tg."""
 
+from py.test import raises
+
 import os
 import csv
+
 import numpy as np
 import pandas as pd
-from py.test import raises
 
 from om.maps.tg import *
 from om.maps.tg import _get_map_names, _get_gene_files, _init_stat_dict

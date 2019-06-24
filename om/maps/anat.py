@@ -1,28 +1,28 @@
-"""Anatomical analyses for the OM project."""
+"""Anatomical analyses for the OM project.
+
+Other metrics:
+    Absolute value of the difference
+    Ratio, normalized to be below 1
+
+Note:
+    Look into Sphere models for null distribution in permutation tests
+        For dealing with spatially correlated data.
+"""
 
 import os
+
 import numpy as np
 import scipy.io as sio
 import scipy.stats.stats as sps
 import matplotlib.pyplot as plt
 
-# Import custom om code
 from om.maps.base import MapCompBase, _init_meg_map_dict
 from om.maps.roi import ROI
 from om.core.utils import get_section
 from om.core.errors import DataNotComputedError
 
-# Other metrics:
-#  Absolute value of the difference
-#  Ratio, normalized to be below 1
-
-# Note:
-#  Look into Sphere models for null distribution in permutation tests
-#    For dealing with spatially correlated data.
-
-####################################################################################
-#################### OMEGAMAPPIN - MAP COMPARE - ANAT - CLASSES ####################
-####################################################################################
+###################################################################################################
+###################################################################################################
 
 class MapCompAnat(MapCompBase):
     """Class for storing and comparing spatial topographies in ROIs.

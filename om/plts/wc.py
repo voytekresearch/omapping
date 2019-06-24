@@ -1,7 +1,11 @@
 """WordCloud plots for OM."""
 
 import random
+
 from wordcloud import WordCloud
+
+############################################################################################
+############################################################################################
 
 def create_wc(words_in):
     """Create WordCloud object.
@@ -31,9 +35,6 @@ def create_wc(words_in):
 
     return wc
 
-############################################################################################
-############################################################################################
-############################################################################################
 
 def _grey_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
     """Function for custom coloring - use gray pallete.

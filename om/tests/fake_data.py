@@ -9,12 +9,11 @@ import numpy as np
 import scipy.io as sio
 
 from om.core.osc import Osc
-#from om.core.io import save_fooof_pickle
 
 from om.tests.utils import TestDB
 
-#####################################################################################
-#####################################################################################
+###################################################################################################
+###################################################################################################
 
 def clear_fake_dat():
     """Loops throught the test database directory, deleting all data files."""

@@ -1,15 +1,15 @@
 """OM - Plots for maps data."""
 
-import matplotlib.pyplot as plt
-import numpy as np
 import random
+
+import numpy as np
+import matplotlib.pyplot as plt
 
 from om.plts.fig_info import FigInfo
 from om.core.utils import get_section
 
-##############################################################################################
-############################## OM - PLTS - MAP COMPARISON PLOTS ##############################
-##############################################################################################
+###################################################################################################
+###################################################################################################
 
 def plot_corrs(corrs, p_vals, save_out=False):
     """Plot the R and p-values of the correlation results.

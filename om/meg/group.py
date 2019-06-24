@@ -3,20 +3,17 @@
 import os
 import pickle
 import datetime
+
 import numpy as np
 import scipy.io as sio
 from scipy.stats.stats import pearsonr
 
-# Import custom om code
 from om.meg.single import MegSubj
 from om.core.osc import check_bands
 from om.core.errors import DataNotComputedError, InconsistentDataError, UnknownDataTypeError
 
-# TODO: work through whether sort_bands is still needed with OrderedDict
-
-###########################################################################################
-############################  OMEGAMAPPIN - MEG GROUP CLASSES  ############################
-###########################################################################################
+###################################################################################################
+###################################################################################################
 
 class MegGroup(MegSubj):
     """A class to store OMEGA data from multiple subjects.
