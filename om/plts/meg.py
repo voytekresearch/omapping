@@ -5,13 +5,15 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from om.plts.fig_info import FigInfo
+from om.plts.utils import set_axis_spines, save_figure
 from om.core.errors import UnknownDataTypeError
 
-#######################################################################################
-############################## OM - PLTS - MEGDATA PLOTS ##############################
-#######################################################################################
+###################################################################################################
+###################################################################################################
 
-def plot_exponents(exponents, title, save_out=False):
+############################## OM - PLTS - MEGDATA PLOTS ##############################
+
+def plot_exponents(exponents, title, save_out=False, fig_info=FigInfo()):
     """Plots a histogram of the chi values for all vertices.
 
     Parameters
@@ -24,49 +26,36 @@ def plot_exponents(exponents, title, save_out=False):
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInfo()
-    f_info = FigInfo()
-
     # Plot Settings
     n_bins = 150             # Number of bins for histograms
-    t_fs = f_info.t_fs           # Title font size
-    ax_fs = f_info.ax_fs         # Axis label font size
-    ti_fs = f_info.ti_fs         # Axis ticks font size
-    ax_lw = f_info.ax_lw
+    t_fs = fig_info.t_fs           # Title font size
+    ax_fs = fig_info.ax_fs         # Axis label font size
+    ti_fs = fig_info.ti_fs         # Axis ticks font size
 
     # Set up plot
     fig, ax = plt.subplots(figsize=[6, 4])
 
     # Create histogram
-    plt.hist(exponents, n_bins, color='#40425e')
+    ax.hist(exponents, n_bins, color='#40425e')
 
     # Add title
-    if f_info.add_title:
-        plt.title('Exponents - ' + title, {'fontsize': t_fs, 'fontweight': 'bold'})
+    if fig_info.add_title:
+        plt.title('Exponents - ' + title, {'fontsize': t_fs})
 
     # Add axis labels
-    plt.xlabel('Exponent', {'fontsize': ax_fs, 'fontweight': 'bold'})
-    plt.ylabel('Count', {'fontsize': ax_fs, 'fontweight': 'bold'})
+    ax.set_xlabel('Exponent', {'fontsize': ax_fs})
+    ax.set_ylabel('Count', {'fontsize': ax_fs})
 
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    # Set the top and right side frame & ticks off
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.xaxis.set_ticks_position('bottom')
-    ax.yaxis.set_ticks_position('left')
-
-    # Set linewidth of remaining spines
-    ax.spines['left'].set_linewidth(ax_lw)
-    ax.spines['bottom'].set_linewidth(ax_lw)
+    # Set spines
+    set_axis_spines(ax, lw=fig_info.ax_lw)
 
     # Set x-lims
-    plt.xlim(0.0, 2.0)
+    ax.set_xlim(0.0, 2.0)
 
-    if save_out:
-        save_name = f_info.save_path + '101-' + title + '_Exponents' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '101-' + title + '_Exponents', fig_info)
 
 
 def plot_hist_count(osc_count, save_out=False):
@@ -81,19 +70,19 @@ def plot_hist_count(osc_count, save_out=False):
     """
 
     # Get FigInto
-    f_info = FigInfo()
+    fig_info = FigInfo()
 
     # Plot Settings
     n_bins = 25              # Number of bins for histograms
-    t_fs = f_info.t_fs           # Title font size
-    ax_fs = f_info.ax_fs         # Axis label font size
-    ti_fs = f_info.ti_fs         # Axis ticks font size
+    t_fs = fig_info.t_fs           # Title font size
+    ax_fs = fig_info.ax_fs         # Axis label font size
+    ti_fs = fig_info.ti_fs         # Axis ticks font size
 
     # Create histogram
     plt.hist(osc_count, n_bins, range=[0, 8])
 
     # Add title
-    if f_info.add_title:
+    if fig_info.add_title:
         plt.title('# Oscillations per Vertex', {'fontsize': t_fs, 'fontweight': 'bold'})
 
     # Add axis labels
@@ -103,12 +92,11 @@ def plot_hist_count(osc_count, save_out=False):
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    if save_out:
-        save_name = f_info.save_path + '102-OscCount' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '102-OscCount', fig_info)
 
 
-def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
+def plot_all_oscs(centers_all, powers_all, bws_all, title,
+                  save_out=False, fig_info=FigInfo()):
     """Plots combined plot with distributions of oscillation centers, powers and bws.
 
     Parameters
@@ -125,39 +113,36 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInto
-    f_info = FigInfo()
-
     # Plot Settings
     n_bins = 160                 # Number of bins for histograms
-    st_fs = f_info.t_fs          # Super Title Font Size
-    sp_fs = f_info.sp_fs         # Subplot Title Font Size
-    ax_fs = f_info.ax_fs         # Axis Label Font Size
-    ti_fs = f_info.ti_fs         # Axis ticks font size
+    st_fs = fig_info.t_fs          # Super Title Font Size
+    sp_fs = fig_info.sp_fs         # Subplot Title Font Size
+    ax_fs = fig_info.ax_fs         # Axis Label Font Size
+    ti_fs = fig_info.ti_fs         # Axis ticks font size
 
     # Set up subplots
     fig, ax = plt.subplots(3, 1, figsize=(15, 15))
 
     # Set plot super-title
-    if f_info.add_title:
+    if fig_info.add_title:
         plt.suptitle('Distributions of Oscillatory Parameters - ' + title,
                      fontsize=st_fs, fontweight='bold')
 
     # Subplot 1 - Center Frequency
     ax[0].hist(centers_all, n_bins)
-    ax[0].set_title('Center Frequency', {'fontsize': sp_fs, 'fontweight': 'bold'})
+    ax[0].set_title('Center Frequency', {'fontsize': sp_fs})
     ax[0].set_xlabel('Frequency', {'fontsize': ax_fs})
     ax[0].set_ylabel('Count', {'fontsize': ax_fs})
 
     # Subplot 2 - Power
     ax[1].hist(np.log10(powers_all), n_bins)
-    ax[1].set_title('Oscillatory Power', {'fontsize': sp_fs, 'fontweight': 'bold'})
+    ax[1].set_title('Oscillatory Power', {'fontsize': sp_fs})
     ax[1].set_xlabel('Log Power', {'fontsize': ax_fs})
     ax[1].set_ylabel('Count', {'fontsize': ax_fs})
 
     # Subplot 3 - Bandwidth
     ax[2].hist(bws_all, n_bins)
-    ax[2].set_title('Band Width', {'fontsize': sp_fs, 'fontweight': 'bold'})
+    ax[2].set_title('Band Width', {'fontsize': sp_fs})
     ax[2].set_xlabel('Bandwidth (Hz)', {'fontsize': ax_fs})
     ax[2].set_ylabel('Count', {'fontsize': ax_fs})
 
@@ -167,91 +152,78 @@ def plot_all_oscs(centers_all, powers_all, bws_all, title, save_out=False):
     # Adjust subplot spacing
     plt.subplots_adjust(hspace=0.4)
 
-    if save_out:
-        save_name = f_info.save_path + '103-AllOscs' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '103-AllOscs', fig_info)
 
 
-def plot_all_oscs_single(data, dat_type, title, n_bins=160, size=(15, 5), save_out=False):
+def plot_all_oscs_single(data, data_type, title, n_bins=160,
+                         figsize=(15, 5), save_out=False, fig_info=FigInfo()):
     """Create a plot for a single oscillation parameter.
 
     Parameters
     ----------
     data : 1d array
         Vector of oscillation parameter data.
-    dat_type : {0, 1, 2}
+    data_type : {0, 1, 2}
         Int refers to which osc parameter is being plotted.
             Key: {0:'Center Frequency', 1:'Power', 2:'Bandwidth'
     title : str
         A string to append to the title.
     n_bins : int, optional (default = 160)
         Number of bins to use for the plot.
-    size : tuple, optional (default = (15, 5))
+    figsize : tuple, optional (default = (15, 5))
         Size of the figure to make.
     save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInto
-    f_info = FigInfo()
-
     # Plot Settings
-    t_fs = f_info.t_fs           # Super Title Font Size
-    ax_fs = f_info.ax_fs         # Axis Label Font Size
-    ti_fs = f_info.ti_fs         # Axis ticks font size
-    ax_lw = f_info.ax_lw
+    t_fs = fig_info.t_fs           # Super Title Font Size
+    ax_fs = fig_info.ax_fs         # Axis Label Font Size
+    ti_fs = fig_info.ti_fs         # Axis ticks font size
 
     # Set up for which data type
-    if dat_type is 0:
-        dat_title = 'Center Frequency'
+    if data_type is 0:
+        data_title = 'Center Frequency'
         xlab = 'Frequency'
-    elif dat_type is 1:
-        dat_title = 'Power'
+    elif data_type is 1:
+        data_title = 'Power'
         xlab = 'Log Power'
         data = np.log10(data)
-    elif dat_type is 2:
-        dat_title = 'Bandwidth'
+    elif data_type is 2:
+        data_title = 'Bandwidth'
         xlab = 'Bandwidth (Hz)'
     else:
         raise UnknownDataTypeError('Data type not understood.')
 
     # Set up plot
-    fig, ax = plt.subplots(figsize=size)
+    fig, ax = plt.subplots(figsize=figsize)
 
     # Subplot 1 - Center Frequency
     ax.hist(data, n_bins, color='#40425e', alpha=0.9)
 
     # Set the title
-    if f_info.add_title:
-        plt.title(dat_title + ' ' + title, {'fontsize': t_fs, 'fontweight': 'bold'})
+    if fig_info.add_title:
+        plt.title(data_title + ' ' + title, {'fontsize': t_fs, 'fontweight': 'bold'})
 
     # Add axis labels
-    plt.xlabel(xlab, {'fontsize': ax_fs})
-    plt.ylabel('Count', {'fontsize': ax_fs})
+    ax.set_xlabel(xlab, {'fontsize': ax_fs})
+    ax.set_ylabel('Count', {'fontsize': ax_fs})
 
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    # Set the top and right side frame & ticks off
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.xaxis.set_ticks_position('bottom')
-    ax.yaxis.set_ticks_position('left')
-
-    # Set linewidth of remaining spines
-    ax.spines['left'].set_linewidth(ax_lw)
-    ax.spines['bottom'].set_linewidth(ax_lw)
+    # Set spines
+    set_axis_spines(ax, lw=fig_info.ax_lw)
 
     # Hard code x-lims
-    #plt.xlim(3, max(data)+0.2)
-    plt.xlim(2.5, 32)
+    #ax.set_xlim(3, max(data)+0.2)
+    ax.set_xlim(2.5, 32)
 
-    if save_out:
-        save_name = f_info.save_path + '104-' + dat_title + '_AllOscs'+ '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '104-' + data_title + '_AllOscs', fig_info)
 
 
-def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=False):
+def plot_osc_param_comparison(centers_all, powers_all, bws_all, title,
+                              save_out=False, fig_info=FigInfo()):
     """Plots comparisons between all oscillatory parameters.
 
     Checks Centers vs. Bandwidth, Centers vs. Power and Bandwidth vs. Power.
@@ -270,21 +242,18 @@ def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInto
-    f_info = FigInfo()
-
     # Plot Settings
-    st_fs = f_info.t_fs              # Super Title Font Size
-    sp_fs = f_info.sp_fs             # Subplot Title Font Size
-    ax_fs = f_info.ax_fs             # Axis Label Font Size
-    ti_fs = f_info.ti_fs             # Axis ticks font size
+    st_fs = fig_info.t_fs              # Super Title Font Size
+    sp_fs = fig_info.sp_fs             # Subplot Title Font Size
+    ax_fs = fig_info.ax_fs             # Axis Label Font Size
+    ti_fs = fig_info.ti_fs             # Axis ticks font size
     vis_opac = 0.1                   # Alpha value for plotted data
 
     # Set up subplots
     fig, ax = plt.subplots(3, 1, figsize=(15, 15))
 
     # Set plot super-title
-    if f_info.add_title:
+    if fig_info.add_title:
         plt.suptitle('Oscillation Parameter Comparisons - ' + title,
                      fontsize=st_fs, fontweight='bold')
 
@@ -312,46 +281,37 @@ def plot_osc_param_comparison(centers_all, powers_all, bws_all, title, save_out=
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    if save_out:
-        save_name = f_info.save_path + '105-OscComparison' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '105-OscComparison', fig_info)
 
 
-########################################################################################
-############################ OM - PLTS - GROUPMEGDATA PLOTS ############################
-########################################################################################
-
-def plot_corr_matrix(corr_dat, labels, save_out=False):
+def plot_corr_matrix(corr_dat, labels, save_out=False, fig_info=FigInfo()):
     """Plot correlation data.
 
     Parameters
     ----------
-    corr_dat : 2d array
+    corr_data : 2d array
         Matrix of correlation data to plot.
     labels : list of str
-    	Labels for the rows & columns of corr_dat.
+    	Labels for the rows & columns of `corr_data`.
     save_out : boolean, optional (default = False)
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInto
-    f_info = FigInfo()
-
     # Plot Settings
-    t_fs = f_info.t_fs              # Title Font Size
-    ti_fs = f_info.ti_fs            # Axis ticks font size
+    t_fs = fig_info.t_fs              # Title Font Size
+    ti_fs = fig_info.ti_fs            # Axis ticks font size
 
     # Set colormap to use
     cmap = plt.get_cmap('seismic')
 
     # Create the plot
-    #im = plt.matshow(corr_dat, vmin=-1, vmax=1, cmap=cmap, interpolation='none')
-    im = plt.matshow(corr_dat, vmin=-1, vmax=1, cmap=cmap, interpolation='nearest')
+    #im = plt.matshow(corr_data, vmin=-1, vmax=1, cmap=cmap, interpolation='none')
+    im = plt.matshow(corr_data, vmin=-1, vmax=1, cmap=cmap, interpolation='nearest')
     # Notes on using nearest here:
     #   https://github.com/matplotlib/matplotlib/issues/2972/
 
     # Add title
-    if f_info.add_title:
+    if fig_info.add_title:
         plt.title('Osc Band Correlations', {'fontsize': t_fs, 'fontweight': 'bold'}, y=1.15)
 
     # Set tick labels
@@ -365,27 +325,27 @@ def plot_corr_matrix(corr_dat, labels, save_out=False):
     # Add a colorbar - add padding to offset further from plot
     plt.colorbar(pad=0.15)
 
-    if save_out:
-        save_name = f_info.save_path + '106-CorrMat' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '106-CorrMat', fig_info)
 
 
-def plot_corr_matrix_tri(corr_dat, labels, save_out=False):
+def plot_corr_matrix_tri(corr_data, labels, save_out=False):
     """   """
 
     # Generate a mask for the upper triangle
-    mask = np.zeros_like(corr_dat, dtype=np.bool)
+    mask = np.zeros_like(corr_data, dtype=np.bool)
     mask[np.triu_indices_from(mask)] = True
 
     # Generate a custom diverging colormap
     cmap = sns.color_palette("coolwarm", 7)
 
     # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(corr_dat, mask=mask, cmap=cmap, annot=True, square=True,
+    sns.heatmap(corr_data, mask=mask, cmap=cmap, annot=True, square=True,
                 vmin=-1, vmax=1, xticklabels=labels, yticklabels=labels)
 
+    save_figure(save_out, 'XX-corr_mat_tri', fig_info)
 
-def plot_peak_boxplot(peaks, osc_band, save_out=False):
+
+def plot_peak_boxplot(peaks, osc_band, save_out=False, fig_info=FigInfo()):
     """Plot a boxplot of peak frequencies within an oscillation band.
 
     Parameters
@@ -398,13 +358,9 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInto
-    f_info = FigInfo()
-
     # Plot Settings
-    t_fs = f_info.sp_fs              # Title Font Size
-    ti_fs = f_info.ti_fs            # Axis ticks font size
-    ax_lw = f_info.ax_lw
+    t_fs = fig_info.sp_fs              # Title Font Size
+    ti_fs = fig_info.ti_fs            # Axis ticks font size
 
     # Initialize the figure
     fig, ax = plt.subplots(figsize=(2, 5))
@@ -412,15 +368,8 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
     # Make the boxplot
     ax.boxplot(peaks, widths=0.45)
 
-    # Set the top and right side frame & ticks off
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.xaxis.set_ticks_position('bottom')
-    ax.yaxis.set_ticks_position('left')
-
-    # Set linewidth of remaining spines
-    ax.spines['left'].set_linewidth(ax_lw)
-    ax.spines['bottom'].set_linewidth(ax_lw)
+    # Set spines
+    set_axis_spines(ax, lw=fig_info.ax_lw)
 
     # Add a title
     #if fi.add_title:
@@ -432,12 +381,10 @@ def plot_peak_boxplot(peaks, osc_band, save_out=False):
     # Remove x ticks
     plt.xticks([])
 
-    if save_out:
-        save_name = f_info.save_path + '107-' + osc_band + '_boxplot' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '107-' + osc_band + '_boxplot', fig_info)
 
 
-def plot_peak_boxplot_all(peaks, bands, save_out=False):
+def plot_peak_boxplot_all(peaks, bands, save_out=False, fig_info=FigInfo()):
     """Plot boxplots of peak frequencies for all oscillation bands.
 
     Parameters
@@ -450,48 +397,32 @@ def plot_peak_boxplot_all(peaks, bands, save_out=False):
     TODO: Figure out how to space out subplots a little
     """
 
-    # Get FigInto
-    f_info = FigInfo()
-
     # Plot Settings
-    t_fs = f_info.sp_fs             # Title Font Size
-    ti_fs = f_info.ti_fs            # Axis ticks font size
-    ax_lw = f_info.ax_lw            # Axis line weight
+    t_fs = fig_info.sp_fs             # Title Font Size
+    ti_fs = fig_info.ti_fs            # Axis ticks font size
+    ax_lw = fig_info.ax_lw            # Axis line weight
 
     n_bands = len(bands)
-    f, ax = plt.subplots(1, n_bands, figsize=(10, 6))
+    fig, axes = plt.subplots(1, n_bands, figsize=(10, 6))
 
     for ind, band in enumerate(bands):
         ax[ind].boxplot(peaks[band], widths=0.40)
 
         # Add title and set y lims using bands and data
-        ax[ind].set_title(band, fontsize=t_fs, fontweight='bold', y=1.04)
-        ax[ind].set_ylim([peaks[band].min()-0.2, peaks[band].max()+0.2])
+        axes[ind].set_title(band, fontsize=t_fs, fontweight='bold', y=1.04)
+        axes[ind].set_ylim([peaks[band].min()-0.2, peaks[band].max()+0.2])
 
-    for ai in ax:
+    for ax in axes:
 
-        # Set the top and right side frame & ticks off
-        ai.spines['right'].set_visible(False)
-        ai.spines['top'].set_visible(False)
-        ai.xaxis.set_ticks_position('bottom')
-        ai.yaxis.set_ticks_position('left')
+        # Set spines & tick params
+        set_axis_spines(ax, lw=fig_info.ax_lw)
+        ax.tick_params(axis='both', which='major', labelsize=ti_fs)
+        ax.set_xticks([])
 
-        # Set linewidth of remaining spines
-        ai.spines['left'].set_linewidth(ax_lw)
-        ai.spines['bottom'].set_linewidth(ax_lw)
-
-        # Set ticks font size
-        ai.tick_params(axis='both', which='major', labelsize=ti_fs)
-
-        # Remove x ticks
-        ai.set_xticks([])
-
-    if save_out:
-        save_name = f_info.save_path + 'XXX-PeakFreqs_All' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, 'XXX-PeakFreqs_All', fig_info)
 
 
-def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
+def plot_freq_corr(fs, corr_vec, p_vec, save_out=False, fig_info=FigInfo()):
     """Creats a scatter plot for the rolling frequency correlation.
 
     Parameters
@@ -506,14 +437,11 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInfo
-    f_info = FigInfo()
-
     # Plot settings
-    t_fs = f_info.t_fs
-    ax_fs = f_info.ax_fs
-    ti_fs = f_info.ti_fs         # Axis ticks font size
-    ax_lw = f_info.ax_lw
+    t_fs = fig_info.t_fs
+    ax_fs = fig_info.ax_fs
+    ti_fs = fig_info.ti_fs         # Axis ticks font size
+    ax_lw = fig_info.ax_lw
 
     #
     r_alpha = 1
@@ -535,7 +463,7 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
             ax.plot(fs[i], corr_vec[i], 'ro', alpha=p_alpha, markersize=p_size)
 
     # Set title
-    if f_info.add_title:
+    if fig_info.add_title:
         plt.suptitle('Correlation Adjacent Frequency Bands', fontsize=t_fs, fontweight='bold')
 
     # Set axis limits
@@ -549,22 +477,14 @@ def plot_freq_corr(fs, corr_vec, p_vec, save_out=False):
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    # Set the top and right side frame & ticks off
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.xaxis.set_ticks_position('bottom')
-    ax.yaxis.set_ticks_position('left')
+    # Set spines
+    set_axis_spines(ax, lw=fig_info.ax_lw)
 
-    # Set linewidth of remaining spines
-    ax.spines['left'].set_linewidth(ax_lw)
-    ax.spines['bottom'].set_linewidth(ax_lw)
-
-    if save_out:
-        save_name = f_info.save_path + '108-FreqCorr' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '108-FreqCorr', fig_info)
 
 
-def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, save_out=False):
+def plot_age_peak(age, peak_theta, peak_alpha, peak_beta,
+                  save_out=False, fig_info=FigInfo()):
     """Createa a plot comparing age to peak frequencies for each oscillation band.
 
     Parameters
@@ -583,19 +503,16 @@ def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, save_out=False):
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInfo
-    f_info = FigInfo()
-
     # Plot settings
-    st_fs = f_info.t_fs
-    sp_fs = f_info.sp_fs
-    ti_fs = f_info.ti_fs         # Axis ticks font size
+    st_fs = fig_info.t_fs
+    sp_fs = fig_info.sp_fs
+    ti_fs = fig_info.ti_fs         # Axis ticks font size
 
     # Set up subplots
     fig, ax = plt.subplots(1, 3, figsize=(14, 4))
 
     # Set plot super-title
-    if f_info.add_title:
+    if fig_info.add_title:
         plt.suptitle('Peak Frequency / Age Comparisons', fontsize=st_fs, fontweight='bold')
 
     # Theta
@@ -616,12 +533,11 @@ def plot_age_peak(age, peak_theta, peak_alpha, peak_beta, save_out=False):
     # Set ticks font size
     #plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    if save_out:
-        save_name = f_info.save_path + '109-AgePeak' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '109-AgePeak', fig_info)
 
 
-def plot_scatter(d1, d2, labels=[None, None], title=None, save_out=False):
+def plot_scatter(d1, d2, labels=[None, None], title=None,
+                 save_out=False, fig_info=FigInfo()):
     """Create a scatter plot.
 
     Parameters
@@ -634,19 +550,16 @@ def plot_scatter(d1, d2, labels=[None, None], title=None, save_out=False):
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInfo
-    f_info = FigInfo()
-
     # Plot settings
-    t_fs = f_info.t_fs
-    ti_fs = f_info.ti_fs
-    ax_fs = f_info.ax_fs
+    t_fs = fig_info.t_fs
+    ti_fs = fig_info.ti_fs
+    ax_fs = fig_info.ax_fs
 
     # Make the plot
     plt.plot(d1, d2, '.', markersize=10, alpha=0.8)
 
     # Add title
-    if f_info.add_title:
+    if fig_info.add_title:
         plt.title(title, fontsize=t_fs, fontweight='bold')
 
     # Add axis labels
@@ -656,12 +569,11 @@ def plot_scatter(d1, d2, labels=[None, None], title=None, save_out=False):
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
-    if save_out:
-        save_name = f_info.save_path + '222' + title + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '222' + title, fig_info)
 
 
-def plot_osc_profiles(centers_hist, n_subj='all', save_out=False):
+def plot_osc_profiles(centers_hist, n_subj='all',
+                       figsize=(15, 5), save_out=False, fig_info=FigInfo()):
     """Creates a plot showing all subjects oscillation profiles.
 
     Parameters
@@ -674,14 +586,11 @@ def plot_osc_profiles(centers_hist, n_subj='all', save_out=False):
         Whether to save out a copy of the figure.
     """
 
-    # Get FigInfo
-    f_info = FigInfo()
-
     # Plot settings
-    t_fs = f_info.t_fs
-    ax_fs = f_info.ax_fs
-    ti_fs = f_info.ti_fs         # Axis ticks font size
-    ax_lw = f_info.ax_lw
+    t_fs = fig_info.t_fs
+    ax_fs = fig_info.ax_fs
+    ti_fs = fig_info.ti_fs         # Axis ticks font size
+    ax_lw = fig_info.ax_lw
 
     # xx
     ind_lw = 1.0
@@ -689,7 +598,7 @@ def plot_osc_profiles(centers_hist, n_subj='all', save_out=False):
     alpha = 0.80
 
     # Initialize plot
-    fig, ax = plt.subplots(figsize=(18, 5))
+    fig, ax = plt.subplots(figsize=figsize)
 
     # Initialize a frequency vector for the x-axis
     freqs = np.arange(3.125, 40.125, 0.25)
@@ -709,35 +618,27 @@ def plot_osc_profiles(centers_hist, n_subj='all', save_out=False):
     ax.plot(freqs, np.median(centers_hist, 0), 'k', linewidth=avg_lw)
 
     # Add title
-    if f_info.add_title:
+    if fig_info.add_title:
         plt.title('Individual Oscillation Profiles', {'fontsize': t_fs, 'fontweight': 'bold'})
 
-    # Set the top and right side frame & ticks off
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.xaxis.set_ticks_position('bottom')
-    ax.yaxis.set_ticks_position('left')
-
-    # Set linewidth of remaining spines
-    ax.spines['left'].set_linewidth(ax_lw)
-    ax.spines['bottom'].set_linewidth(ax_lw)
+    # Set spines
+    set_axis_spines(ax, lw=fig_info.ax_lw)
 
     # Add axis labels
-    plt.xlabel('Frequency', {'fontsize': ax_fs})#, 'fontweight': 'bold'})
-    plt.ylabel('Count', {'fontsize': ax_fs})#, 'fontweight': 'bold'})
+    ax.set_xlabel('Frequency', {'fontsize': ax_fs})
+    ax.set_ylabel('Count', {'fontsize': ax_fs})
 
     # Set ticks font size
     plt.tick_params(axis='both', which='major', labelsize=ti_fs)
 
     # Set the x axis limits
-    plt.xlim([3, 30])
+    ax.set_xlim([3, 30])
 
-    if save_out:
-        save_name = f_info.save_path + '111-OscillationProfiles' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '111-OscillationProfiles', fig_info)
 
 
-def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1, save_out=False):
+def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1,
+                    save_out=False, fig_info=FigInfo()):
     """
 
     TODO: Fill in.
@@ -758,17 +659,14 @@ def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1, save_
         xx
     """
 
-    # Get FigInfo
-    f_info = FigInfo()
-
     # Plot settings
-    t_fs = f_info.t_fs
-    ax_fs = f_info.ax_fs
+    t_fs = fig_info.t_fs
+    ax_fs = fig_info.ax_fs
 
     #
     space = verts[:, space_param]
     sort_inds = np.argsort(space)
-    freqs = [dat if dat > 0 else None for dat in oscs[band][sort_inds, osc_param, subj]]
+    freqs = [data if data > 0 else None for data in oscs[band][sort_inds, osc_param, subj]]
 
     fig = plt.figure()
 
@@ -776,15 +674,13 @@ def plot_space_comp(oscs, verts, band, subj=0, osc_param=0, space_param=1, save_
 
     plt.xlim([space.min()-0.05, space.max()+0.05])
 
-    plt.title(band, {'fontsize': t_fs, 'fontweight': 'bold'})
+    plt.title(band, {'fontsize': t_fs})
 
     # NOTE: These are wrong / need to change with osc & space params
     #plt.xlabel('Posterior -> Anterior', {'fontsize': ax_fs, 'fontweight': 'bold'})
     #plt.ylabel('Center Frequency', {'fontsize': ax_fs, 'fontweight': 'bold'})
 
-    if save_out:
-        save_name = f_info.save_path + '1XX-OscillationSpaceSingleSubject' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '1XX-OscillationSpaceSingleSubject', fig_info)
 
 
 def plot_space_comp_all():
@@ -792,45 +688,32 @@ def plot_space_comp_all():
     pass
 
 
-def plot_osc_space_corr_boxplot(dat, labels, save_out=False):
+def plot_osc_space_corr_boxplot(data, labels, save_out=False, fig_info=FigInfo()):
     """
 
     Parameters
     ----------
-    dat : ?
+    data : ?
         xx
     labels : ?
         xx
     """
 
-    # Get FigInfo
-    f_info = FigInfo()
-
     # Plot settings
-    t_fs = f_info.t_fs
-    ax_fs = f_info.ax_fs
-    ti_fs = f_info.ti_fs         # Axis ticks font size
-    ax_lw = f_info.ax_lw
+    t_fs = fig_info.t_fs
+    ax_fs = fig_info.ax_fs
+    ti_fs = fig_info.ti_fs         # Axis ticks font size
 
     fig, ax = plt.subplots()
-    ax.boxplot(dat[:, :, 0], widths = 0.40)
+    ax.boxplot(data[:, :, 0], widths = 0.40)
 
     ax.set_xticklabels(labels, {'fontsize': 16})
     #ax.set_xlabel('Oscillation Bands', {'fontsize': ax_fs, 'fontweight': 'bold'})
     #ax.set_ylabel('Correlation Value', {'fontsize': ax_fs, 'fontweight': 'bold'})
 
-    # Set the top and right side frame & ticks off
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.xaxis.set_ticks_position('bottom')
-    ax.yaxis.set_ticks_position('left')
-
-    # Set linewidth of remaining spines
-    ax.spines['left'].set_linewidth(ax_lw)
-    ax.spines['bottom'].set_linewidth(ax_lw)
+    # Set spines
+    set_axis_spines(ax, lw=fig_info.ax_lw)
 
     #plt.title('Spatial Analysis', {'fontsize': t_fs, 'fontweight': 'bold'})
 
-    if save_out:
-        save_name = f_info.save_path + '1XX-OscillationSpaceCorrs' + '.' + f_info.format
-        plt.savefig(save_name, format=f_info.format, bbox_inches=f_info.bbox, dpi=f_info.dpi)
+    save_figure(save_out, '1XX-OscillationSpaceCorrs', fig_info)

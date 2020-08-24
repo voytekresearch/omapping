@@ -37,13 +37,13 @@ class FigInfo(object):
     def __init__(self):
 
         # Default Settings - font sizes
-        self.t_fs = 22         # Title font size
-        self.sp_fs = 20        # Subplot title font size
-        self.ax_fs = 20        # Axis font size
-        self.ti_fs = 12        # Ticks font size
+        self.t_fs = 36         # Title font size
+        self.sp_fs = 28        # Subplot title font size
+        self.ax_fs = 24        # Axis font size
+        self.ti_fs = 16        # Ticks font size
 
         # Default Settings - other settings
-        self.ax_lw = 2.5
+        self.ax_lw = 3
 
         # Default Settings - what to add to plot
         self.add_title = False
@@ -55,6 +55,6 @@ class FigInfo(object):
         # Save Information
         self.save_path = ("/Users/tom/Documents/Research/"
                           "1-Projects/MEGmapping/4-Figures/MegAnalysis/")
-        self.format = 'png'
+        self.format = 'pdf'
         self.bbox = 'tight'
-        self.dpi = 150
+        self.dpi = 600
